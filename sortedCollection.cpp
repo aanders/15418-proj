@@ -5,4 +5,6 @@
 
 template <class T> SortedCollection<T>::SortedCollection() {bob=0;}
 
+template <class T> SortedCollection<T>::SortedCollection()
+
 #endif
