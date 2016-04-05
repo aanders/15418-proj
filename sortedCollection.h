@@ -3,12 +3,15 @@
 
 template <class T> class SortedCollection
 {
-  public:
-  T *bob;
+  private:
   int (*comp)(T a, T b);
+  T *array;
   
-  SortedCollection();
+  public:
   SortedCollection(int (*c)(T a, T b));
+  void ins(T a);
+  void del(int idx);
+  T lookup(int idx);
 };
 
 #endif
