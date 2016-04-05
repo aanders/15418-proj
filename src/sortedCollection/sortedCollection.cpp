@@ -1,10 +1,6 @@
 #include "sortedCollection.h"
 
-#ifndef __sortedCollection_cpp__
-#define __sortedCollection_cpp__
-
-template <class T> SortedCollection<T>::SortedCollection() {bob=0;}
-
-template <class T> SortedCollection<T>::SortedCollection()
-
-#endif
+template <class T> SortedCollection<T>::SortedCollection(int (*c)(T a, T b))
+{
+  comp = c;
+}
