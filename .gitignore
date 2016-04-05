@@ -1,3 +1,19 @@
+###############################
+# 15418-proj .gitignore rules #
+###############################
+
+# Executable
+a.out
+
+# tags file
+tags
+
+# etc
+
+#######################################
+# Default GitHub C++ .gitignore rules #
+#######################################
+
 # Compiled Object files
 *.slo
 *.lo
