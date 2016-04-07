@@ -9,7 +9,7 @@ OBJDIR=obj
 #
 # Add source files to compile here
 #
-SRCS = harness/main.cpp
+SRCS = harness/main.cpp harness/runner.cpp
 
 
 OBJS = $(SRCS:.cpp=.o)
@@ -20,8 +20,11 @@ CXXFLAGS=-Wall -Wextra -O2 --std=c++11
 INCLUDES=-I$(SRCDIR)/
 LDFLAGS=-lpthread
 
+
+all: $(APPNAME)
+
 $(APPNAME): $(addprefix $(OBJDIR)/,$(OBJS))
-	$(CXX) $(LDFLAGS) -o $@ $<
+	$(CXX) $(LDFLAGS) -o $@ $^
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 	mkdir -p $(dir $@)
@@ -29,3 +32,8 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 
 clean:
 	rm -rf $(OBJDIR)
+
+veryclean: clean
+	rm -rf $(APPNAME)
+
+.PHONY: all clean veryclean
