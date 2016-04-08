@@ -1,4 +1,4 @@
-#include "sortedCollection.cpp"
+#include "sortedCollection/sortedCollection.h"
 
 int main(void)
 {

@@ -3,12 +3,12 @@
 ###############################
 
 # Executable
-a.out
+sortedCollection
+# but don't ignore the sortedCollection directory
+!sortedCollection/
 
 # tags file
 tags
-
-# etc
 
 #######################################
 # Default GitHub C++ .gitignore rules #
