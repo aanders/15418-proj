@@ -13,7 +13,7 @@ RBNode<T>* RBTree<T>::lookup(T val) {
   
   if (!_root) {
     // Tree has no content
-    return NULL;
+    return nullptr;
   }
   
   while (node->val != val) {
@@ -25,7 +25,7 @@ RBNode<T>* RBTree<T>::lookup(T val) {
     if (!node) {
       // We reached the end of the branch
       // and could not find the requested value
-      return NULL;
+      return nullptr;
     }
   }
   
@@ -47,14 +47,14 @@ T RBTree<T>::insert(T val) {
     // Go as far as we can in the tree and then
     // insert the new value
     RBNode<T>* node = _root;
-    RBNode<T>* newNode = NULL;  // don't create the new node
+    RBNode<T>* newNode = nullptr;  // don't create the new node
                                 // until we know we can insert it
     while (true) {
       if (val < node->val) {
         if (node->left) {
           node = node->left;
         } else {
-          newNode = new RBNode(val, NodeColor::RED);
+          newNode = new RBNode<T>(val, NodeColor::RED);
           newNode->parent = node;
           node->left = newNode;
           _ibalance(newNode);
@@ -64,7 +64,7 @@ T RBTree<T>::insert(T val) {
         if (node->right) {
           node = node->right;
         } else {
-          newNode = new RBNode(val, NodeColor::RED);
+          newNode = new RBNode<T>(val, NodeColor::RED);
           newNode->parent = node;
           node->right = newNode;
           _ibalance(newNode);
@@ -74,7 +74,7 @@ T RBTree<T>::insert(T val) {
         // Value is already in the tree.  For simplicity,
         // we do not allow duplicate elements
         // TODO: allow duplicate elements
-        return 0;
+        return nullptr;
       }
     }
   }
@@ -86,7 +86,7 @@ T RBTree<T>::insert(T val) {
  * Protected helper to re-balance the tree after insertion
  */
 template <class T>
-void RBTree<T>::_ibalance(RBNode* inserted) {
+void RBTree<T>::_ibalance(RBNode<T>* inserted) {
   if (inserted == _root) {
     // Easy peasy.  Color node black and we're done
     inserted->color = NodeColor::BLACK;
@@ -162,7 +162,7 @@ void RBTree<T>::_ibalance(RBNode* inserted) {
  * remove
  */
 template <class T>
-T RBTree::remove(T val) {
+T RBTree<T>::remove(T val) {
   
   // Search the tree to find the node containing val
   RBNode<T>* node = lookup(val);
@@ -312,7 +312,7 @@ void RBTree<T>::_rbalance(RBNode<T>* removed) {
   } else {
     // Calculate the sibling of the removed node
     bool rightSibling = (removed->parent->left == removed);
-    RBNode* sibling = (rightSibling) ?
+    RBNode<T>* sibling = (rightSibling) ?
         removed->parent->right : removed->parent->left;
     NodeColor siblingColor = (sibling) ? sibling->color : NodeColor::BLACK;
     
@@ -456,7 +456,7 @@ RBNode<T>* RBTree<T>::_rotateLeft(RBNode<T>* node) {
     newRoot->parent = node->parent;
   } else {
     // node is the root of the entire tree
-    newRoot->parent = NULL;
+    newRoot->parent = nullptr;
     _root = newRoot;
   }
   // Now update the rest of the pointers
@@ -495,7 +495,7 @@ RBNode<T>* RBTree<T>::_rotateRight(RBNode<T>* node) {
     newRoot->parent = node->parent;
   } else {
     // node is the root of the entire tree
-    newRoot->parent = NULL;
+    newRoot->parent = nullptr;
     _root = newRoot;
   }
   // Now update the rest of the pointers

@@ -18,7 +18,7 @@ public:
   
   // Constructor
   RBNode(T val, NodeColor color) : val(val), color(color),
-      left(NULL), right(NULL), parent(NULL) {}
+      left(nullptr), right(nullptr), parent(nullptr) {}
 };
 
 template <class T>
@@ -36,7 +36,7 @@ protected:
 public:
   /* Looks up a node by value in the tree.
    * Returns NULL if no node with the specified value is found. */
-  RBNode* lookup(T val);
+  RBNode<T>* lookup(T val);
   
   /* Inserts a node with value val into the tree, keeping the tree
    * roughly balanced.  Duplicate values are not allowed; so if the
