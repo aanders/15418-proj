@@ -1,6 +1,6 @@
-#include <set>
-#include <vector>
-#include "queue.cpp"
+#include "queue.h"
+#include "../arrays/vector_v1.h"
+#include "../trees/simpleTree.h"
 
 #ifndef __sortedCollection_h__
 #define __sortedCollection_h__
@@ -22,26 +22,28 @@ template <class T> class Entry
 
 template <class T> class SortedCollection
 {
-  private:
+  protected:
   bool (*comp)(T a, T b);
-  bool comp2(Entry<T> a, Entry<T> b);
+  //bool comp2(Entry<T> a, Entry<T> b);
   
-  std::vector<T> vector;
-  std::set< Entry<T> > set;
-  Queue< Update<T> > setUpdates;
-  Queue< Update<T> > vectorUpdates;
+  Array<T> array;
+  SimpleTree<T> tree;
+  Queue< Update<T> > treeUpdates;
+  Queue< Update<T> > arrayUpdates;
   
   int numUpdates;
-  int numVUpdates;
-  int numSUpdates;
+  int numAUpdates;
+  int numTUpdates;
   
-  void handleUpdatesVector();
+  void handleUpdatesArray(void *unused);
   
   public:
   SortedCollection(bool (*c)(T a, T b));
+  SortedCollection();
   void ins(T a);
   void del(int idx);
   T lookup(int idx);
+  bool lookupElt(T val);
 };
 
 #endif

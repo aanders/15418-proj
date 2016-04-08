@@ -1,17 +1,22 @@
 #include "queue.cpp"
 #include "sortedCollection.h"
+#include <pthread.h>
 
+/*
 template <class T> bool SortedCollection<T>::comp2(Entry<T> a, Entry<T> b)
 {
   return comp(a.val, b.val);
 }
+*/
 
 template <class T> SortedCollection<T>::SortedCollection(
-  bool (*c)(T a, T b)) 
+  bool (*c)(T a, T b))
 {
-  numUpdates = numVUpdates = numSUpdates = 0;
+  numUpdates = numTUpdates = numAUpdates = 0;
   comp = c;
-  set = std::set<T, bool(*)(T,T)>(comp2);
+  array = Array<T>(comp);
+  tree = SimpleTree<T>(comp);
+  pthread_create(&handleUpdatesArray, 0);
 }
 
 template <class T> void SortedCollection<T>::ins(T t)
@@ -20,8 +25,8 @@ template <class T> void SortedCollection<T>::ins(T t)
   Update<T> addition;
   addition.ins = true;
   addition.val = t;
-  //setUpdates.ins(addition);
-  vectorUpdates.ins(addition);
+  treeUpdates.ins(addition);
+  arrayUpdates.ins(addition);
 }
 
 
@@ -31,60 +36,32 @@ template <class T> void SortedCollection<T>::del(int idx)
   Update<T> deletion;
   deletion.ins = false;
   deletion.idx = idx;
-  //setUpdates.ins(deletion);
-  vectorUpdates.ins(addition);
+  treeUpdates.ins(deletion);
+  arrayUpdates.ins(deletion);
 }
 
 
 template <class T> T SortedCollection<T>::lookup(int idx)
 {
-  while(numSVUpdates != numUpdates) {}
+  while(numAUpdates != numUpdates) {}
   
-  return vector[idx];
+  return array.lookup(idx);
 }
 
-//Returns the first index equal to val
-template class<T> int binarySearch(std::vector<T> *vec, bool (*comp)(T a, T b),
-                                   T val)
-{
-  int start = 0;
-  int end = vec->size();
-  int mid = (end - start) / 2 + start;
-  
-  while(start != end - 1)
-  {
-    //equal
-    if(!comp(val, (*vec)[mid]) && !comp((*vec)[mid], val))
-    {
-      end = mid;
-    }
-    else if(comp(val, (*vec)[mid])) //val < vec[mid]
-    {
-      end = mid;
-    }
-    else //val > vec[mid]
-    {
-      start = mid;
-    }
-  }
-  
-  return start;
-}
-
-template <class T> void SortedCollection<T>::handleUpdatesVector()
+template <class T> void SortedCollection<T>::handleUpdatesArray(void *unused)
 {
   Update<T> u;
   while(true)
   {
-    while(!vectorQueue.remove(&u)) {}
+    while(!arrayUpdates.remove(&u)) {}
     if(!u.ins)
     {
-      vector->erase(u.idx);
+      array.del(u.idx);
     }
     else
     {
-      
+      array.ins(u.val);
     }
-    numVUpdates++;
+    numAUpdates++;
   }
 }
