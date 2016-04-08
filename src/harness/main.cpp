@@ -1,5 +1,5 @@
 #include <iostream>
-#include "../sortedCollection/sortedCollection.h"
+#include "sortedCollection/sortedCollection.h"
 
 using namespace std;
 

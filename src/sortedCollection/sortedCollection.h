@@ -1,6 +1,6 @@
 #include "queue.h"
-#include "../arrays/vector_v1.h"
-#include "../trees/simpleTree.h"
+#include "arrays/vector_v1.h"
+#include "trees/simpleTree.h"
 
 #ifndef __sortedCollection_h__
 #define __sortedCollection_h__
@@ -26,8 +26,8 @@ template <class T> class SortedCollection
   bool (*comp)(T a, T b);
   //bool comp2(Entry<T> a, Entry<T> b);
   
-  Array<T> array;
-  SimpleTree<T> tree;
+  Array<T> *array;
+  SimpleTree<T> *tree;
   Queue< Update<T> > treeUpdates;
   Queue< Update<T> > arrayUpdates;
   
@@ -46,4 +46,5 @@ template <class T> class SortedCollection
   bool lookupElt(T val);
 };
 
+#include "sortedCollection.tpp"
 #endif

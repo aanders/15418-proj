@@ -20,4 +20,5 @@ template <class T> class SimpleTree
   T lookup(int idx);
 };
 
+#include "simpleTree.tpp"
 #endif

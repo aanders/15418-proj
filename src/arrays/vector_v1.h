@@ -17,4 +17,6 @@ template <class T> class Array
   bool lookupElt(T val);
 };
 
+#include "vector_v1.tpp"
+
 #endif

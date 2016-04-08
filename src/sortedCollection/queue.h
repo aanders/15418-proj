@@ -21,4 +21,5 @@ template <class T> class Queue
   bool remove(T* ret);
 };
 
+#include "queue.tpp"
 #endif

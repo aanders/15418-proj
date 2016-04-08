@@ -9,7 +9,7 @@ OBJDIR=obj
 #
 # Add source files to compile here
 #
-SRCS = harness/main.cpp harness/runner.cpp arrays/vector_v1.cpp trees/simpleTree.cpp sortedCollection/sortedCollection.cpp
+SRCS = harness/main.cpp harness/runner.cpp 
 
 
 OBJS = $(SRCS:.cpp=.o)
