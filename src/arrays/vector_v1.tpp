@@ -7,10 +7,11 @@ template <class T> int binarySearch(std::vector<T> *vec, bool (*comp)(T a, T b),
 {
   int start = 0;
   int end = vec->size();
-  int mid = (end - start) / 2 + start;
-  
-  while(start != end - 1)
+
+  while(start < end - 1)
   {
+    int mid = (end - start) / 2 + start;
+
     //equal
     if(!comp(val, (*vec)[mid]) && !comp((*vec)[mid], val))
     {
