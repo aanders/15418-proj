@@ -61,5 +61,6 @@ public:
   
 };
 
+#include "rbtree.tpp"
 
 #endif /* _RBTREE_H */
