@@ -6,10 +6,11 @@ template <class T> int binarySearch(std::vector<T> *vec, bool (*comp)(T a, T b),
 {
   int start = 0;
   int end = vec->size();
-  int mid = (end - start) / 2 + start;
-  
-  while(start != end - 1)
+
+  while(start < end - 1)
   {
+    int mid = (end - start) / 2 + start;
+
     //equal
     if(!comp(val, (*vec)[mid]) && !comp((*vec)[mid], val))
     {
@@ -35,7 +36,7 @@ template <class T> Array<T>::Array(bool (*c)(T a, T b))
 
 template <class T> void Array<T>::ins(T a)
 {
-  data.insert(data.begin() + (binarySearch(&data, comp, a) - 1), a);
+  data.insert(data.begin() + binarySearch(&data, comp, a), a);
 }
 
 template <class T> void Array<T>::del(int idx)
