@@ -35,9 +35,8 @@ template <class T> class SortedCollection
   int numAUpdates;
   int numTUpdates;
   
-  void handleUpdatesArray(void *unused);
-  
   public:
+  void *handleUpdatesArray(void *arg);
   SortedCollection(bool (*c)(T a, T b));
   SortedCollection();
   void ins(T a);

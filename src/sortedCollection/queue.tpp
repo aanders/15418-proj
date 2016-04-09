@@ -31,7 +31,7 @@ template <class T> bool Queue<T>::remove(T* ret)
 {
   if(start != end)
   {
-    *ret = start->next->value;
+    *ret = start->next->val;
     start = start->next;
     return true;
   }

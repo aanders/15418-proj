@@ -11,6 +11,11 @@ template <class T> bool SortedCollection<T>::comp2(Entry<T> a, Entry<T> b)
 }
 */
 
+template <class T> void *arrayThread(void *sc)
+{
+  return ((SortedCollection<T>*) sc)->handleUpdatesArray(NULL);
+}
+
 template <class T> SortedCollection<T>::SortedCollection(
   bool (*c)(T a, T b))
 {
@@ -19,7 +24,8 @@ template <class T> SortedCollection<T>::SortedCollection(
   array = new Array<T>(comp);
   tree = new SimpleTree<T>(comp);
   // TODO: FIXME: this line causes major problems
-  // pthread_create(&handleUpdatesArray, 0);
+  pthread_t wat;
+  pthread_create(&wat, NULL, arrayThread<T>, this);
 }
 
 template <class T> void SortedCollection<T>::ins(T t)
@@ -51,12 +57,16 @@ template <class T> T SortedCollection<T>::lookup(int idx)
   return array->lookup(idx);
 }
 
-template <class T> void SortedCollection<T>::handleUpdatesArray(void *unused)
+template <class T> void *SortedCollection<T>::handleUpdatesArray(void *arg)
 {
+  arg = 2 + (int*) arg;
+  
   Update<T> u;
   while(true)
   {
+    
     while(!arrayUpdates.remove(&u)) {}
+    
     if(!u.ins)
     {
       array->del(u.idx);
@@ -66,5 +76,7 @@ template <class T> void SortedCollection<T>::handleUpdatesArray(void *unused)
       array->ins(u.val);
     }
     numAUpdates++;
+    
   }
+  return NULL;
 }

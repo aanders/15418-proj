@@ -35,12 +35,12 @@ template <class T> Array<T>::Array(bool (*c)(T a, T b))
 
 template <class T> void Array<T>::ins(T a)
 {
-  data.insert(a, binarySearch(&data, comp, a));
+  data.insert(data.begin() + (binarySearch(&data, comp, a) - 1), a);
 }
 
 template <class T> void Array<T>::del(int idx)
 {
-  data.erase(idx);
+  data.erase(data.begin() + (idx - 1));
 }
 
 template <class T> T Array<T>::lookup(int idx)
