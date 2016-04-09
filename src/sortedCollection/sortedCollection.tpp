@@ -1,4 +1,4 @@
-#include "queue.cpp"
+#include "queue.h"
 #include "sortedCollection.h"
 #include "arrays/vector_v1.h"
 #include "trees/simpleTree.h"
