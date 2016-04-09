@@ -24,7 +24,7 @@ LDFLAGS=-lpthread
 all: $(APPNAME)
 
 $(APPNAME): $(addprefix $(OBJDIR)/,$(OBJS))
-	$(CXX) $(LDFLAGS) -o $@ $^
+	$(CXX) -o $@ $^ $(LDFLAGS)
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 	mkdir -p $(dir $@)
