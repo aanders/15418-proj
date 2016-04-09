@@ -1,6 +1,7 @@
+#include <iostream>
 #include "vector_v1.h"
 
-//finds FIRST index with an element <= to val
+//finds FIRST index with an element >= to val
 template <class T> int binarySearch(std::vector<T> *vec, bool (*comp)(T a, T b),
                                    T val)
 {
@@ -13,7 +14,7 @@ template <class T> int binarySearch(std::vector<T> *vec, bool (*comp)(T a, T b),
     //equal
     if(!comp(val, (*vec)[mid]) && !comp((*vec)[mid], val))
     {
-      end = mid;
+      start = mid;
     }
     else if(comp(val, (*vec)[mid])) //val < vec[mid]
     {
@@ -23,9 +24,11 @@ template <class T> int binarySearch(std::vector<T> *vec, bool (*comp)(T a, T b),
     {
       start = mid;
     }
+    
+    mid = (end - start) / 2 + start;
   }
   
-  return start;
+  return end;
 }
 
 template <class T> Array<T>::Array(bool (*c)(T a, T b))
@@ -35,12 +38,24 @@ template <class T> Array<T>::Array(bool (*c)(T a, T b))
 
 template <class T> void Array<T>::ins(T a)
 {
-  data.insert(data.begin() + (binarySearch(&data, comp, a) - 1), a);
+  if(data.size() == 0)
+  {
+    data.push_back(a);
+  }
+  else
+  {
+    
+    std::cout<<"A"<<std::endl;
+    int insertionIndex = binarySearch(&data, comp, a);
+    std::cout<<"B"<<std::endl;
+    data.insert(data.begin() + insertionIndex, a);
+    std::cout<<"C"<<std::endl;
+  }
 }
 
 template <class T> void Array<T>::del(int idx)
 {
-  data.erase(data.begin() + (idx - 1));
+  data.erase(data.begin() + idx);
 }
 
 template <class T> T Array<T>::lookup(int idx)
