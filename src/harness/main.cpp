@@ -10,7 +10,7 @@ bool intComp(int a, int b)
 
 bool charComp(char a, char b)
 {
-  return true;
+  return a < b;
 }
 
 int main(void)
