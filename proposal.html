@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>[15418 Project Proposal] Team VeggieTales</title>
+</head>
+
+<body style="background-color: #2a2a2a;">
+
+<div style="
+  width: 80%;
+  margin: 20px auto;
+  padding: 5px 20px;
+  background-color: #e8e8e8;
+  border-radius: 5px;">
+
+  <h1>Improving the Performance of Sequential Programs with Multithreaded Data Structure</h1>
+  <h3>Aaron Anderson (aaanders) and Justus Hibshman (jhibshma)</h3>
+
+  <h2>Summary</h2>
+
+  <p>We intend to develop a data structure actually composed of multiple data structures
+  and managed by its own thread(s). It will hold sorted data. The idea is that if a
+  program isn&rsquo;t going to use all the execution contexts on a machine, it may be
+  beneficial for some execution contexts to perform the work involved in maintaining a
+  data structure in order to provide faster time-bounds to the main program on the
+  lookups, inserts, deletes and updates.</p>
+
+  <h2>Background</h2>
+
+  <p>Most data structures have a variety of trade-offs, especially if they involve
+  sorted data and the ability to vary the number of elements they store. Usually,
+  the work required to maintain the structure of the data is performed during a
+  call to interact with the data structure, such as insert or lookup, which can
+  slow these operations down.  We hope to implement a data structure that stores
+  data in multiple fashions (e.g. tree and array), so that it can service a
+  program&rsquo;s insert or lookup immediately and then propagate the necessary
+  changes throughout the structure. This &ldquo;data structure&rdquo; would be a
+  useful tool particularly for less experienced programmers who are unlikely to
+  make full use of a machine&rsquo;s capabilities.</p>
+
+  <h2>The Challenge</h2>
+
+  <p>We would need to implement the data structure well enough that the communication
+  between threads does not outweigh the speedup obtained from the data
+  structure&mdash;so keeping communication costs low will be of vital importance. 
+  We also need to be mindful of locality and conflicts as this system will use more
+  total space. Also, making the system scalable (or adjustable) for larger and smaller
+  amounts of data should be a challenge. If the program using our data structure
+  switches between inserts, deletions and lookups quite often, our system could have a
+  hard time keeping up. We will need to figure out what is feasible and then execute
+  it well.</p>
+
+  <p>The design space is very broad: Should we use trees and arrays? Do linked-lists
+  have a place? Should the system ever service requests from the &ldquo;slower&rdquo;
+  data structure? If so, when? Would we get a speedup if, for instance, we waited for
+  a number of insertions and then did them in a batch? These and more factors would
+  be considerations we would take into account when designing our approach.</p>
+
+  <p>Finally, we will need to pay attention to the consistency of the data structure.
+  Because inserts and deletions may no longer be immediately reflected in the
+  underlying structures, we will need to choose a consistency model and ensure that
+  the values returned by lookups adhere to that model. Because our target is standard
+  programs and less advanced programmers, we would like to maintain strong consistency
+  since this is what would naturally be expected.</p>
+
+  <h2>Resources</h2>
+
+  <p>It would be nice to have source code for a variety of programs so we can try
+  running them both with our data structure and without. We might end up needing to
+  write a variety of test programs. It would be good to run things on systems like
+  our laptops, where other programs are already running, and on systems where just
+  one program will be running.</p>
+
+  <h2>Goals and Deliverables</h2>
+
+  <p>Our goal is to make a system that provides (from the perspective of the user) a
+  speedup of insert, delete, and lookup of sorted values; then test to find what sorts
+  of programs the system helps the most. Ideally we would reach O(1) operations in at
+  least some program contexts.</p>
+
+  <p>If things go more quickly than expected, we could create a different version for
+  unsorted data, perhaps adding an update operation.</p>
+
+  <p>We hope to produce graphs indicating (A) that in some cases our data structure
+  improved program performance, and (B) the situations in which our system performed
+  best and worst.</p>
+
+  <h2>Platform Choice</h2>
+  
+  <ul>
+    <li>Language: C++</li>
+    <li>Processors: Our laptops, as this is meant to be a tool for run-of-the-mill programs.
+    For testing on systems with a minimal number of other processes running, we may also
+    perform some benchmarking on the latedays cluster nodes.</li>
+  </ul>
+
+  <h2>Schedule</h2>
+
+  <ul>
+    <li>April 8 - Create &ldquo;naive,&rdquo; correct version of our data structure</li>
+    <li>April 15 - Test the structure on a variety of programs and begin improving</li>
+    <li>April 22 - Overhaul design if necessary. Continue optimizing</li>
+    <li>April 29 - Alternate between optimizing and testing</li>
+    <li>May 9 - Wrap it up</li>
+  </ul>
+</div>
+
+</body>
+
+</html>
