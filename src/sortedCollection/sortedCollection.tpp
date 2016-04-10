@@ -56,11 +56,6 @@ template <class T> T SortedCollection<T>::lookup(int idx)
 {
   while(numAUpdates != numUpdates) 
   {
-    /*
-    Update<T> wait;
-    wait.type = TYPE_WAIT;
-    arrayUpdates.insert(wait);
-    */
     aReady.wait(aUpdatesWait);
   }
   return array->lookup(idx);
@@ -86,12 +81,6 @@ template <class T> void *SortedCollection<T>::handleUpdatesArray()
       //cout<<"It's an insertion."<<endl;
       array->ins(u.val);
     }
-    /*
-    else if(u.type == TYPE_WAIT)
-    {
-      cout<<"Gotta notify."<<endl;
-    }
-    */
     
     numAUpdates++;
     //cout<<"Job done."<<endl;

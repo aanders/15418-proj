@@ -9,7 +9,6 @@
 
 #define TYPE_INSERT 0
 #define TYPE_DELETE 1
-#define TYPE_WAIT 2
 
 template <class T> class Update
 {
