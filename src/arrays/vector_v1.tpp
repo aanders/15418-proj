@@ -1,21 +1,20 @@
 #include <iostream>
 #include "vector_v1.h"
 
-//finds FIRST index with an element >= to val
 template <class T> int binarySearch(std::vector<T> *vec, bool (*comp)(T a, T b),
                                    T val)
 {
   int start = 0;
   int end = vec->size();
-
+  int mid = (end - start) / 2 + start;
+  
   while(start < end - 1)
   {
-    int mid = (end - start) / 2 + start;
-
+    mid = (end - start) / 2 + start;
     //equal
     if(!comp(val, (*vec)[mid]) && !comp((*vec)[mid], val))
     {
-      start = mid;
+      return mid;
     }
     else if(comp(val, (*vec)[mid])) //val < vec[mid]
     {
@@ -25,11 +24,14 @@ template <class T> int binarySearch(std::vector<T> *vec, bool (*comp)(T a, T b),
     {
       start = mid;
     }
-    
-    mid = (end - start) / 2 + start;
   }
   
-  return end;
+  if(comp(val, (*vec)[start]))
+  {
+    return start;
+  }
+  
+  return start + 1;
 }
 
 template <class T> Array<T>::Array(bool (*c)(T a, T b))
@@ -46,11 +48,11 @@ template <class T> void Array<T>::ins(T a)
   else
   {
     
-    std::cout<<"A"<<std::endl;
+    //std::cout<<"A"<<std::endl;
     int insertionIndex = binarySearch(&data, comp, a);
-    std::cout<<"B"<<std::endl;
+    //std::cout<<"B"<<std::endl;
     data.insert(data.begin() + insertionIndex, a);
-    std::cout<<"C"<<std::endl;
+    //std::cout<<"C"<<std::endl;
   }
 }
 
