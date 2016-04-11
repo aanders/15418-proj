@@ -5,6 +5,12 @@
 #include "rbtree.h"
 
 /*
+ * constructor
+ */
+template <class T>
+RBTree<T>::RBTree(bool (*c)(T a, T b)) : comp (c) {}
+
+/*
  * lookup
  */
 template <class T>
@@ -16,10 +22,12 @@ RBNode<T>* RBTree<T>::lookup(T val) {
     return nullptr;
   }
   
-  while (node->val != val) {
-    if (val < node->val) {
+  while (!comp(val, node->val) && !comp(node->val, val)) {
+    if (comp(val, node->val)) {
+      // val < node->val
       node = node->left;
     } else {
+      // val > node->val
       node = node->right;
     }
     if (!node) {
@@ -50,7 +58,8 @@ T RBTree<T>::insert(T val) {
     RBNode<T>* newNode = nullptr;  // don't create the new node
                                 // until we know we can insert it
     while (true) {
-      if (val < node->val) {
+      if (comp(val, node->val)) {
+        // val < node->val
         if (node->left) {
           node = node->left;
         } else {
@@ -60,7 +69,8 @@ T RBTree<T>::insert(T val) {
           _ibalance(newNode);
           return val;
         }
-      } else if (val > node->val) {
+      } else if (comp(node->val, val)) {
+        // val > node->val
         if (node->right) {
           node = node->right;
         } else {
@@ -564,11 +574,11 @@ int RBTree<T>::_verifyHelper(RBNode<T>* current) {
     } else {
       // The red-black properties are satisfied.  We just need to check if
       // the tree ordering properties are satisfied
-      if (current->left && current->left->val > current->val) {
+      if (current->left && comp(current->val, current->left->val)) {
         //std::cerr << "Node ordering error at " << current->val <<
         //    "; left child " << current->left->val << " is greater" << std::endl;
         return 0;
-      } else if (current->right && current->right->val < current->val) {
+      } else if (current->right && comp(current->right->val, current->val)) {
         //std::cerr << "Node ordering error at " << current->val <<
         //  "; right child " << current->right->val << " is greater" << std::endl;
         return 0;
