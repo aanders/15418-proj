@@ -29,6 +29,7 @@ template <class T> SortedCollection<T>::SortedCollection(
   comp = c;
   array = new Array<T>(comp);
   tree = new SimpleTree<T>(comp);
+  rbtree = new RBTree<T>(comp);
   aUpdatesWait = std::unique_lock<std::mutex>(aUpdatesMutex);
   rbtUpdatesWait = std::unique_lock<std::mutex>(rbtUpdatesMutex);
   
@@ -75,7 +76,10 @@ template <class T> bool SortedCollection<T>::lookupElt(T val)
   {
     rbtReady.wait(rbtUpdatesWait);
   }
-  return (rbtree->lookup(val) != nullptr);
+  RBNode<T> *stuff = rbtree->lookup(val);
+  cout<<"Found "<<stuff->val<<endl;
+  //return (rbtree->lookup(val) != 0);
+  return (stuff != 0);
 }
 
 template <class T> void *SortedCollection<T>::handleUpdatesArray()
