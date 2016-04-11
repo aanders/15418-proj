@@ -84,7 +84,7 @@ T RBTree<T>::insert(T val) {
         // Value is already in the tree.  For simplicity,
         // we do not allow duplicate elements
         // TODO: allow duplicate elements
-        return nullptr;
+        return 0;
       }
     }
   }

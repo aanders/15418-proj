@@ -17,6 +17,11 @@ template <class T> void *arrayThread(void *sc)
   return ((SortedCollection<T>*) sc)->handleUpdatesArray();
 }
 
+template <class T> void *rbtThread(void *sc)
+{
+  return ((SortedCollection<T>*) sc)->handleUpdatesRBT();
+}
+
 template <class T> SortedCollection<T>::SortedCollection(
   bool (*c)(T a, T b))
 {
@@ -25,9 +30,11 @@ template <class T> SortedCollection<T>::SortedCollection(
   array = new Array<T>(comp);
   tree = new SimpleTree<T>(comp);
   aUpdatesWait = std::unique_lock<std::mutex>(aUpdatesMutex);
+  rbtUpdatesWait = std::unique_lock<std::mutex>(rbtUpdatesMutex);
   
-  pthread_t wat;
+  pthread_t wat, morewat;
   pthread_create(&wat, NULL, arrayThread<T>, this);
+  pthread_create(&morewat, NULL, rbtThread<T>, this);
 }
 
 template <class T> void SortedCollection<T>::ins(T t)
@@ -38,6 +45,7 @@ template <class T> void SortedCollection<T>::ins(T t)
   addition.val = t;
   treeUpdates.insert(addition);
   arrayUpdates.insert(addition);
+  rbtreeUpdates.insert(addition);
 }
 
 
@@ -59,6 +67,15 @@ template <class T> T SortedCollection<T>::lookup(int idx)
     aReady.wait(aUpdatesWait);
   }
   return array->lookup(idx);
+}
+
+template <class T> bool SortedCollection<T>::lookupElt(T val)
+{
+  while(numRBTUpdates != numUpdates)
+  {
+    rbtReady.wait(rbtUpdatesWait);
+  }
+  return (rbtree->lookup(val) != nullptr);
 }
 
 template <class T> void *SortedCollection<T>::handleUpdatesArray()
@@ -84,6 +101,30 @@ template <class T> void *SortedCollection<T>::handleUpdatesArray()
     
     numAUpdates++;
     //cout<<"Job done."<<endl;
+  }
+  return NULL;
+}
+
+template <class T> void *SortedCollection<T>::handleUpdatesRBT()
+{
+  Update<T> u;
+  while(true)
+  {
+    while(!rbtreeUpdates.remove(&u))
+    {
+      rbtReady.notify_all();
+    }
+    if(u.type == TYPE_DELETE)
+    {
+      cerr<<"WARNING: rbtree does not support lookup by index"<<endl;
+      //rbtree->remove(u.val);
+    }
+    else if(u.type == TYPE_INSERT)
+    {
+      rbtree->insert(u.val);
+    }
+
+    numRBTUpdates++;
   }
   return NULL;
 }

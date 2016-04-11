@@ -40,7 +40,7 @@ public:
   /* Constructor
    * c returns true iff a < b
    */
-  RBNode(bool (*c)(T a, T b));
+  RBTree(bool (*c)(T a, T b));
 
   /* Looks up a node by value in the tree.
    * Returns NULL if no node with the specified value is found. */

@@ -1,6 +1,7 @@
 #include "queue.h"
 #include "arrays/vector_v1.h"
 #include "trees/simpleTree.h"
+#include "trees/rbtree.h"
 #include <mutex>
 #include <condition_variable>
 
@@ -35,25 +36,38 @@ template <class T> class SortedCollection
   
   Array<T> *array;
   SimpleTree<T> *tree;
+  RBTree<T> *rbtree;
   Queue< Update<T> > treeUpdates;
   Queue< Update<T> > arrayUpdates;
+  Queue< Update<T> > rbtreeUpdates;
   
   int numUpdates;
+
   int numAUpdates;
-  std::mutex aUpdatesMutex;
-  std::unique_lock<std::mutex> aUpdatesWait;
-  std::condition_variable aReady;
-  
   int numTUpdates;
+  int numRBTUpdates;
+
+  std::mutex aUpdatesMutex;
+  std::mutex rbtUpdatesMutex;
+
+  std::unique_lock<std::mutex> aUpdatesWait;
+  std::unique_lock<std::mutex> rbtUpdatesWait;
+
+  std::condition_variable aReady;
+  std::condition_variable rbtReady;
+  
   
   public:
-  void *handleUpdatesArray();
   SortedCollection(bool (*c)(T a, T b));
   SortedCollection();
   void ins(T a);
   void del(int idx);
   T lookup(int idx);
   bool lookupElt(T val);
+  void remove(T val);
+
+  void *handleUpdatesArray();
+  void *handleUpdatesRBT();
 };
 
 #include "sortedCollection.tpp"
