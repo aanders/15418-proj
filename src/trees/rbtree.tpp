@@ -2,6 +2,7 @@
  * Implementation of rbtree interface
  */
 
+#include <iostream>
 #include "rbtree.h"
 
 /*
@@ -22,7 +23,7 @@ RBNode<T>* RBTree<T>::lookup(T val) {
     return nullptr;
   }
   
-  while (!comp(val, node->val) && !comp(node->val, val)) {
+  while (comp(val, node->val) || comp(node->val, val)) {
     if (comp(val, node->val)) {
       // val < node->val
       node = node->left;

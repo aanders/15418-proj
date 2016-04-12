@@ -76,10 +76,7 @@ template <class T> bool SortedCollection<T>::lookupElt(T val)
   {
     rbtReady.wait(rbtUpdatesWait);
   }
-  RBNode<T> *stuff = rbtree->lookup(val);
-  cout<<"Found "<<stuff->val<<endl;
-  //return (rbtree->lookup(val) != 0);
-  return (stuff != 0);
+  return (rbtree->lookup(val) != nullptr);
 }
 
 template <class T> void *SortedCollection<T>::handleUpdatesArray()

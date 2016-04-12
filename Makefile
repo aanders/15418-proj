@@ -14,7 +14,7 @@ SRCS = harness/main.cpp harness/runner.cpp
 #
 # Add template file dependencies here
 #
-TEMPLATES = arrays/vector_v1.tpp trees/simpleTree.tpp \
+TEMPLATES = arrays/vector_v1.tpp trees/simpleTree.tpp trees/rbtree.tpp \
 	    sortedCollection/queue.tpp sortedCollection/sortedCollection.tpp
 
 

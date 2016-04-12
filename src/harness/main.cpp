@@ -39,7 +39,11 @@ int main(void)
   {
     if (sc.lookupElt(tests[i]) && (refsol[i] == 1))
     {
-      cout<<"RBT test "<<i<<" passed!"<<endl;
+      cout<<"RBT test "<<i<<" passed! (found element)"<<endl;
+    }
+    else if (!sc.lookupElt(tests[i]) && (refsol[i] == 0))
+    {
+      cout<<"RBT test "<<i<<" passed! (element doesn't exist)"<<endl;
     }
     else
     {
