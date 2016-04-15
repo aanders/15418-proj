@@ -45,6 +45,7 @@ template <class T> CustomArray<T>::CustomArray(bool (*c)(T a, T b))
 template <class T> void CustomArray<T>::ins(T a)
 {
   if(size == allocated)
+    a = a;
     //do something.
   int insertionIndex = binarySearch(data, size, this->comp, a);
   insertionIndex++;
