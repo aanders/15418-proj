@@ -108,8 +108,8 @@ template <class T> void *SortedCollection<T>::handleUpdatesTree()
     }
     if(u.type == TYPE_DELETE)
     {
-      cerr<<"WARNING: rbtree does not support lookup by index"<<endl;
-      //rbtree->remove(u.val);
+      RBNode<T> *n = tree->lookupByIdx(u.idx);
+      if (n != nullptr) tree->remove(n->val);
     }
     else if(u.type == TYPE_INSERT)
     {
