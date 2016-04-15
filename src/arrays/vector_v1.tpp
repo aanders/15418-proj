@@ -1,4 +1,6 @@
 #include <iostream>
+#include <vector>
+#include "array.h"
 #include "vector_v1.h"
 
 template <class T> int binarySearch(std::vector<T> *vec, bool (*comp)(T a, T b),
@@ -34,12 +36,9 @@ template <class T> int binarySearch(std::vector<T> *vec, bool (*comp)(T a, T b),
   return start + 1;
 }
 
-template <class T> Array<T>::Array(bool (*c)(T a, T b))
-{
-  comp = c;
-}
+template <class T> VecArray<T>::VecArray(bool (*c)(T a, T b)) : Array<T>(c) {}
 
-template <class T> void Array<T>::ins(T a)
+template <class T> void VecArray<T>::ins(T a)
 {
   if(data.size() == 0)
   {
@@ -47,21 +46,27 @@ template <class T> void Array<T>::ins(T a)
   }
   else
   {
-    
     //std::cout<<"A"<<std::endl;
-    int insertionIndex = binarySearch(&data, comp, a);
+    int insertionIndex = binarySearch(&data, this->comp, a);
     //std::cout<<"B"<<std::endl;
     data.insert(data.begin() + insertionIndex, a);
     //std::cout<<"C"<<std::endl;
   }
 }
 
-template <class T> void Array<T>::del(int idx)
+template <class T> void VecArray<T>::del(int idx)
 {
   data.erase(data.begin() + idx);
 }
 
-template <class T> T Array<T>::lookup(int idx)
+template <class T> T VecArray<T>::lookup(int idx)
 {
   return data[idx];
 }
+
+/*
+template <class T> bool VecArray<T>::lookupElt(T val)
+{
+  return this->comp(val, val);
+}
+*/

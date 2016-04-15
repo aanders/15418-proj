@@ -1,5 +1,5 @@
 #include "queue.h"
-#include "arrays/vector_v1.h"
+#include "arrays/array.h"
 #include "trees/simpleTree.h"
 #include "trees/rbtree.h"
 #include <mutex>
@@ -19,42 +19,30 @@ template <class T> class Update
   int idx;
 };
 
-/*
-template <class T> class Entry
-{
-  public:
-  T val;
-  int count;
-};
-*/
 
 template <class T> class SortedCollection
 {
   protected:
   bool (*comp)(T a, T b);
-  //bool comp2(Entry<T> a, Entry<T> b);
   
   Array<T> *array;
-  SimpleTree<T> *tree;
-  RBTree<T> *rbtree;
+  RBTree<T> *tree;
   Queue< Update<T> > treeUpdates;
   Queue< Update<T> > arrayUpdates;
-  Queue< Update<T> > rbtreeUpdates;
   
   int numUpdates;
 
   int numAUpdates;
   int numTUpdates;
-  int numRBTUpdates;
 
   std::mutex aUpdatesMutex;
-  std::mutex rbtUpdatesMutex;
+  std::mutex tUpdatesMutex;
 
   std::unique_lock<std::mutex> aUpdatesWait;
-  std::unique_lock<std::mutex> rbtUpdatesWait;
+  std::unique_lock<std::mutex> tUpdatesWait;
 
   std::condition_variable aReady;
-  std::condition_variable rbtReady;
+  std::condition_variable tReady;
   
   
   public:
@@ -65,9 +53,9 @@ template <class T> class SortedCollection
   T lookup(int idx);
   bool lookupElt(T val);
   void remove(T val);
-
+  
   void *handleUpdatesArray();
-  void *handleUpdatesRBT();
+  void *handleUpdatesTree();
 };
 
 #include "sortedCollection.tpp"
