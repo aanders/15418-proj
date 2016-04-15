@@ -1,41 +1,35 @@
 #include "queue.h"
 #include "sortedCollection.h"
+#include "arrays/array.h"
 #include "arrays/vector_v1.h"
+#include "arrays/custom_v1.h"
 #include "trees/simpleTree.h"
 #include <pthread.h>
 #include <mutex>
-
-/*
-template <class T> bool SortedCollection<T>::comp2(Entry<T> a, Entry<T> b)
-{
-  return comp(a.val, b.val);
-}
-*/
 
 template <class T> void *arrayThread(void *sc)
 {
   return ((SortedCollection<T>*) sc)->handleUpdatesArray();
 }
 
-template <class T> void *rbtThread(void *sc)
+template <class T> void *treeThread(void *sc)
 {
-  return ((SortedCollection<T>*) sc)->handleUpdatesRBT();
+  return ((SortedCollection<T>*) sc)->handleUpdatesTree();
 }
 
 template <class T> SortedCollection<T>::SortedCollection(
   bool (*c)(T a, T b))
 {
-  numUpdates = numTUpdates = numAUpdates = 0;
   comp = c;
-  array = new Array<T>(comp);
-  tree = new SimpleTree<T>(comp);
-  rbtree = new RBTree<T>(comp);
+  numUpdates = numTUpdates = numAUpdates = 0;
+  array = new CustomArray<T>(comp);
+  tree = new RBTree<T>(comp);
   aUpdatesWait = std::unique_lock<std::mutex>(aUpdatesMutex);
-  rbtUpdatesWait = std::unique_lock<std::mutex>(rbtUpdatesMutex);
+  tUpdatesWait = std::unique_lock<std::mutex>(tUpdatesMutex);
   
   pthread_t wat, morewat;
   pthread_create(&wat, NULL, arrayThread<T>, this);
-  pthread_create(&morewat, NULL, rbtThread<T>, this);
+  pthread_create(&morewat, NULL, treeThread<T>, this);
 }
 
 template <class T> void SortedCollection<T>::ins(T t)
@@ -46,9 +40,7 @@ template <class T> void SortedCollection<T>::ins(T t)
   addition.val = t;
   treeUpdates.insert(addition);
   arrayUpdates.insert(addition);
-  rbtreeUpdates.insert(addition);
 }
-
 
 template <class T> void SortedCollection<T>::del(int idx)
 {
@@ -59,7 +51,6 @@ template <class T> void SortedCollection<T>::del(int idx)
   treeUpdates.insert(deletion);
   arrayUpdates.insert(deletion);
 }
-
 
 template <class T> T SortedCollection<T>::lookup(int idx)
 {
@@ -72,11 +63,11 @@ template <class T> T SortedCollection<T>::lookup(int idx)
 
 template <class T> bool SortedCollection<T>::lookupElt(T val)
 {
-  while(numRBTUpdates != numUpdates)
+  while(numTUpdates != numUpdates)
   {
-    rbtReady.wait(rbtUpdatesWait);
+    tReady.wait(tUpdatesWait);
   }
-  return (rbtree->lookup(val) != nullptr);
+  return (tree->lookup(val) != nullptr);
 }
 
 template <class T> void *SortedCollection<T>::handleUpdatesArray()
@@ -106,14 +97,14 @@ template <class T> void *SortedCollection<T>::handleUpdatesArray()
   return NULL;
 }
 
-template <class T> void *SortedCollection<T>::handleUpdatesRBT()
+template <class T> void *SortedCollection<T>::handleUpdatesTree()
 {
   Update<T> u;
   while(true)
   {
-    while(!rbtreeUpdates.remove(&u))
+    while(!treeUpdates.remove(&u))
     {
-      rbtReady.notify_all();
+      tReady.notify_all();
     }
     if(u.type == TYPE_DELETE)
     {
@@ -122,10 +113,10 @@ template <class T> void *SortedCollection<T>::handleUpdatesRBT()
     }
     else if(u.type == TYPE_INSERT)
     {
-      rbtree->insert(u.val);
+      tree->insert(u.val);
     }
 
-    numRBTUpdates++;
+    numTUpdates++;
   }
   return NULL;
 }
