@@ -64,7 +64,9 @@ template <class T> T VecArray<T>::lookup(int idx)
   return data[idx];
 }
 
+/*
 template <class T> bool VecArray<T>::lookupElt(T val)
 {
   return this->comp(val, val);
 }
+*/

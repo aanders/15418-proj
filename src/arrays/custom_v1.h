@@ -15,7 +15,7 @@ template <class T> class CustomArray : public Array<T>
   void ins(T a);
   void del(int idx);
   T lookup(int idx);
-  bool lookupElt(T val);
+  //bool lookupElt(T val);
 };
 
 #include "custom_v1.tpp"

@@ -104,7 +104,9 @@ template <class T> T CustomArray<T>::lookup(int idx)
   return data[idx];
 }
 
+/*
 template <class T> bool CustomArray<T>::lookupElt(T val)
 {
   return this->comp(val, val);
 }
+*/
