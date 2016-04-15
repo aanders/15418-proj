@@ -15,10 +15,12 @@ public:
   RBNode* left;
   RBNode* right;
   RBNode* parent;
+  int size_left;
+  int size_right;
   
   // Constructor
-  RBNode(T val, NodeColor color) : val(val), color(color),
-      left(nullptr), right(nullptr), parent(nullptr) {}
+  RBNode(T val, NodeColor color) : val(val), color(color), left(nullptr),
+      right(nullptr), parent(nullptr), size_left(0), size_right(0) {}
 };
 
 template <class T>
@@ -45,13 +47,17 @@ public:
   /* Looks up a node by value in the tree.
    * Returns NULL if no node with the specified value is found. */
   RBNode<T>* lookup(T val);
+
+  /* Looks up a node by index in the tree, as if the tree
+   * were storing a sorted array of elements and received a
+   * request for the element at index i
+   */
+  RBNode<T>* lookupByIdx(int i);
   
   /* Inserts a node with value val into the tree, keeping the tree
    * roughly balanced.  Duplicate values are not allowed; so if the
    * value already exists in the tree, it is not inserted and the
    * function returns null.  Otherwise, it returns the value inserted.
-   *
-   * TODO: allow duplicates
    */
   T insert(T val);
   
