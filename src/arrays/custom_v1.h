@@ -9,7 +9,7 @@ template <class T> class CustomArray : public Array<T>
   int allocated;
   int size;
   T *data;
- 
+  
   public:
   CustomArray(bool (*c)(T a, T b));
   void ins(T a);

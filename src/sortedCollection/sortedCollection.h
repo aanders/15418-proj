@@ -53,7 +53,7 @@ template <class T> class SortedCollection
   T lookup(int idx);
   bool lookupElt(T val);
   void remove(T val);
-
+  
   void *handleUpdatesArray();
   void *handleUpdatesTree();
 };
