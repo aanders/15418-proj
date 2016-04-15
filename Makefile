@@ -16,7 +16,8 @@ SRCS = harness/main.cpp harness/runner.cpp
 #
 TEMPLATES = arrays/vector_v1.tpp arrays/array.tpp trees/simpleTree.tpp \
       trees/rbtree.tpp sortedCollection/queue.tpp \
-      sortedCollection/sortedCollection.tpp
+      sortedCollection/sortedCollection.tpp arrays/custom_v1.tpp \
+      arrays/custom_v2.tpp
 
 
 OBJS = $(SRCS:.cpp=.o)
