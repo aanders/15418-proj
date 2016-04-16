@@ -30,6 +30,8 @@ template <class T> void CustomArrayV2<T>::sort(T *tbs, int size)
   {
     if(this->comp(tbs[idx2], tbs[idx1]))
     {
+      if(idx1 == mainIdx)
+        idx1 = idx2;
       tmp = tbs[mainIdx];
       tbs[mainIdx] = tbs[idx2];
       tbs[idx2] = tmp;
