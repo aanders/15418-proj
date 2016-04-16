@@ -65,7 +65,10 @@ int main(void)
   {
     sc.ins(additions[i]);
   }
-  for(int j = 0; j < size; j++)
+  
+  sc.del(1);
+  
+  for(int j = 0; j < size - 1; j++)
   {
     int res = sc.lookup(j);
     cout<<res<<endl;

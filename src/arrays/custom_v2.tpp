@@ -67,8 +67,8 @@ template <class T> void CustomArrayV2<T>::emptyInsertions()
     return;
   
   sort(insertions, numInsertions);
-  cout<<"Sorted insertions:\n";
-  printData(insertions, numInsertions); 
+  //cout<<"Sorted insertions:\n";
+  //printData(insertions, numInsertions); 
   
   int startIdx = 0;
   int indices[numInsertions];
@@ -139,7 +139,6 @@ template <class T> void CustomArrayV2<T>::emptyInsertions()
 
 template <class T> void CustomArrayV2<T>::ins(T a)
 {
-  
   insertions[numInsertions] = a;
   numInsertions++;
   
@@ -155,7 +154,7 @@ template <class T> void CustomArrayV2<T>::del(int idx)
   
   for(int i = idx; i < size - 1; i++)
   {
-    data[idx] = data[i+1];
+    data[i] = data[i+1];
   }
   
   size--;
