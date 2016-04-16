@@ -1,5 +1,6 @@
 #include <iostream>
 #include <stdlib.h>
+#include "trees/rbtree.h"
 #include "sortedCollection/sortedCollection.h"
 
 using namespace std;
@@ -14,12 +15,49 @@ bool charComp(char a, char b)
   return a < b;
 }
 
+bool testRbtIndexing()
+{
+  const int size = 12;
+  int inserts[size] = {5, 4, 8, -3, 2, 4, 7, 25, -113, 0, 3, 0};
+  int sorted[size] = {-113, -3, 0, 0, 2, 3, 4, 4, 5, 7, 8, 25};
+  
+  RBTree<int> rbt(&intComp);
+  
+  for (int i = 0; i < size; i++)
+  {
+    rbt.insert(inserts[i]);
+  }
+
+  for(int i = 0; i < size; i++)
+  {
+    RBNode<int> *n = rbt.lookupByIdx(i);
+    if (n == nullptr)
+    {
+      cout<<"Error in lookupByIdx!"<<endl;
+      return false;
+    }
+    cout<<n->val<<endl;
+    if (n->val != sorted[i])
+    {
+      cout<<"Error: indexed value not in sorted order"<<endl;
+    }
+  }
+  if (rbt.lookupByIdx(size) != nullptr)
+  {
+    cout<<"Error in lookupByIdx!"<<endl;
+  }
+  return true;
+}
+
+
 int main(void)
 {
   const int size = 15;
   int additions[size] = {5,4,5,2,9,
                          1, -3, 9, 22, 490,
                          11, 12, -7345353, 12, 18};
+  
+  if (!testRbtIndexing()) return 0;
   
   SortedCollection<int> sc(&intComp);
 
@@ -55,4 +93,5 @@ int main(void)
   }
   */
   return 0; 
+  
 }
