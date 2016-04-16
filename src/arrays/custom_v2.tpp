@@ -1,4 +1,5 @@
 #include <iostream>
+#include "sort.h"
 #include "custom_v2.h"
 #include "binSearch.h"
 
@@ -12,51 +13,6 @@ template <class T> CustomArrayV2<T>::CustomArrayV2(bool (*c)(T a, T b))
   numInsertions = 0;
 }
 
-//an in-place merge sort (don't know if stable)
-template <class T> void CustomArrayV2<T>::sort(T *tbs, int size)
-{
-  if(size < 2)
-    return;
-  
-  int idx1 = 0;
-  int idx2 = size / 2;
-  sort(tbs, idx2);
-  sort(tbs + idx2, size - idx2);
-  
-  int mainIdx = 0;
-  T tmp;
-  
-  while(mainIdx < size)
-  {
-    if(this->comp(tbs[idx2], tbs[idx1]))
-    {
-      if(idx1 == mainIdx)
-        idx1 = idx2;
-      tmp = tbs[mainIdx];
-      tbs[mainIdx] = tbs[idx2];
-      tbs[idx2] = tmp;
-      idx2++;
-    }
-    else
-    {
-      if(mainIdx == idx1)
-      {
-        idx1++;
-      }
-      else
-      {
-        tmp = tbs[mainIdx];
-        tbs[mainIdx] = tbs[idx1];
-        tbs[idx1] = tmp;
-      }
-    }
-    
-    if(idx1 == idx2 || idx2 == size)
-      return;
-    
-    mainIdx++;
-  }
-}
 
 template <class T> void CustomArrayV2<T>::emptyInsertions()
 {
@@ -66,7 +22,7 @@ template <class T> void CustomArrayV2<T>::emptyInsertions()
   if(numInsertions == 0)
     return;
   
-  sort(insertions, numInsertions);
+  sort(insertions, numInsertions, this->comp);
   //cout<<"Sorted insertions:\n";
   //printData(insertions, numInsertions); 
   

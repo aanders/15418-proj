@@ -67,8 +67,9 @@ int main(void)
   }
   
   sc.del(1);
+  sc.del(13);
   
-  for(int j = 0; j < size - 1; j++)
+  for(int j = 0; j < size - 2; j++)
   {
     int res = sc.lookup(j);
     cout<<res<<endl;
