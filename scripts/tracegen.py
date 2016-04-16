@@ -2,10 +2,15 @@
 #
 # Generate test traces for evaluating the data structure
 
+import argparse
 import random
 
 TRACE_LENGTH = 100
-DATA_RANGE = [0,10]
+INT_DATA_RANGE = [-1000,1000]
+CHAR_DATA_RANGE = [33, 126] # printable, non-space ASCII range
+
+DATATYPES = ['int', 'char']
+DATATYPE = DATATYPES[0] # int by default
 
 INSTRUCTIONS = [
     "insert",
@@ -13,13 +18,106 @@ INSTRUCTIONS = [
     "delete",
 ]
 
-def instruction():
-    instr = INSTRUCTIONS[random.randint(0,len(INSTRUCTIONS)-1)]
-    data = random.randint(*DATA_RANGE)
-    return instr, data
+UNIFORM_PDF = [1.0/len(INSTRUCTIONS) for i in xrange(0,len(INSTRUCTIONS))]
+INSERT_BIAS_PDF = [0.7, 0.2, 0.1]
+LOOKUP_BIAS_PDF = [0.2, 0.6, 0.2]
+BIASTYPES = ['uniform', 'insert', 'lookup']
+BIAS = BIASTYPES[0] # uniform by default
 
+values = []
+
+# Return a random element of list l based on the
+# probability density represented by the list pdf,
+# where the elements of pdf sum to 1 and pdf[i]
+# represents the probability of choosing l[i]
+def rand_elt(l, pdf):
+    r = random.uniform(0,1)
+    i = 0
+    cumulative_p = 0
+    if len(l) != len(pdf):
+        return None
+    for p in pdf:
+        cumulative_p += p
+        if cumulative_p > r:
+            break
+        else:
+            i += 1
+    return l[i]
+
+# Generate a random trace instruction
+def instruction():
+    # Pick instruction according to pdf
+    if BIAS == 'uniform':
+        instr = rand_elt(INSTRUCTIONS, UNIFORM_PDF)
+    elif BIAS == 'insert':
+        instr = rand_elt(INSTRUCTIONS, INSERT_BIAS_PDF)
+    elif BIAS == 'lookup':
+        instr = rand_elt(INSTRUCTIONS, LOOKUP_BIAS_PDF)
+
+    # Generate appropriate data for the selected instruction
+    if instr == 'insert':
+        if DATATYPE == 'char':
+            data = chr(random.randint(*CHAR_DATA_RANGE))
+        else:
+            data = random.randint(*INT_DATA_RANGE)
+        values.append(data)
+        values.sort()
+        return instr, data
+    elif instr == 'delete':
+        if len(values) == 0:
+            # can't do delete with no data
+            return None, None
+        else:
+            data = random.randint(0,len(values)-1)
+            del values[data]
+            return instr, data
+    elif instr == 'lookup':
+        # TODO: possibly simulate out-of-bounds lookups?
+        if len(values) == 0:
+            # can't do lookup with no data
+            return None, None
+        else:
+            data = random.randint(0,len(values)-1)
+            ref = values[data]
+            return instr, data, ref
+    else:
+        return None, None
+
+# Print a variable number of arguments
+def printline(*args):
+    output = ""
+    for a in args:
+        output += str(a) + " "
+    if output != "":
+        output = output[:-1]
+    print output
+
+def load_args():
+    global TRACE_LENGTH, DATATYPE, BIAS
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-l", "--trace-length", type=int,
+            metavar="NUM",
+            help="Number of instructions to generate")
+    parser.add_argument("-t", "--datatype", choices=DATATYPES,
+            help="Type of data values to use")
+    parser.add_argument("-b", "--bias", choices=BIASTYPES,
+            help="Bias for the trace")
+    args = parser.parse_args()
+
+    if args.trace_length:
+        TRACE_LENGTH = args.trace_length
+    if args.datatype:
+        DATATYPE = args.datatype
+    if args.bias:
+        BIAS = args.bias
+#
+# MAIN
+#
 if __name__ == '__main__':
+    load_args()
     for i in xrange(0,TRACE_LENGTH):
-        line = instruction()
-        print line[0], line[1]
+        line = (None, None)
+        while line[0] == None:
+            line = instruction()
+        printline(*line)
 
