@@ -3,6 +3,8 @@
 #ifndef __custom_v2_h__
 #define __custom_v2_h__
 
+#define INSERT_BUFFER_SIZE 10
+
 template <class T> class CustomArrayV2 : public Array<T>
 {
   protected:
@@ -10,12 +12,15 @@ template <class T> class CustomArrayV2 : public Array<T>
   int size;
   T *data;
   
-  const int INSERT_BUFFER_SIZE = 10;
   T insertions[INSERT_BUFFER_SIZE];
   int numInsertions = 0;
   
+  void sort(T *tbs, int size);
+  void emptyInsertions();
+  void printData(T *d, int s);
+  
   public:
-  CustomArray(bool (*c)(T a, T b));
+  CustomArrayV2(bool (*c)(T a, T b));
   void ins(T a);
   void del(int idx);
   T lookup(int idx);

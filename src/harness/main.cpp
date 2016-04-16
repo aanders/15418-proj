@@ -26,13 +26,13 @@ int main(void)
   for(int i = 0; i < size; i++)
   {
     sc.ins(additions[i]);
-    for(int j = 0; j < i + 1; j++)
-    {
-      int res = sc.lookup(j);
-      cout<<res<<endl;
-    }
-    cout<<endl;
   }
+  for(int j = 0; j < size; j++)
+  {
+    int res = sc.lookup(j);
+    cout<<res<<endl;
+  }
+  cout<<endl;
   
   /*
   int tests[size] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
