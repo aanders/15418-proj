@@ -3,6 +3,7 @@
 #include "arrays/array.h"
 #include "arrays/vector_v1.h"
 #include "arrays/custom_v1.h"
+#include "arrays/custom_v2.h"
 #include "trees/simpleTree.h"
 #include <pthread.h>
 #include <mutex>
@@ -22,14 +23,14 @@ template <class T> SortedCollection<T>::SortedCollection(
 {
   comp = c;
   numUpdates = numTUpdates = numAUpdates = 0;
-  array = new CustomArray<T>(comp);
+  array = new CustomArrayV2<T>(comp);
   tree = new RBTree<T>(comp);
   aUpdatesWait = std::unique_lock<std::mutex>(aUpdatesMutex);
   tUpdatesWait = std::unique_lock<std::mutex>(tUpdatesMutex);
   
-  pthread_t wat, morewat;
+  pthread_t wat;//, morewat;
   pthread_create(&wat, NULL, arrayThread<T>, this);
-  pthread_create(&morewat, NULL, treeThread<T>, this);
+  //pthread_create(&morewat, NULL, treeThread<T>, this);
 }
 
 template <class T> void SortedCollection<T>::ins(T t)
