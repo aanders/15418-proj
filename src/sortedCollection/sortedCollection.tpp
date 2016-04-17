@@ -4,6 +4,7 @@
 #include "arrays/vector_v1.h"
 #include "arrays/custom_v1.h"
 #include "arrays/custom_v2.h"
+#include "arrays/custom_v3.h"
 #include "trees/simpleTree.h"
 #include <pthread.h>
 #include <mutex>
