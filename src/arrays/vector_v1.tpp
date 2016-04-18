@@ -36,9 +36,10 @@ template <class T> int binarySearch(std::vector<T> *vec, bool (*comp)(T a, T b),
   return start + 1;
 }
 
-template <class T> VecArray<T>::VecArray(bool (*c)(T a, T b)) : Array<T>(c) {}
+template <class T> VectorArray<T>::VectorArray(bool (*c)(T a, T b)) 
+  : Array<T>(c) {}
 
-template <class T> void VecArray<T>::ins(T a)
+template <class T> void VectorArray<T>::ins(T a)
 {
   if(data.size() == 0)
   {
@@ -54,18 +55,18 @@ template <class T> void VecArray<T>::ins(T a)
   }
 }
 
-template <class T> void VecArray<T>::del(int idx)
+template <class T> void VectorArray<T>::del(int idx)
 {
   data.erase(data.begin() + idx);
 }
 
-template <class T> T VecArray<T>::lookup(int idx)
+template <class T> T VectorArray<T>::lookup(int idx)
 {
   return data[idx];
 }
 
 /*
-template <class T> bool VecArray<T>::lookupElt(T val)
+template <class T> bool VectorArray<T>::lookupElt(T val)
 {
   return this->comp(val, val);
 }

@@ -24,7 +24,7 @@ template <class T> SortedCollection<T>::SortedCollection(
 {
   comp = c;
   numUpdates = numTUpdates = numAUpdates = 0;
-  array = new CustomArray<T>(comp);
+  array = new VectorArray<T>(comp);
   tree = new RBTree<T>(comp);
   aUpdatesWait = std::unique_lock<std::mutex>(aUpdatesMutex);
   tUpdatesWait = std::unique_lock<std::mutex>(tUpdatesMutex);
