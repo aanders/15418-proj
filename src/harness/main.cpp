@@ -5,6 +5,7 @@
 #include "sortedCollection/sortedCollection.h"
 
 #include "int_runner.h"
+#include "char_runner.h"
 
 using namespace std;
 
@@ -63,7 +64,7 @@ int main(int argc, char* argv[])
   if (argc > 1)
   {
     std::ifstream f(argv[1]);
-    IntRunner runner(f);
+    CharRunner runner(f);
     runner.run();
   }
   else
