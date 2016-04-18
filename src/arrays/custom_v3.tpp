@@ -37,7 +37,7 @@ template <class T> void CustomArrayV3<T>::addUpdate(int type, T *a, int idx)
   if(type == AV3_INS)
   {
     addition->val = *a;
-    addition->idx = binSearch(data, size, a);
+    addition->idx = binSearch(data, size, addition->val);
   }
   else if(type == AV3_DEL)
   {
@@ -53,7 +53,8 @@ template <class T> void CustomArrayV3<T>::addUpdate(int type, T *a, int idx)
   {
     UpdateNode<T> *list = updates;
     UpdateNode<T> *prevList = nullptr;
-    while(list != nullptr && list->idx <= addition->idx)
+    while(list != nullptr && (list->idx < addition->idx || 
+      (list->idx == addition->idx && !comp(*a, *a)))
     {
       if(addition->type == AV3_INS && list->type == AV3_INS)
       {

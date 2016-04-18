@@ -4,7 +4,7 @@
 
 #include "sortedCollection/sortedCollection.h"
 #include "int_runner.h"
-#define DEBUG
+//#define DEBUG
 
 void IntRunner::runop(std::string op, std::string data,
     unsigned int trial)
