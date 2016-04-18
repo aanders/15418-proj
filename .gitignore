@@ -7,6 +7,9 @@ sortedCollection
 # but don't ignore the sortedCollection directory
 !sortedCollection/
 
+# Ignore trace files
+*.trace
+
 # tags file
 tags
 

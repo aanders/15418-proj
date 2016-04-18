@@ -1,7 +1,10 @@
 #include <iostream>
+#include <fstream>
 #include <stdlib.h>
 #include "trees/rbtree.h"
 #include "sortedCollection/sortedCollection.h"
+
+#include "int_runner.h"
 
 using namespace std;
 
@@ -50,52 +53,60 @@ bool testRbtIndexing()
 }
 
 
-int main(void)
+int main(int argc, char* argv[])
 {
   const int size = 15;
   int additions[size] = {5,4,5,2,9,
                          1, -3, 9, 22, 490,
                          11, 12, -7345353, 12, 18};
   
-  if (!testRbtIndexing()) return 0;
-  
-  SortedCollection<int> sc(&intComp);
+  if (argc > 1)
+  {
+    std::ifstream f(argv[1]);
+    IntRunner runner(f);
+    runner.run();
+  }
+  else
+  {
+    if (!testRbtIndexing()) return 0;
 
-  for(int i = 0; i < size; i++)
-  {
-    sc.ins(additions[i]);
-  }
-  
-  sc.del(1);
-  sc.del(13);
-  
-  for(int j = 0; j < size - 2; j++)
-  {
-    int res = sc.lookup(j);
-    cout<<res<<endl;
-  }
-  cout<<endl;
-  
-  /*
-  int tests[size] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
-  int refsol[size] = {1,1,0,1,1,0,0,0,1,0,1,1,0,0,0};
-  
-  for(int i = 0; i < size; i++)
-  {
-    if (sc.lookupElt(tests[i]) && (refsol[i] == 1))
+    SortedCollection<int> sc(&intComp);
+
+    for(int i = 0; i < size; i++)
     {
-      cout<<"RBT test "<<i<<" passed! (found element)"<<endl;
+      sc.ins(additions[i]);
     }
-    else if (!sc.lookupElt(tests[i]) && (refsol[i] == 0))
+    
+    sc.del(1);
+    sc.del(13);
+    
+    for(int j = 0; j < size - 2; j++)
     {
-      cout<<"RBT test "<<i<<" passed! (element doesn't exist)"<<endl;
+      int res = sc.lookup(j);
+      cout<<res<<endl;
     }
-    else
+    cout<<endl;
+    
+    /*
+    int tests[size] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
+    int refsol[size] = {1,1,0,1,1,0,0,0,1,0,1,1,0,0,0};
+    
+    for(int i = 0; i < size; i++)
     {
-      cout<<"RBT test "<<i<<" failed :("<<endl;
+      if (sc.lookupElt(tests[i]) && (refsol[i] == 1))
+      {
+	cout<<"RBT test "<<i<<" passed! (found element)"<<endl;
+      }
+      else if (!sc.lookupElt(tests[i]) && (refsol[i] == 0))
+      {
+	cout<<"RBT test "<<i<<" passed! (element doesn't exist)"<<endl;
+      }
+      else
+      {
+	cout<<"RBT test "<<i<<" failed :("<<endl;
+      }
     }
+    */
   }
-  */
   return 0; 
-  
 }
