@@ -57,6 +57,7 @@ template <class T> void CustomArray<T>::del(int idx)
   if(size < allocated / 4)
   {
     T *newArr = new T[allocated / 2];
+    allocated = allocated / 2;
     for(int i = 0; i < size; i++)
     {
       newArr[i] = data[i];
