@@ -29,9 +29,9 @@ template <class T> SortedCollection<T>::SortedCollection(
   aUpdatesWait = std::unique_lock<std::mutex>(aUpdatesMutex);
   tUpdatesWait = std::unique_lock<std::mutex>(tUpdatesMutex);
   
-  pthread_t wat;//, morewat;
+  pthread_t wat, morewat;
   pthread_create(&wat, NULL, arrayThread<T>, this);
-  //pthread_create(&morewat, NULL, treeThread<T>, this);
+  pthread_create(&morewat, NULL, treeThread<T>, this);
 }
 
 template <class T> void SortedCollection<T>::ins(T t)
