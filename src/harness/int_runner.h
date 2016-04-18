@@ -19,7 +19,7 @@ class IntRunner : public Runner
     IntRunner(std::ifstream& tracefile)
       : Runner(tracefile), collection_(&comp) {}
     
-    void runop(std::string op, std::string data);
+    void runop(std::string op, std::string data, unsigned int trial);
 };
 
 #endif // _INT_RUNNER_H_

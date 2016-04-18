@@ -5,7 +5,8 @@
 #include "sortedCollection/sortedCollection.h"
 #include "char_runner.h"
 
-void CharRunner::runop(std::string op, std::string data)
+void CharRunner::runop(std::string op, std::string data,
+    unsigned int trial)
 {
   if (op.compare("insert") == 0)
   {

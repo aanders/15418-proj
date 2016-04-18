@@ -65,7 +65,7 @@ int main(int argc, char* argv[])
   {
     std::ifstream f(argv[1]);
     CharRunner runner(f);
-    runner.run();
+    runner.run(1);
   }
   else
   {
