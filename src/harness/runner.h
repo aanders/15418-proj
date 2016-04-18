@@ -12,6 +12,10 @@ class Runner
 {
   protected:
     std::ifstream& tracefile_;
+    
+    // The following fields will be populated when running the trace
+    unsigned int trial_no_;
+    unsigned int line_no_;
 
   public:
     std::vector<std::string> trialNames;
@@ -22,8 +26,7 @@ class Runner
 
     ~Runner() { tracefile_.close(); }
     
-    virtual void runop(std::string op, std::string data,
-        unsigned int trial) = 0;
+    virtual void runop(std::string op, std::string data) = 0;
 
     /*
      * Run a given number of trials on the associated tracefile.
