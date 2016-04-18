@@ -11,6 +11,7 @@ void Runner::run(unsigned int trials)
 
   for (unsigned int t = 0; t < trials; t++)
   {
+    tracefile_.clear();
     tracefile_.seekg(0, ios::beg);
     while (std::getline(tracefile_, line))
     {

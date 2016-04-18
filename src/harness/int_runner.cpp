@@ -4,6 +4,7 @@
 
 #include "sortedCollection/sortedCollection.h"
 #include "int_runner.h"
+#define DEBUG
 
 void IntRunner::runop(std::string op, std::string data,
     unsigned int trial)
@@ -12,7 +13,14 @@ void IntRunner::runop(std::string op, std::string data,
     if (op.compare("insert") == 0)
     {
       int elt = std::stoi(data);
-      collection_.ins(elt);
+      if (trial == 0)
+      {
+        collection_.ins(elt);
+      }
+      else
+      {
+        tree_.insert(elt);
+      }
 #ifdef DEBUG
       std::cout << "Inserted " << elt << std::endl;
 #endif
@@ -23,7 +31,16 @@ void IntRunner::runop(std::string op, std::string data,
       if (n != string::npos) {
         int idx = std::stoi(data.substr(0,n));
         int ref = std::stoi(data.substr(n+1));
-        int elt = collection_.lookup(idx);
+        int elt;
+        if (trial == 0)
+        {
+          elt = collection_.lookup(idx);
+        }
+        else
+        {
+          RBNode<int> *node = tree_.lookupByIdx(idx);
+          elt = (node != nullptr) ? node->val : 0;
+        }
 #ifdef DEBUG
         std::cout << "Lookup at index " << idx << std::endl;
         std::cout << "  -> expected " << ref << ", got " << elt << std::endl;
@@ -38,7 +55,15 @@ void IntRunner::runop(std::string op, std::string data,
     else if (op.compare("delete") == 0)
     {
       int idx = std::stoi(data);
-      collection_.del(idx);
+      if (trial == 0)
+      {
+        collection_.del(idx);
+      }
+      else
+      {
+        RBNode<int> *node = tree_.lookupByIdx(idx);
+        if (node != nullptr) tree_.remove(node->val);
+      }
 #ifdef DEBUG
       std::cout << "Deletion at index " << idx << std::endl;
 #endif

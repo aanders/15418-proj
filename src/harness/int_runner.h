@@ -8,16 +8,18 @@
 #include "runner.h"
 
 #include "sortedCollection/sortedCollection.h"
+#include "trees/rbtree.h"
 
 class IntRunner : public Runner
 {
   protected:
     static bool comp(int a, int b) { return a < b; };
     SortedCollection<int> collection_;
+    RBTree<int> tree_;
 
   public:
     IntRunner(std::ifstream& tracefile)
-      : Runner(tracefile), collection_(&comp) {}
+      : Runner(tracefile), collection_(&comp), tree_(&comp) {}
     
     void runop(std::string op, std::string data, unsigned int trial);
 };
