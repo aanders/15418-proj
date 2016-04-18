@@ -4,7 +4,6 @@
 
 #include "sortedCollection/sortedCollection.h"
 #include "int_runner.h"
-#define DEBUG
 
 void IntRunner::runop(std::string op, std::string data,
     unsigned int trial)
@@ -49,6 +48,8 @@ void IntRunner::runop(std::string op, std::string data,
         {
           std::cerr << "ERROR: lookup failed: expected "
               << ref << ", got " << elt << std::endl;
+          std::cerr << "  in \"" << this->getTrialName(trial)
+              << "\"" << std::endl;
         }
       }
     }
@@ -72,12 +73,20 @@ void IntRunner::runop(std::string op, std::string data,
     {
       std::cerr << "ERROR: internal error: unrecognized instruction" << std::endl;
       std::cerr << "  at '" << op << " " << data << "'" << std::endl;
+      std::cerr << "  in \"" << this->getTrialName(trial)
+          << "\"" << std::endl;
     }
   }
   catch (const std::invalid_argument& e)
   {
     std::cerr << "ERROR: internal error: invalid data for instruction" << std::endl;
     std::cerr << "  at '" << op << " " << data << "'" << std::endl;
+    std::cerr << "  in \"" << this->getTrialName(trial)
+        << "\"" << std::endl;
   }
 }
 
+void IntRunner::run()
+{
+  Runner::run(2);
+}

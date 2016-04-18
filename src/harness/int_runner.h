@@ -19,9 +19,11 @@ class IntRunner : public Runner
 
   public:
     IntRunner(std::ifstream& tracefile)
-      : Runner(tracefile), collection_(&comp), tree_(&comp) {}
+      : Runner(tracefile, {"SortedCollection trial", "RedBlackTree trial"}),
+        collection_(&comp), tree_(&comp) {}
     
     void runop(std::string op, std::string data, unsigned int trial);
+    void run();
 };
 
 #endif // _INT_RUNNER_H_

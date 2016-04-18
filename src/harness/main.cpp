@@ -15,7 +15,7 @@ int main(int argc, char* argv[])
   {
     std::ifstream f(argv[1]);
     IntRunner runner(f);
-    runner.run(2);
+    runner.run();
   }
   else
   {
