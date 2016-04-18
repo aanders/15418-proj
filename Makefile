@@ -9,7 +9,8 @@ OBJDIR=obj
 #
 # Add source files to compile here
 #
-SRCS = harness/main.cpp harness/runner.cpp harness/int_runner.cpp harness/char_runner.cpp
+SRCS = harness/main.cpp harness/manual_tests.cpp harness/runner.cpp \
+       harness/int_runner.cpp harness/char_runner.cpp
 
 #
 # Add template file dependencies here
