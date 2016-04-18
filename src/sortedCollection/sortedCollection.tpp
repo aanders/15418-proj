@@ -24,14 +24,14 @@ template <class T> SortedCollection<T>::SortedCollection(
 {
   comp = c;
   numUpdates = numTUpdates = numAUpdates = 0;
-  array = new CustomArrayV2<T>(comp);
+  array = new VectorArray<T>(comp);
   tree = new RBTree<T>(comp);
   aUpdatesWait = std::unique_lock<std::mutex>(aUpdatesMutex);
   tUpdatesWait = std::unique_lock<std::mutex>(tUpdatesMutex);
   
-  pthread_t wat;//, morewat;
+  pthread_t wat, morewat;
   pthread_create(&wat, NULL, arrayThread<T>, this);
-  //pthread_create(&morewat, NULL, treeThread<T>, this);
+  pthread_create(&morewat, NULL, treeThread<T>, this);
 }
 
 template <class T> void SortedCollection<T>::ins(T t)

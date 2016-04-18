@@ -26,6 +26,10 @@ template <class T> class CustomArrayV3 : public Array<T>
   UpdateNode<T> *notUpdates;
   UpdateNode<T> *updates;
   
+  void addUpdate(int type, T *a, int idx);
+  int numInserts;
+  int numDeletes;
+  
   void executeUpdates();
   void printData(T *d, int s);
   

@@ -4,14 +4,14 @@
 #ifndef __vector_v1_h__
 #define __vector_v1_h__
 
-template <class T> class VecArray: public Array<T>
+template <class T> class VectorArray: public Array<T>
 {
   protected:
   //bool (*comp)(T a, T b);
   std::vector<T> data;
   
   public:
-  VecArray(bool (*c)(T a, T b));
+  VectorArray(bool (*c)(T a, T b));
   void ins(T a);
   void del(int idx);
   T lookup(int idx);
