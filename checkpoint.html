@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>[15418 Project Checkpoint] Team VeggieTales</title>
+</head>
+
+<body style="background-color: #2a2a2a;">
+
+<div style="
+  width: 80%;
+  margin: 20px auto;
+  padding: 5px 20px;
+  background-color: #e8e8e8;
+  border-radius: 5px;">
+
+  <h1>Improving the Performance of Sequential Programs with Multithreaded Data Structure</h1>
+  <h3>Aaron Anderson (aaanders) and Justus Hibshman (jhibshma)</h3>
+
+  <h2>Project Security Checkpoint</h2>
+
+  <p>Please remove all liquids, gels, and aerosols, and place them in a quart-size bag.</p>
+
+  <h2>Summary of Present Work Completed</h2>
+
+  <p>Thus far, we have done several things: Created a simple testing harness to generate
+  trace files and time our code. Created the base parallel data structure, and began work
+  on the sub-structures used by the main one. For a tree, we have implemented a (still
+  slightly buggy) RBTree with the added functionality of being able to lookup by the
+  index of an element as opposed to its value. Also, we have implemented several versions
+  of a sorted array-like structure, one with c++ standard vectors and others with arrays.</p>
+
+  <p>The basic parallel structure uses a lock-free work queue, so that inserts and deletes
+  may be performed at a later time by the extra thread. Then, when a lookup is performed,
+  the main structure uses the fastest available up-to-date structure (and suspends if none
+  are up-to-date).</p>
+
+  <p>With the array-based structure, we have begun working on a version that takes advantage
+  of the fact that it does not always need to be up-to-date, saving up operations and then
+  performing them in a batch. The jury is out as to the usefulness of this method.</p>
+
+  <h2>Preliminary Results</h2>
+
+  <p>We are still working out bugs in the underlying data structures, so it is difficult to
+  tell at this stage how successful this approach will be.  The current data structure is
+  roughly 4x slower than a standard red-black tree on small trace files, so our target will
+  be at least an equivalent speedup.</p>
+
+  <h2>Goals and Deliverables</h2>
+
+  <p>Our main goal is twofold: to make this parallelized data structure useful, but also to
+  find out the conditions under which such an approach would be most useful. We doubt we
+  will be able to reach the &ldquo;ultimate goal&rdquo; of O(1) time for all operations,
+  but still desire to show a noticeable speedup. We intend to show facts and figures at the
+  parallelization competition.</p>
+
+  <h2>Concerns</h2>
+
+  <p>Some preliminary testing of an array structure with batched inserts proved worse rather
+  than better compared to a similar structure. We have yet to ascertain the reason. Overhead
+  costs may be too big a factor. Currently, an implementation based on the C++
+  <code>std::vector</code> is much faster than our other array versions (perhaps sticking with
+  the vector, already highly optimized code, will prove worthwhile, but it seems like it should
+  be possible to make a version which makes better use of the parallelism.)</p>
+
+  <p>As much as anything, time is a big concern: having time enough to test thoroughly and
+  respond to tests, figuring out what works well and what doesn’t.</p>
+
+</div>
+
+</body>
+
+</html>
