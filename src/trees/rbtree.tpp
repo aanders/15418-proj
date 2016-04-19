@@ -654,6 +654,36 @@ int RBTree<T>::_verifyHelper(RBNode<T>* current) {
           //    << std::endl;
           return 0;
         }
+
+        // Verify sizing information
+        if (current->left) {
+          if (current->size_left != 
+              current->left->size_left + current->left->size_right + 1) {
+            //std::cerr << "Improper sizing info at " << current->val
+            //    << std::endl;
+            return 0;
+          }
+        } else {
+          if (current->size_left != 0) {
+            //std::cerr << "Improper sizing info at " << current->val
+            //    << std::endl;
+            return 0;
+          }
+        }
+        if (current->right) {
+          if (current->size_right != 
+              current->right->size_left + current->right->size_right + 1) {
+            //std::cerr << "Improper sizing info at " << current->val
+            //    << std::endl;
+            return 0;
+          }
+        } else {
+          if (current->size_right != 0) {
+            //std::cerr << "Improper sizing info at " << current->val
+            //    << std::endl;
+            return 0;
+          }
+        }
         
         // Everything is ok.
         return lBlackHeight + ((current->color == NodeColor::BLACK) ? 1 : 0);

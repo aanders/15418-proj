@@ -18,6 +18,12 @@ void IntRunner::runop(std::string op, std::string data)
       else
       {
         tree_.insert(elt);
+        if (!tree_.verify()) {
+          std::cerr << "ERROR: tree verification failed" << std::endl;
+          std::cerr << "  at line " << this->line_no_ << std::endl;
+          std::cerr << "  in \"" << this->getTrialName(this->trial_no_)
+              << "\"" << std::endl;
+        }
       }
 #ifdef DEBUG
       std::cout << "Inserted " << elt << std::endl;
@@ -64,6 +70,12 @@ void IntRunner::runop(std::string op, std::string data)
       {
         RBNode<int> *node = tree_.lookupByIdx(idx);
         if (node != nullptr) tree_.remove(node->val);
+        if (!tree_.verify()) {
+          std::cerr << "ERROR: tree verification failed" << std::endl;
+          std::cerr << "  at line " << this->line_no_ << std::endl;
+          std::cerr << "  in \"" << this->getTrialName(this->trial_no_)
+              << "\"" << std::endl;
+        }
       }
 #ifdef DEBUG
       std::cout << "Deletion at index " << idx << std::endl;
