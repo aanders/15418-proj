@@ -37,7 +37,10 @@ template <class T> void CustomArrayV3<T>::addUpdate(int type, T *a, int idx)
   if(type == AV3_INS)
   {
     addition->val = *a;
-    addition->idx = binSearch(data, size, addition->val);
+    if(size > 0)
+      addition->idx = binarySearch(data, size, this->comp, addition->val);
+    else
+      addition->idx = 0;
   }
   else if(type == AV3_DEL)
   {
@@ -47,14 +50,15 @@ template <class T> void CustomArrayV3<T>::addUpdate(int type, T *a, int idx)
   
   if(updates == nullptr)
   {
-    updates == addition;
+    updates = addition;
   }
   else
   {
     UpdateNode<T> *list = updates;
     UpdateNode<T> *prevList = nullptr;
     while(list != nullptr && (list->idx < addition->idx || 
-      (list->idx == addition->idx && !this->comp(*a, *a))))
+      (list->idx == addition->idx && list->type == AV3_DEL) ||
+      (list->idx == addition->idx && this->comp(list->val, addition->val))))
     {
       if(addition->type == AV3_INS && list->type == AV3_INS)
       {
@@ -188,7 +192,7 @@ template <class T> void CustomArrayV3<T>::executeUpdates()
       dataOffset++;
     }
     
-    for(int i = currIdx; i++; i < nextIdx)
+    for(int i = currIdx; i < nextIdx; i++)
     {
       if(dataOffset < 0)
       {

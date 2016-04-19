@@ -16,13 +16,10 @@ template <class T> CustomArrayV2<T>::CustomArrayV2(bool (*c)(T a, T b))
 
 template <class T> void CustomArrayV2<T>::emptyInsertions()
 {
-  //cout<<"Before:\n";
-  //printData(data, size);
-  
   if(numInsertions == 0)
     return;
   //cout<<numInsertions<<endl;
-  sort(insertions, numInsertions, this->comp);
+  sort(insertions, numInsertions, this->comp, insertions+INSERT_BUFFER_SIZE);
   //sortedChecker(insertions, numInsertions);
   //cout<<"Sorted insertions:\n";
   //printData(insertions, numInsertions); 
@@ -39,7 +36,8 @@ template <class T> void CustomArrayV2<T>::emptyInsertions()
   {
     for(int i = 0; i < numInsertions; i++)
     {
-      startIdx = binarySearch(data, size, 
+      if(startIdx < size)
+        startIdx += binarySearch(data + startIdx, size - startIdx, 
                               this->comp, insertions[i]);
       indices[i] = startIdx + i;
     }

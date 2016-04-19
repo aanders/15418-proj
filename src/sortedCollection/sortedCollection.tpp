@@ -24,14 +24,27 @@ template <class T> SortedCollection<T>::SortedCollection(
 {
   comp = c;
   numUpdates = numTUpdates = numAUpdates = 0;
-  array = new CustomArrayV2<T>(comp);
+  array = new VectorArray<T>(comp);
   tree = new RBTree<T>(comp);
   aUpdatesWait = std::unique_lock<std::mutex>(aUpdatesMutex);
   tUpdatesWait = std::unique_lock<std::mutex>(tUpdatesMutex);
+  atUpdatesWait = std::unique_lock<std::mutex>(atUpdatesMutex);
   
-  pthread_t wat;//, morewat;
-  pthread_create(&wat, NULL, arrayThread<T>, this);
-  //pthread_create(&morewat, NULL, treeThread<T>, this);
+  pthread_create(&aThread, NULL, arrayThread<T>, this);
+  //pthread_create(&tThread, NULL, treeThread<T>, this);
+}
+
+template <class T> SortedCollection<T>::~SortedCollection()
+{
+  Update<T> stop;
+  stop.type = TYPE_STOP;
+  treeUpdates.insert(stop);
+  arrayUpdates.insert(stop);
+  
+  if(pthread_join(aThread, NULL) != 0)
+    cout<<"Join failed."<<endl;
+  //if(pthread_join(tThread, NULL) != 0)
+  //  cout<<"Join failed."<<endl;
 }
 
 template <class T> void SortedCollection<T>::ins(T t)
@@ -56,11 +69,16 @@ template <class T> void SortedCollection<T>::del(int idx)
 
 template <class T> T SortedCollection<T>::lookup(int idx)
 {
-  while(numAUpdates != numUpdates) 
+  while(numTUpdates != numUpdates && numAUpdates != numUpdates) 
   {
-    aReady.wait(aUpdatesWait);
+    atReady.wait(atUpdatesWait);
   }
-  return array->lookup(idx);
+  
+  if(numAUpdates == numUpdates)
+  {
+    return array->lookup(idx);
+  }
+  return tree->lookup(idx)->val;
 }
 
 template <class T> bool SortedCollection<T>::lookupElt(T val)
@@ -79,22 +97,23 @@ template <class T> void *SortedCollection<T>::handleUpdatesArray()
   {
     while(!arrayUpdates.remove(&u)) 
     {
+      atReady.notify_all();
       aReady.notify_all();
     }
-    //cout<<"Got job."<<endl;
     if(u.type == TYPE_DELETE)
     {
-      //cout<<"It's a deletion."<<endl;
       array->del(u.idx);
     }
     else if(u.type == TYPE_INSERT)
     {
-      //cout<<"It's an insertion."<<endl;
       array->ins(u.val);
+    }
+    else if(u.type == TYPE_STOP)
+    {
+      return NULL;
     }
     
     numAUpdates++;
-    //cout<<"Job done."<<endl;
   }
   return NULL;
 }
@@ -106,8 +125,10 @@ template <class T> void *SortedCollection<T>::handleUpdatesTree()
   {
     while(!treeUpdates.remove(&u))
     {
+      atReady.notify_all();
       tReady.notify_all();
     }
+    
     if(u.type == TYPE_DELETE)
     {
       RBNode<T> *n = tree->lookupByIdx(u.idx);
@@ -116,6 +137,10 @@ template <class T> void *SortedCollection<T>::handleUpdatesTree()
     else if(u.type == TYPE_INSERT)
     {
       tree->insert(u.val);
+    }
+    else if(u.type == TYPE_STOP)
+    {
+      return NULL;
     }
 
     numTUpdates++;
