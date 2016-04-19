@@ -3,7 +3,7 @@
 #ifndef __custom_v2_h__
 #define __custom_v2_h__
 
-#define INSERT_BUFFER_SIZE 10
+#define INSERT_BUFFER_SIZE 3
 //#define DELETE_BUFFER_SIZE 10
 
 template <class T> class CustomArrayV2 : public Array<T>
@@ -18,6 +18,8 @@ template <class T> class CustomArrayV2 : public Array<T>
   
   //int deletions[DELETE_BUFFER_SIZE];
   //int numDeletions;
+  
+  void sortedChecker(T *d, int s);
   
   void emptyInsertions();
   void printData(T *d, int s);

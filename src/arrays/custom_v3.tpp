@@ -54,7 +54,7 @@ template <class T> void CustomArrayV3<T>::addUpdate(int type, T *a, int idx)
     UpdateNode<T> *list = updates;
     UpdateNode<T> *prevList = nullptr;
     while(list != nullptr && (list->idx < addition->idx || 
-      (list->idx == addition->idx && !comp(*a, *a)))
+      (list->idx == addition->idx && !this->comp(*a, *a))))
     {
       if(addition->type == AV3_INS && list->type == AV3_INS)
       {

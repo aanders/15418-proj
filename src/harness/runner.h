@@ -4,6 +4,7 @@
 
 #include <fstream>
 #include <string>
+#include <vector>
 
 #include "sortedCollection/sortedCollection.h"
 
@@ -13,8 +14,12 @@ class Runner
     std::ifstream& tracefile_;
 
   public:
+    std::vector<std::string> trialNames;
 
     Runner(std::ifstream& tracefile) : tracefile_(tracefile) {}
+    Runner(std::ifstream& tracefile, std::vector<std::string> trialNames)
+      : tracefile_(tracefile), trialNames(trialNames) {}
+
     ~Runner() { tracefile_.close(); }
     
     virtual void runop(std::string op, std::string data,
@@ -27,6 +32,11 @@ class Runner
      * behavior to be implemented on each trial.
      */
     void run(unsigned int trials);
+
+    /*
+     * Retrieve the name of the associated trial number, if it exists
+     */
+    std::string getTrialName(unsigned int trial);
 };
 
 #endif // _RUNNER_H_

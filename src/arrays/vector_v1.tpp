@@ -53,18 +53,44 @@ template <class T> void VectorArray<T>::ins(T a)
     data.insert(data.begin() + insertionIndex, a);
     //std::cout<<"C"<<std::endl;
   }
+  //sortedChecker();
 }
 
 template <class T> void VectorArray<T>::del(int idx)
 {
   data.erase(data.begin() + idx);
+  //sortedChecker();
 }
 
 template <class T> T VectorArray<T>::lookup(int idx)
 {
   return data[idx];
 }
-
+/*
+template <class T> void VectorArray<T>::sortedChecker()
+{
+  bool ok = true;
+  int size = data.size();
+  
+  for(int i = 0; i < size - 1; i++)
+  {
+    if(this->comp(data[i+1], data[i]))
+    {
+      ok = false;
+    }
+    cout<<data[i]<<", ";
+  }
+  if(size > 0)
+    cout<<data[size - 1]<<endl;
+  else
+    cout<<endl;
+  
+  if(!ok)
+  {
+    cout<<"Not ok bro.\n";
+  }
+}
+*/
 /*
 template <class T> bool VectorArray<T>::lookupElt(T val)
 {
