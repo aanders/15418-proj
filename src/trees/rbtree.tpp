@@ -253,8 +253,11 @@ T RBTree<T>::remove(T val) {
   } else {
     // The node has two subtrees
     // Get the greatest element in the left subtree
+    // FIXME: need to decrement sizes as we go down
     RBNode<T>* r = node->left;
+    node->size_left--;
     while (r->right) {
+      r->size_right--;
       r = r->right;
     }
     

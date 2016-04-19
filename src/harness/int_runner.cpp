@@ -6,14 +6,13 @@
 #include "int_runner.h"
 //#define DEBUG
 
-void IntRunner::runop(std::string op, std::string data,
-    unsigned int trial)
+void IntRunner::runop(std::string op, std::string data)
 {
   try {
     if (op.compare("insert") == 0)
     {
       int elt = std::stoi(data);
-      if (trial == 0)
+      if (this->trial_no_ == 0)
       {
         collection_.ins(elt);
       }
@@ -32,7 +31,7 @@ void IntRunner::runop(std::string op, std::string data,
         int idx = std::stoi(data.substr(0,n));
         int ref = std::stoi(data.substr(n+1));
         int elt;
-        if (trial == 0)
+        if (this->trial_no_ == 0)
         {
           elt = collection_.lookup(idx);
         }
@@ -49,7 +48,8 @@ void IntRunner::runop(std::string op, std::string data,
         {
           std::cerr << "ERROR: lookup failed: expected "
               << ref << ", got " << elt << std::endl;
-          std::cerr << "  in \"" << this->getTrialName(trial)
+          std::cerr << "  at line " << this->line_no_ << std::endl;
+          std::cerr << "  in \"" << this->getTrialName(this->trial_no_)
               << "\"" << std::endl;
         }
       }
@@ -57,7 +57,7 @@ void IntRunner::runop(std::string op, std::string data,
     else if (op.compare("delete") == 0)
     {
       int idx = std::stoi(data);
-      if (trial == 0)
+      if (this->trial_no_ == 0)
       {
         collection_.del(idx);
       }
@@ -74,7 +74,8 @@ void IntRunner::runop(std::string op, std::string data,
     {
       std::cerr << "ERROR: internal error: unrecognized instruction" << std::endl;
       std::cerr << "  at '" << op << " " << data << "'" << std::endl;
-      std::cerr << "  in \"" << this->getTrialName(trial)
+      std::cerr << "  at line " << this->line_no_ << std::endl;
+      std::cerr << "  in \"" << this->getTrialName(this->trial_no_)
           << "\"" << std::endl;
     }
   }
@@ -82,7 +83,8 @@ void IntRunner::runop(std::string op, std::string data,
   {
     std::cerr << "ERROR: internal error: invalid data for instruction" << std::endl;
     std::cerr << "  at '" << op << " " << data << "'" << std::endl;
-    std::cerr << "  in \"" << this->getTrialName(trial)
+    std::cerr << "  at line " << this->line_no_ << std::endl;
+    std::cerr << "  in \"" << this->getTrialName(this->trial_no_)
         << "\"" << std::endl;
   }
 }

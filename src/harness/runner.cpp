@@ -28,15 +28,18 @@ void Runner::run(unsigned int trials)
   std::vector<std::string>::const_iterator it = trialNames.cbegin();
   for (unsigned int t = 0; t < trials; t++)
   {
+    trial_no_ = t;
     tracefile_.clear();
     tracefile_.seekg(0, ios::beg);
+    line_no_ = 0;
     double start = CycleTimer::currentSeconds();
     while (std::getline(tracefile_, line))
     {
+      line_no_++;
       std::size_t n = line.find(" ");
       if (n != string::npos)
       {
-        runop(line.substr(0,n), line.substr(n+1), t);
+        runop(line.substr(0,n), line.substr(n+1));
       }
     }
     double end = CycleTimer::currentSeconds();
