@@ -10,6 +10,8 @@ template <class T> class VectorArray: public Array<T>
   //bool (*comp)(T a, T b);
   std::vector<T> data;
   
+  //void sortedChecker();
+  
   public:
   VectorArray(bool (*c)(T a, T b));
   void ins(T a);

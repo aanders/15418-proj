@@ -4,6 +4,7 @@
 
 #include "sortedCollection/sortedCollection.h"
 #include "int_runner.h"
+//#define DEBUG
 
 void IntRunner::runop(std::string op, std::string data)
 {
@@ -102,5 +103,5 @@ void IntRunner::runop(std::string op, std::string data)
 
 void IntRunner::run()
 {
-  Runner::run(2);
+  Runner::run(1); //CHANGE BACK TO A 1
 }

@@ -9,7 +9,9 @@ template <class T> class CustomArray : public Array<T>
   int allocated;
   int size;
   T *data;
-  
+ 
+  //void sortedChecker();
+   
   public:
   CustomArray(bool (*c)(T a, T b));
   void ins(T a);

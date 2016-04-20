@@ -12,7 +12,9 @@ template <class T> CustomArray<T>::CustomArray(bool (*c)(T a, T b))
 
 template <class T> void CustomArray<T>::ins(T a)
 {
-  int insertionIndex = binarySearch(data, size, this->comp, a);
+  int insertionIndex = 0;
+  if(size > 0)
+    insertionIndex = binarySearch(data, size, this->comp, a);
   
   if(size == allocated)
   {
@@ -43,13 +45,15 @@ template <class T> void CustomArray<T>::ins(T a)
     data[insertionIndex] = a;
     size++;
   }
+  
+  //sortedChecker();
 }
 
 template <class T> void CustomArray<T>::del(int idx)
 {
   for(int i = idx; i < size - 1; i++)
   {
-    data[idx] = data[i+1];
+    data[i] = data[i+1];
   }
   
   size--;
@@ -66,13 +70,38 @@ template <class T> void CustomArray<T>::del(int idx)
     delete[] data;
     data = newArr;
   }
+  
+  //sortedChecker();
 }
 
 template <class T> T CustomArray<T>::lookup(int idx)
 {
   return data[idx];
 }
-
+/*
+template <class T> void CustomArray<T>::sortedChecker()
+{
+  bool ok = true;
+  
+  for(int i = 0; i < size - 1; i++)
+  {
+    if(this->comp(data[i+1], data[i]))
+    {
+      ok = false;
+    }
+    cout<<data[i]<<", ";
+  }
+  if(size > 0)
+    cout<<data[size - 1]<<endl;
+  else
+    cout<<endl;
+  
+  if(!ok)
+  {
+    cout<<"Not ok bro.\n";
+  }
+}
+*/
 /*
 template <class T> bool CustomArray<T>::lookupElt(T val)
 {

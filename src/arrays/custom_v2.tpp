@@ -16,13 +16,11 @@ template <class T> CustomArrayV2<T>::CustomArrayV2(bool (*c)(T a, T b))
 
 template <class T> void CustomArrayV2<T>::emptyInsertions()
 {
-  //cout<<"Before:\n";
-  //printData(data, size);
-  
   if(numInsertions == 0)
     return;
-  
-  sort(insertions, numInsertions, this->comp);
+  //cout<<numInsertions<<endl;
+  sort(insertions, numInsertions, this->comp, insertions+INSERT_BUFFER_SIZE);
+  //sortedChecker(insertions, numInsertions);
   //cout<<"Sorted insertions:\n";
   //printData(insertions, numInsertions); 
   
@@ -38,59 +36,56 @@ template <class T> void CustomArrayV2<T>::emptyInsertions()
   {
     for(int i = 0; i < numInsertions; i++)
     {
-      startIdx = binarySearch(data, size, 
+      if(startIdx < size)
+        startIdx += binarySearch(data + startIdx, size - startIdx, 
                               this->comp, insertions[i]);
       indices[i] = startIdx + i;
     }
   }
   
+  T *newArr = data;
+  bool aNewArr = false;
+  
   if(size + numInsertions > allocated)
   {
-    //cout<<"Neither here\n";
+    aNewArr = true;
+    
     while(size + numInsertions > allocated)
     {
       allocated = allocated * 2;
     }
-    T *newArr = new T[allocated];
-    int offset = 0;
-    for(int i = 0; i < size + numInsertions; i++)
-    {
-      if(offset < numInsertions && i == indices[offset])
-      {
-        newArr[i] = insertions[offset];
-        offset++;
-      }
-      else
-      {
-        newArr[i] = data[i - offset];
-      }
-    }
+    newArr = new T[allocated];
     
-    delete[] data;
-    data = newArr;
-  }
-  else
-  {
-    //cout<<"Nor there.\n";
-    int idx = numInsertions - 1;
-    for(int i = size + numInsertions - 1; i >= indices[0]; i--)
+    for(int i = 0; i < indices[0]; i++)
     {
-      if(i == indices[idx])
-      {
-        data[i] = insertions[idx];
-        idx--;
-      }
-      else
-      {
-        data[i] = data[i - (idx + 1)];
-      }
+      newArr[i] = data[i];
+    }
+  }
+  
+  int idx = numInsertions - 1;
+  for(int i = size + numInsertions - 1; i >= indices[0]; i--)
+  {
+    if(i == indices[idx])
+    {
+      newArr[i] = insertions[idx];
+      idx--;
+    }
+    else
+    {
+      newArr[i] = data[i - (idx + 1)];
     }
   }
   
   size += numInsertions;
   numInsertions = 0;
-  //cout<<"After:\n";
-  //printData(data, size);
+  
+  if(aNewArr)
+  {
+    delete[] data;
+    data = newArr;
+  }
+  
+  //sortedChecker();
 }
 
 template <class T> void CustomArrayV2<T>::ins(T a)
@@ -144,6 +139,29 @@ template <class T> void CustomArrayV2<T>::printData(T *d, int s)
       cout<<", ";
   }
   cout<<endl;
+}
+
+template <class T> void CustomArrayV2<T>::sortedChecker(T *d, int s)
+{
+  bool ok = true;
+  
+  for(int i = 0; i < s - 1; i++)
+  {
+    if(this->comp(d[i+1], d[i]))
+    {
+      ok = false;
+    }
+    cout<<d[i]<<", ";
+  }
+  if(size > 0)
+    cout<<d[size - 1]<<endl;
+  else
+    cout<<endl;
+  
+  if(!ok)
+  {
+    cout<<"Not ok bro.\n";
+  }
 }
 
 /*

@@ -10,6 +10,7 @@
 
 #define TYPE_INSERT 0
 #define TYPE_DELETE 1
+#define TYPE_STOP 2
 
 template <class T> class Update
 {
@@ -37,17 +38,21 @@ template <class T> class SortedCollection
 
   std::mutex aUpdatesMutex;
   std::mutex tUpdatesMutex;
+  std::mutex atUpdatesMutex;
 
   std::unique_lock<std::mutex> aUpdatesWait;
   std::unique_lock<std::mutex> tUpdatesWait;
+  std::unique_lock<std::mutex> atUpdatesWait;
 
   std::condition_variable aReady;
   std::condition_variable tReady;
+  std::condition_variable atReady;
   
+  pthread_t tThread, aThread;
   
   public:
   SortedCollection(bool (*c)(T a, T b));
-  SortedCollection();
+  ~SortedCollection();
   void ins(T a);
   void del(int idx);
   T lookup(int idx);
