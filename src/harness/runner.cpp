@@ -3,6 +3,8 @@
 #include <vector>
 #include <string>
 
+#include <unistd.h>
+
 #include "CycleTimer.h"
 
 #include "sortedCollection/sortedCollection.h"
@@ -39,7 +41,27 @@ void Runner::run(unsigned int trials)
       std::size_t n = line.find(" ");
       if (n != string::npos)
       {
-        runop(line.substr(0,n), line.substr(n+1));
+        std::string op = line.substr(0,n);
+        std::string data = line.substr(n+1);
+        if (op.compare("pause") == 0)
+        {
+          try
+          {
+            usleep(std::stoi(data));
+          }
+          catch (const std::invalid_argument& e)
+          {
+            std::cerr << "ERROR: internal error: invalid data for instruction" << std::endl;
+            std::cerr << "  at '" << op << " " << data << "'" << std::endl;
+            std::cerr << "  at line " << line_no_ << std::endl;
+            std::cerr << "  in \"" << getTrialName(trial_no_)
+                << "\"" << std::endl;
+          }
+        }
+        else
+        {
+          runop(op, data);
+        }
       }
     }
     double end = CycleTimer::currentSeconds();

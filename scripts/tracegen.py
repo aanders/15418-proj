@@ -24,6 +24,9 @@ LOOKUP_BIAS_PDF = [0.2, 0.6, 0.2]
 BIASTYPES = ['uniform', 'insert', 'lookup']
 BIAS = BIASTYPES[0] # uniform by default
 
+MEAN_DELAY = 500 # microseconds
+STDDEV_DELAY = 300
+
 values = []
 
 # Return a random element of list l based on the
@@ -83,6 +86,11 @@ def instruction():
     else:
         return None, None
 
+# Generate a random pause interval
+def pause():
+    delay_us = random.gauss(MEAN_DELAY, STDDEV_DELAY)
+    return 'pause', abs(int(delay_us))
+
 # Print a variable number of arguments
 def printline(*args):
     output = ""
@@ -93,15 +101,21 @@ def printline(*args):
     print output
 
 def load_args():
-    global TRACE_LENGTH, DATATYPE, BIAS
+    global TRACE_LENGTH, DATATYPE, BIAS, MEAN_DELAY, STDDEV_DELAY
     parser = argparse.ArgumentParser()
     parser.add_argument("-l", "--trace-length", type=int,
             metavar="NUM",
-            help="Number of instructions to generate")
+            help="Number of instructions to generate (default: 100)")
     parser.add_argument("-t", "--datatype", choices=DATATYPES,
-            help="Type of data values to use")
+            help="Type of data values to use (default: int)")
     parser.add_argument("-b", "--bias", choices=BIASTYPES,
-            help="Bias for the trace")
+            help="Bias for the trace (default: uniform)")
+    parser.add_argument("-d", "--avg-delay", type=int,
+            metavar="MICROSECONDS",
+            help="Average delay between instructions (default: 500us)")
+    parser.add_argument("-s", "--stddev-delay", type=int,
+            metavar="MICROSECONDS",
+            help="Std-dev of delay between instructions (default: 300us)")
     args = parser.parse_args()
 
     if args.trace_length:
@@ -110,6 +124,10 @@ def load_args():
         DATATYPE = args.datatype
     if args.bias:
         BIAS = args.bias
+    if args.avg_delay:
+        MEAN_DELAY = args.avg_delay
+    if args.stddev_delay:
+        STDDEV_DELAY = args.stddev_delay
 #
 # MAIN
 #
@@ -119,5 +137,7 @@ if __name__ == '__main__':
         line = (None, None)
         while line[0] == None:
             line = instruction()
+        printline(*line)
+        line = pause()
         printline(*line)
 
