@@ -3,14 +3,13 @@
  */
 
 #include <iostream>
-#include <assert.h>
 #include "rbtree.h"
 
 /*
  * constructor
  */
 template <class T>
-RBTree<T>::RBTree(bool (*c)(T a, T b)) : _root(nullptr), comp(c) {}
+RBTree<T>::RBTree(bool (*c)(T a, T b)) : comp (c) {}
 
 /*
  * lookup
@@ -44,41 +43,6 @@ RBNode<T>* RBTree<T>::lookup(T val) {
 }
 
 /*
- * lookupByIdx
- */
-template <class T>
-RBNode<T>* RBTree<T>::lookupByIdx(int i) {
-  RBNode<T>* node = _root;
-  
-  // can't access a negative index
-  if (i < 0) {
-    return nullptr;
-  }
-
-  while(true) {
-    if (!node) {
-      // Index out of bounds
-      // or something went horribly wrong
-      return nullptr;
-    }
-    if (i == node->size_left) {
-      return node;
-    } else if (i < node->size_left) {
-      // continue on left subtree
-      // no adjustment to i needed
-      node = node->left;
-    }
-    else {
-      // continue on right subtree
-      // subtract number of elements we "skipped" from index
-      // (i.e. left subtree plus the node we were at)
-      i -= (node->size_left + 1);
-      node = node->right;
-    }
-  }
-}
-
-/*
  * insert
  */
 template <class T>
@@ -92,33 +56,36 @@ T RBTree<T>::insert(T val) {
     // Go as far as we can in the tree and then
     // insert the new value
     RBNode<T>* node = _root;
-    RBNode<T>* newNode = new RBNode<T>(val, NodeColor::RED);
-
+    RBNode<T>* newNode = nullptr;  // don't create the new node
+                                // until we know we can insert it
     while (true) {
       if (comp(val, node->val)) {
         // val < node->val
         if (node->left) {
-          node->size_left++;
           node = node->left;
         } else {
+          newNode = new RBNode<T>(val, NodeColor::RED);
           newNode->parent = node;
           node->left = newNode;
-          node->size_left++;
+          _ibalance(newNode);
+          return val;
+        }
+      } else if (comp(node->val, val)) {
+        // val > node->val
+        if (node->right) {
+          node = node->right;
+        } else {
+          newNode = new RBNode<T>(val, NodeColor::RED);
+          newNode->parent = node;
+          node->right = newNode;
           _ibalance(newNode);
           return val;
         }
       } else {
-        // val >= node->val
-        if (node->right) {
-          node->size_right++;
-          node = node->right;
-        } else {
-          newNode->parent = node;
-          node->right = newNode;
-          node->size_right++;
-          _ibalance(newNode);
-          return val;
-        }
+        // Value is already in the tree.  For simplicity,
+        // we do not allow duplicate elements
+        // TODO: allow duplicate elements
+        return 0;
       }
     }
   }
@@ -253,11 +220,8 @@ T RBTree<T>::remove(T val) {
   } else {
     // The node has two subtrees
     // Get the greatest element in the left subtree
-    // FIXME: need to decrement sizes as we go down
     RBNode<T>* r = node->left;
-    node->size_left--;
     while (r->right) {
-      r->size_right--;
       r = r->right;
     }
     
@@ -299,26 +263,6 @@ void RBTree<T>::_prepTree(RBNode<T>* toRemove) {
    *   -- AND --
    * At least one of toRemove->left and toRemove->right is NULL
    */
-  
-  // First traverse tree from root and subtract one from size
-  // on the branches we take (this will update the sizing info)
-  assert(_root); // we should never have _root == NULL
-  RBNode<T> *node = _root;
-  
-  while (comp(toRemove->val, node->val) || comp(node->val, toRemove->val)) {
-    if (comp(toRemove->val, node->val)) {
-      // val < node->val
-      node->size_left--;
-      node = node->left;
-    } else {
-      // val > node->val
-      node->size_right--;
-      node = node->right;
-    }
-    assert(node); // should never have node==NULL
-                  // indicates toRemove wasn't actually in the tree
-  }
-  
   if (toRemove->color == NodeColor::BLACK) {
     if (!toRemove->left) {
       // toRemove has only a right subtree
@@ -526,14 +470,12 @@ RBNode<T>* RBTree<T>::_rotateLeft(RBNode<T>* node) {
     newRoot->parent = nullptr;
     _root = newRoot;
   }
-  // Now update the rest of the pointers and subtree sizes
+  // Now update the rest of the pointers
   node->parent = newRoot;
   node->right = newRoot->left;
-  node->size_right = newRoot->size_left;
   if (newRoot->left) newRoot->left->parent = node;
   newRoot->left = node;
-  newRoot->size_left = node->size_left + node->size_right + 1;
-
+  
   return newRoot;
 }
 
@@ -567,13 +509,11 @@ RBNode<T>* RBTree<T>::_rotateRight(RBNode<T>* node) {
     newRoot->parent = nullptr;
     _root = newRoot;
   }
-  // Now update the rest of the pointers and subtree sizes
+  // Now update the rest of the pointers
   node->parent = newRoot;
   node->left = newRoot->right;
-  node->size_left = newRoot->size_right;
   if (newRoot->right) newRoot->right->parent = node;
   newRoot->right = node;
-  newRoot->size_right = node->size_left + node->size_right + 1;
   
   return newRoot;
 }
@@ -653,36 +593,6 @@ int RBTree<T>::_verifyHelper(RBNode<T>* current) {
           //std::cerr << "Improper parent pointer at " << current->right->val
           //    << std::endl;
           return 0;
-        }
-
-        // Verify sizing information
-        if (current->left) {
-          if (current->size_left != 
-              current->left->size_left + current->left->size_right + 1) {
-            //std::cerr << "Improper sizing info at " << current->val
-            //    << std::endl;
-            return 0;
-          }
-        } else {
-          if (current->size_left != 0) {
-            //std::cerr << "Improper sizing info at " << current->val
-            //    << std::endl;
-            return 0;
-          }
-        }
-        if (current->right) {
-          if (current->size_right != 
-              current->right->size_left + current->right->size_right + 1) {
-            //std::cerr << "Improper sizing info at " << current->val
-            //    << std::endl;
-            return 0;
-          }
-        } else {
-          if (current->size_right != 0) {
-            //std::cerr << "Improper sizing info at " << current->val
-            //    << std::endl;
-            return 0;
-          }
         }
         
         // Everything is ok.
