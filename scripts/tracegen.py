@@ -25,7 +25,7 @@ BIASTYPES = ['uniform', 'insert', 'lookup']
 BIAS = BIASTYPES[0] # uniform by default
 
 MEAN_DELAY = 500 # microseconds
-STDDEV_DELAY = 300
+STDDEV_DELAY = 200
 
 values = []
 
