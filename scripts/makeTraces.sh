@@ -18,6 +18,18 @@
 PARAMS=(
     # -l <trace-length> -t <datatype> -b <bias> -d <avg-delay> -s <stddev-delay>
     "-l 10     -t int  -b insert  -d 100 -s 30"
+    "-l 10     -t int  -b insert  -d 100 -s 30"
+    "-l 10     -t int  -b insert  -d 100 -s 30"
+    "-l 10     -t int  -b insert  -d 100 -s 30"
+    "-l 10     -t int  -b insert  -d 100 -s 30"
+    "-l 10     -t int  -b insert  -d 100 -s 30"
+    "-l 10     -t int  -b insert  -d 100 -s 30"
+    "-l 10     -t int  -b insert  -d 100 -s 30"
+    "-l 10     -t int  -b insert  -d 100 -s 30"
+    "-l 10     -t int  -b insert  -d 100 -s 30"
+    "-l 10     -t int  -b insert  -d 100 -s 30"
+    "-l 10     -t int  -b insert  -d 100 -s 30"
+    "-l 10     -t int  -b insert  -d 100 -s 30"
     "-l 10     -t char -b uniform -d 100 -s 30"
     "-l 10     -t int  -b lookup  -d 100 -s 30"
 )
@@ -25,6 +37,19 @@ PARAMS=(
 NAMES=(
     "sample.trace"
     "sample2.trace"
+    "sample3.trace"
+    "sample4.trace"
+    "sample5.trace"
+    "sample6.trace"
+    "sample7.trace"
+    "sample8.trace"
+    "sample9.trace"
+    "sample10.trace"
+    "sample11.trace"
+    "sample12.trace"
+    "sample13.trace"
+    "sample14.trace"
+    "sample15.trace"
 )
 
 #
@@ -56,7 +81,7 @@ else
 fi
 
 for paramset in "${PARAMS[@]}"; do
-    if [[ $COUNTER < ${#NAMES[@]} ]]; then
+    if [[ $COUNTER -lt ${#NAMES[@]} ]]; then
         name=${NAMES[$COUNTER]}
     else
         name="test.$COUNTER.trace"
