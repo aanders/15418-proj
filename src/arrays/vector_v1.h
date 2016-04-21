@@ -17,6 +17,8 @@ template <class T> class VectorArray: public Array<T>
   void ins(T a);
   void del(int idx);
   T lookup(int idx);
+  
+  void flush();
   //bool lookupElt(T val);
 };
 

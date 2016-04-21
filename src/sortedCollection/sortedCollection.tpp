@@ -31,7 +31,7 @@ template <class T> SortedCollection<T>::SortedCollection(
   atUpdatesWait = std::unique_lock<std::mutex>(atUpdatesMutex);
   
   pthread_create(&aThread, NULL, arrayThread<T>, this);
-  //pthread_create(&tThread, NULL, treeThread<T>, this);
+  pthread_create(&tThread, NULL, treeThread<T>, this);
 }
 
 template <class T> SortedCollection<T>::~SortedCollection()
@@ -43,8 +43,8 @@ template <class T> SortedCollection<T>::~SortedCollection()
   
   if(pthread_join(aThread, NULL) != 0)
     cout<<"Join failed."<<endl;
-  //if(pthread_join(tThread, NULL) != 0)
-  //  cout<<"Join failed."<<endl;
+  if(pthread_join(tThread, NULL) != 0)
+    cout<<"Join failed."<<endl;
 }
 
 template <class T> void SortedCollection<T>::ins(T t)
@@ -97,6 +97,7 @@ template <class T> void *SortedCollection<T>::handleUpdatesArray()
   {
     while(!arrayUpdates.remove(&u)) 
     {
+      array->flush();
       atReady.notify_all();
       aReady.notify_all();
     }

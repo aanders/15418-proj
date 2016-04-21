@@ -164,6 +164,10 @@ template <class T> void CustomArrayV2<T>::sortedChecker(T *d, int s)
   }
 }
 
+template <class T> void CustomArrayV2<T>::flush() 
+{
+  emptyInsertions();
+}
 /*
 template <class T> bool CustomArrayV2<T>::lookupElt(T val)
 {
