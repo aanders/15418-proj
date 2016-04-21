@@ -31,8 +31,10 @@ template <class T> class SortedCollection
   Queue< Update<T> > treeUpdates;
   Queue< Update<T> > arrayUpdates;
   
+  long servicedFromTree;
+  long servicedFromArray;
+  
   int numUpdates;
-
   int numAUpdates;
   int numTUpdates;
 
