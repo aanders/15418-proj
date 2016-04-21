@@ -46,7 +46,6 @@ template <class T> SortedCollection<T>::~SortedCollection()
   cout<<"Serviced from tree: \t"<<servicedFromTree<<endl;
   cout<<"Serviced from array: \t"<<servicedFromArray<<endl;
   
-  
   if(pthread_join(aThread, NULL) != 0)
     cout<<"Join failed."<<endl;
   if(pthread_join(tThread, NULL) != 0)
