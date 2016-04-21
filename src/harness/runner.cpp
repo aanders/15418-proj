@@ -30,17 +30,18 @@ volatile int spinCounter;
 void Runner::run(unsigned int trials)
 {
   std::string line;
-  std::string op;
 
   std::vector<std::string>::const_iterator it = trialNames.cbegin();
   for (unsigned int t = 0; t < trials; t++)
   {
+    double trialTime = 0.0;
+    double start, end;
+
     trial_no_ = t;
     tracefile_.clear();
     tracefile_.seekg(0, ios::beg);
     line_no_ = 0;
     init();
-    double start = CycleTimer::currentSeconds();
     while (std::getline(tracefile_, line))
     {
       line_no_++;
@@ -51,6 +52,7 @@ void Runner::run(unsigned int trials)
         std::string data = line.substr(n+1);
         if (op.compare("pause") == 0)
         {
+          start = CycleTimer::currentSeconds();
           try
           {
             int cycles = std::stoi(data);
@@ -65,24 +67,28 @@ void Runner::run(unsigned int trials)
             std::cerr << "  in \"" << getTrialName(trial_no_)
                 << "\"" << std::endl;
           }
+          end = CycleTimer::currentSeconds();
+          trialTime += end-start;
         }
         else
         {
+          start = CycleTimer::currentSeconds();
           runop(op, data);
+          end = CycleTimer::currentSeconds();
+          trialTime += end-start;
         }
       }
     }
-    double end = CycleTimer::currentSeconds();
     cleanup();
     
     if (std::distance(it, trialNames.cend()) > 0)
     {
-      std::cout << *it << " took " << end-start
+      std::cout << *it << " took " << trialTime
           << " seconds to complete" << std::endl;
     }
     else
     {
-      std::cout << "Trial " << t << " took " << end-start
+      std::cout << "Trial " << t << " took " << trialTime
           << " seconds to complete" << std::endl;
     }
     it++;
