@@ -17,14 +17,37 @@
 
 PARAMS=(
     # -l <trace-length> -t <datatype> -b <bias> -d <avg-delay> -s <stddev-delay>
-    "-l 10     -t int  -b insert  -d 100 -s 30"
-    "-l 10     -t char -b uniform -d 100 -s 30"
-    "-l 10     -t int  -b lookup  -d 100 -s 30"
+    "-l 10     -t int  -b insert  -d 200 -s 50"
+    "-l 20     -t int -b insert -d 200 -s 50"
+    "-l 40     -t int  -b lookup  -d 200 -s 50"
+    "-l 80     -t int  -b lookup  -d 200 -s 50"
+    "-l 160     -t int  -b lookup  -d 200 -s 50"
+    "-l 320     -t int  -b lookup  -d 200 -s 50"
+    "-l 640     -t int  -b lookup  -d 200 -s 50"
+    "-l 1280     -t int  -b lookup  -d 200 -s 50"
+    "-l 2560     -t int  -b lookup  -d 200 -s 50"
+    "-l 5120     -t int  -b lookup  -d 200 -s 50"
+    "-l 10240     -t int  -b lookup  -d 200 -s 50"
+    "-l 20480     -t int  -b lookup  -d 200 -s 50"
+    "-l 40960     -t int  -b lookup  -d 200 -s 50"
+    "-l 81920     -t int  -b lookup  -d 200 -s 50"
 )
 
 NAMES=(
-    "sample.trace"
-    "sample2.trace"
+    #"sample.trace0"
+    #"sample.trace1"
+    #"sample.trace2"
+    #"sample.trace3"
+    #"sample.trace4"
+    #"sample.trace5"
+    #"sample.trace6"
+    #"sample.trace7"
+    #"sample.trace8"
+    #"sample.trace9"
+    #"sample.trace10"
+    #"sample.trace11"
+    #"sample.trace12"
+    #"sample.trace13"
 )
 
 #
