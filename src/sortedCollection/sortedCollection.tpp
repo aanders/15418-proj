@@ -25,7 +25,8 @@ template <class T> SortedCollection<T>::SortedCollection(
   comp = c;
   numUpdates = numTUpdates = numAUpdates = 0;
   servicedFromTree = servicedFromArray = 0;
-  
+  numTimesWaitedOnLookup = 0;
+   
   array = new VectorArray<T>(comp);
   tree = new RBTree<T>(comp);
   aUpdatesWait = std::unique_lock<std::mutex>(aUpdatesMutex);
@@ -45,6 +46,7 @@ template <class T> SortedCollection<T>::~SortedCollection()
   
   cout<<"Serviced from tree: \t"<<servicedFromTree<<endl;
   cout<<"Serviced from array: \t"<<servicedFromArray<<endl;
+  cout<<"Times it wasn't ready: \t"<<numTimesWaitedOnLookup<<endl;
   
   if(pthread_join(aThread, NULL) != 0)
     cout<<"Join failed."<<endl;
@@ -74,8 +76,14 @@ template <class T> void SortedCollection<T>::del(int idx)
 
 template <class T> T SortedCollection<T>::lookup(int idx)
 {
+  bool ready = true;
   while(numTUpdates != numUpdates && numAUpdates != numUpdates) 
   {
+    if(ready)
+    {
+      ready = false;
+      numTimesWaitedOnLookup++;
+    }
     atReady.wait(atUpdatesWait);
   }
   

@@ -33,6 +33,7 @@ template <class T> class SortedCollection
   
   long servicedFromTree;
   long servicedFromArray;
+  long numTimesWaitedOnLookup;
   
   int numUpdates;
   int numAUpdates;
