@@ -3,20 +3,13 @@
  */
 
 #include <iostream>
-#include <assert.h>
 #include "rbtree.h"
-
-/*
- * constructor
- */
-template <class T>
-RBTree<T>::RBTree(bool (*c)(T a, T b)) : _root(nullptr), comp(c) {}
 
 /*
  * lookup
  */
 template <class T>
-RBNode<T>* RBTree<T>::lookup(T val) {
+RBNode<T>* RBTree<T>::lookup(T val, bool for_del) {
   RBNode<T>* node = _root;
   
   if (!_root) {
@@ -25,6 +18,9 @@ RBNode<T>* RBTree<T>::lookup(T val) {
   }
   
   while (comp(val, node->val) || comp(node->val, val)) {
+    if (for_del) {
+      node->size--;
+    }
     if (comp(val, node->val)) {
       // val < node->val
       node = node->left;
@@ -47,32 +43,39 @@ RBNode<T>* RBTree<T>::lookup(T val) {
  * lookupByIdx
  */
 template <class T>
-RBNode<T>* RBTree<T>::lookupByIdx(int i) {
+RBNode<T> *RBTree<T>::lookupByIdx(unsigned int i, bool for_del) {
   RBNode<T>* node = _root;
-  
-  // can't access a negative index
-  if (i < 0) {
+
+  if (!_root) {
+    // Tree has no content
     return nullptr;
   }
 
-  while(true) {
+  if (i >= _root->size) {
+    // Index out of bounds
+    return nullptr;
+  }
+
+  while (true) {
     if (!node) {
-      // Index out of bounds
-      // or something went horribly wrong
+      // should never happen
       return nullptr;
     }
-    if (i == node->size_left) {
-      return node;
-    } else if (i < node->size_left) {
-      // continue on left subtree
-      // no adjustment to i needed
-      node = node->left;
+
+    if (for_del) {
+      node->size--;
     }
-    else {
-      // continue on right subtree
-      // subtract number of elements we "skipped" from index
-      // (i.e. left subtree plus the node we were at)
-      i -= (node->size_left + 1);
+    if (node->left && i < node->left->size) {
+      // i is unchanged
+      node = node->left;
+    } else if (node->left && i == node->left->size) {
+      return node;
+    } else if (!node->left && i == 0) {
+      return node;
+    } else {
+      // i > node->left->size, or node->left == NULL
+      // in which case we can treat node->left->size == 0
+      i -= (1 + ((node->left)? node->left->size : 0));
       node = node->right;
     }
   }
@@ -95,27 +98,24 @@ T RBTree<T>::insert(T val) {
     RBNode<T>* newNode = new RBNode<T>(val, NodeColor::RED);
 
     while (true) {
+      node->size++;
       if (comp(val, node->val)) {
         // val < node->val
         if (node->left) {
-          node->size_left++;
           node = node->left;
         } else {
           newNode->parent = node;
           node->left = newNode;
-          node->size_left++;
           _ibalance(newNode);
           return val;
         }
       } else {
         // val >= node->val
         if (node->right) {
-          node->size_right++;
           node = node->right;
         } else {
           newNode->parent = node;
           node->right = newNode;
-          node->size_right++;
           _ibalance(newNode);
           return val;
         }
@@ -209,12 +209,38 @@ template <class T>
 T RBTree<T>::remove(T val) {
   
   // Search the tree to find the node containing val
-  RBNode<T>* node = lookup(val);
+  RBNode<T>* node = lookup(val, true);
   if (!node) {
     // Tree does not contain the value to remove
     return 0;
   }
+
+  return removeNode(node);
+}
+
+/*
+ * removeByIdx
+ */
+template <class T>
+T RBTree<T>::removeByIdx(unsigned int i) {
+
+  // Search the tree to find the proper node
+  RBNode<T>* node = lookupByIdx(i, true);
+  if (!node) {
+    // Index out of bounds, or other error
+    return 0;
+  }
+
+  return removeNode(node);
+}
   
+/*
+ * Remove specific node from red-black tree
+ */
+template <class T>
+T RBTree<T>::removeNode(RBNode<T> *node) {
+  T val = node->val;
+
   // Remove the node from the tree
   if (!node->left) {
     // the node has only a right subtree
@@ -253,12 +279,12 @@ T RBTree<T>::remove(T val) {
   } else {
     // The node has two subtrees
     // Get the greatest element in the left subtree
-    // FIXME: need to decrement sizes as we go down
+    // Also have to keep on decrementing the size on branches we travel
     RBNode<T>* r = node->left;
-    node->size_left--;
+    r->size--;
     while (r->right) {
-      r->size_right--;
       r = r->right;
+      r->size--;
     }
     
     // This element will replace the node that we are deleting,
@@ -299,26 +325,6 @@ void RBTree<T>::_prepTree(RBNode<T>* toRemove) {
    *   -- AND --
    * At least one of toRemove->left and toRemove->right is NULL
    */
-  
-  // First traverse tree from root and subtract one from size
-  // on the branches we take (this will update the sizing info)
-  assert(_root); // we should never have _root == NULL
-  RBNode<T> *node = _root;
-  
-  while (comp(toRemove->val, node->val) || comp(node->val, toRemove->val)) {
-    if (comp(toRemove->val, node->val)) {
-      // val < node->val
-      node->size_left--;
-      node = node->left;
-    } else {
-      // val > node->val
-      node->size_right--;
-      node = node->right;
-    }
-    assert(node); // should never have node==NULL
-                  // indicates toRemove wasn't actually in the tree
-  }
-  
   if (toRemove->color == NodeColor::BLACK) {
     if (!toRemove->left) {
       // toRemove has only a right subtree
@@ -526,14 +532,18 @@ RBNode<T>* RBTree<T>::_rotateLeft(RBNode<T>* node) {
     newRoot->parent = nullptr;
     _root = newRoot;
   }
-  // Now update the rest of the pointers and subtree sizes
+  // Now update the rest of the pointers
   node->parent = newRoot;
   node->right = newRoot->left;
-  node->size_right = newRoot->size_left;
   if (newRoot->left) newRoot->left->parent = node;
   newRoot->left = node;
-  newRoot->size_left = node->size_left + node->size_right + 1;
 
+  // Update sizing information
+  newRoot->size = node->size;
+  node->size =
+      ((node->left) ? node->left->size : 0) +
+      ((node->right) ? node->right->size : 0) + 1;
+  
   return newRoot;
 }
 
@@ -567,13 +577,17 @@ RBNode<T>* RBTree<T>::_rotateRight(RBNode<T>* node) {
     newRoot->parent = nullptr;
     _root = newRoot;
   }
-  // Now update the rest of the pointers and subtree sizes
+  // Now update the rest of the pointers
   node->parent = newRoot;
   node->left = newRoot->right;
-  node->size_left = newRoot->size_right;
   if (newRoot->right) newRoot->right->parent = node;
   newRoot->right = node;
-  newRoot->size_right = node->size_left + node->size_right + 1;
+  
+  // Update sizing information
+  newRoot->size = node->size;
+  node->size =
+      ((node->left) ? node->left->size : 0) +
+      ((node->right) ? node->right->size : 0) + 1;
   
   return newRoot;
 }
@@ -654,41 +668,42 @@ int RBTree<T>::_verifyHelper(RBNode<T>* current) {
           //    << std::endl;
           return 0;
         }
-
-        // Verify sizing information
-        if (current->left) {
-          if (current->size_left != 
-              current->left->size_left + current->left->size_right + 1) {
-            //std::cerr << "Improper sizing info at " << current->val
-            //    << std::endl;
-            return 0;
-          }
-        } else {
-          if (current->size_left != 0) {
-            //std::cerr << "Improper sizing info at " << current->val
-            //    << std::endl;
-            return 0;
-          }
-        }
-        if (current->right) {
-          if (current->size_right != 
-              current->right->size_left + current->right->size_right + 1) {
-            //std::cerr << "Improper sizing info at " << current->val
-            //    << std::endl;
-            return 0;
-          }
-        } else {
-          if (current->size_right != 0) {
-            //std::cerr << "Improper sizing info at " << current->val
-            //    << std::endl;
-            return 0;
-          }
+        unsigned int lsize = 0;
+        if (current->left) lsize += current->left->size;
+        if (current->right) lsize += current->right->size;
+        if (current->size != lsize+1) {
+          std::cerr << "Sizing error at " << current->val << std::endl;
+          return 0;
         }
         
         // Everything is ok.
         return lBlackHeight + ((current->color == NodeColor::BLACK) ? 1 : 0);
       }
     }
+  }
+}
+
+/*
+ * traverse
+ */
+template <class T>
+void RBTree<T>::traverse() {
+  std::cout<<"[ ";
+  _traverseHelper(_root);
+  std::cout<<"]"<<std::endl;
+}
+
+template <class T>
+void RBTree<T>::_traverseHelper(RBNode<T>* current) {
+  if (!current) {
+    return;
+  } else {
+    _traverseHelper(current->left);
+    std::cout<<current->val;
+    if (current->color == NodeColor::BLACK) std::cout<<"B";
+    else std::cout<<"R";
+    std::cout<<current->size<<", ";
+    _traverseHelper(current->right);
   }
 }
 

@@ -78,7 +78,7 @@ template <class T> T SortedCollection<T>::lookup(int idx)
   {
     return array->lookup(idx);
   }
-  return tree->lookup(idx)->val;
+  return tree->lookupByIdx(idx)->val;
 }
 
 template <class T> bool SortedCollection<T>::lookupElt(T val)
@@ -131,8 +131,7 @@ template <class T> void *SortedCollection<T>::handleUpdatesTree()
     
     if(u.type == TYPE_DELETE)
     {
-      RBNode<T> *n = tree->lookupByIdx(u.idx);
-      if (n != nullptr) tree->remove(n->val);
+      tree->removeByIdx(u.idx);
     }
     else if(u.type == TYPE_INSERT)
     {
