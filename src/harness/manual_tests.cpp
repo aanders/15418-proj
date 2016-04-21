@@ -16,11 +16,11 @@ bool charComp(char a, char b)
 bool testRbtIndexing()
 {
   const int size = 12;
-//  int inserts[size] = {5, 4, 8, -3, 2, 4, 7, 25, -113, 0, 3, 0};
-//  int sorted[size] = {-113, -3, 0, 0, 2, 3, 4, 4, 5, 7, 8, 25};
+  int inserts[size] = {5, 4, 8, -3, 2, 4, 7, 25, -113, 0, 3, 0};
+  int sorted[size] = {-113, -3, 0, 0, 2, 3, 4, 4, 5, 7, 8, 25};
   
-  int inserts[size] = {5, 4, 8, -3, 2, 11, 7, 25, -113, 1, 3, 0};
-  int sorted[size] = {-113, -3, 0, 1, 2, 3, 4, 5, 7, 8, 11, 25};
+//  int inserts[size] = {5, 4, 8, -3, 2, 11, 7, 25, -113, 1, 3, 0};
+//  int sorted[size] = {-113, -3, 0, 1, 2, 3, 4, 5, 7, 8, 11, 25};
   
   RBTree<int> rbt(&intComp);
   

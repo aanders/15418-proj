@@ -57,11 +57,7 @@ public:
   RBNode<T>* lookupByIdx(unsigned int i, bool for_del = false);
   
   /* Inserts a node with value val into the tree, keeping the tree
-   * roughly balanced.  Duplicate values are not allowed; so if the
-   * value already exists in the tree, it is not inserted and the
-   * function returns null.  Otherwise, it returns the value inserted.
-   *
-   * TODO: allow duplicates
+   * roughly balanced.
    */
   T insert(T val);
   

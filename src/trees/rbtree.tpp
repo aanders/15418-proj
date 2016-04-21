@@ -109,8 +109,8 @@ T RBTree<T>::insert(T val) {
           _ibalance(newNode);
           return val;
         }
-      } else if (comp(node->val, val)) {
-        // val > node->val
+      } else {
+        // val >= node->val
         if (node->right) {
           node = node->right;
         } else {
@@ -119,13 +119,6 @@ T RBTree<T>::insert(T val) {
           _ibalance(newNode);
           return val;
         }
-      } else {
-        // Value is already in the tree.  For simplicity,
-        // we do not allow duplicate elements
-        // TODO: allow duplicate elements
-        std::cerr << "ERROR: tried to insert duplicate element." << std::endl;
-        std::cerr << "  The sizing information is going to be all messed up." << std::endl;
-        return 0;
       }
     }
   }
