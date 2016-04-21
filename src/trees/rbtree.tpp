@@ -6,16 +6,10 @@
 #include "rbtree.h"
 
 /*
- * constructor
- */
-template <class T>
-RBTree<T>::RBTree(bool (*c)(T a, T b)) : comp (c) {}
-
-/*
  * lookup
  */
 template <class T>
-RBNode<T>* RBTree<T>::lookup(T val) {
+RBNode<T>* RBTree<T>::lookup(T val, bool for_del) {
   RBNode<T>* node = _root;
   
   if (!_root) {
@@ -24,6 +18,9 @@ RBNode<T>* RBTree<T>::lookup(T val) {
   }
   
   while (comp(val, node->val) || comp(node->val, val)) {
+    if (for_del) {
+      node->size--;
+    }
     if (comp(val, node->val)) {
       // val < node->val
       node = node->left;
@@ -43,6 +40,48 @@ RBNode<T>* RBTree<T>::lookup(T val) {
 }
 
 /*
+ * lookupByIdx
+ */
+template <class T>
+RBNode<T> *RBTree<T>::lookupByIdx(unsigned int i, bool for_del) {
+  RBNode<T>* node = _root;
+
+  if (!_root) {
+    // Tree has no content
+    return nullptr;
+  }
+
+  if (i >= _root->size) {
+    // Index out of bounds
+    return nullptr;
+  }
+
+  while (true) {
+    if (!node) {
+      // should never happen
+      return nullptr;
+    }
+
+    if (for_del) {
+      node->size--;
+    }
+    if (node->left && i < node->left->size) {
+      // i is unchanged
+      node = node->left;
+    } else if (node->left && i == node->left->size) {
+      return node;
+    } else if (!node->left && i == 0) {
+      return node;
+    } else {
+      // i > node->left->size, or node->left == NULL
+      // in which case we can treat node->left->size == 0
+      i -= (1 + ((node->left)? node->left->size : 0));
+      node = node->right;
+    }
+  }
+}
+
+/*
  * insert
  */
 template <class T>
@@ -56,15 +95,15 @@ T RBTree<T>::insert(T val) {
     // Go as far as we can in the tree and then
     // insert the new value
     RBNode<T>* node = _root;
-    RBNode<T>* newNode = nullptr;  // don't create the new node
-                                // until we know we can insert it
+    RBNode<T>* newNode = new RBNode<T>(val, NodeColor::RED);
+
     while (true) {
+      node->size++;
       if (comp(val, node->val)) {
         // val < node->val
         if (node->left) {
           node = node->left;
         } else {
-          newNode = new RBNode<T>(val, NodeColor::RED);
           newNode->parent = node;
           node->left = newNode;
           _ibalance(newNode);
@@ -75,7 +114,6 @@ T RBTree<T>::insert(T val) {
         if (node->right) {
           node = node->right;
         } else {
-          newNode = new RBNode<T>(val, NodeColor::RED);
           newNode->parent = node;
           node->right = newNode;
           _ibalance(newNode);
@@ -85,6 +123,8 @@ T RBTree<T>::insert(T val) {
         // Value is already in the tree.  For simplicity,
         // we do not allow duplicate elements
         // TODO: allow duplicate elements
+        std::cerr << "ERROR: tried to insert duplicate element." << std::endl;
+        std::cerr << "  The sizing information is going to be all messed up." << std::endl;
         return 0;
       }
     }
@@ -176,12 +216,38 @@ template <class T>
 T RBTree<T>::remove(T val) {
   
   // Search the tree to find the node containing val
-  RBNode<T>* node = lookup(val);
+  RBNode<T>* node = lookup(val, true);
   if (!node) {
     // Tree does not contain the value to remove
     return 0;
   }
+
+  return removeNode(node);
+}
+
+/*
+ * removeByIdx
+ */
+template <class T>
+T RBTree<T>::removeByIdx(unsigned int i) {
+
+  // Search the tree to find the proper node
+  RBNode<T>* node = lookupByIdx(i, true);
+  if (!node) {
+    // Index out of bounds, or other error
+    return 0;
+  }
+
+  return removeNode(node);
+}
   
+/*
+ * Remove specific node from red-black tree
+ */
+template <class T>
+T RBTree<T>::removeNode(RBNode<T> *node) {
+  T val = node->val;
+
   // Remove the node from the tree
   if (!node->left) {
     // the node has only a right subtree
@@ -220,9 +286,12 @@ T RBTree<T>::remove(T val) {
   } else {
     // The node has two subtrees
     // Get the greatest element in the left subtree
+    // Also have to keep on decrementing the size on branches we travel
     RBNode<T>* r = node->left;
+    r->size--;
     while (r->right) {
       r = r->right;
+      r->size--;
     }
     
     // This element will replace the node that we are deleting,
@@ -475,6 +544,12 @@ RBNode<T>* RBTree<T>::_rotateLeft(RBNode<T>* node) {
   node->right = newRoot->left;
   if (newRoot->left) newRoot->left->parent = node;
   newRoot->left = node;
+
+  // Update sizing information
+  newRoot->size = node->size;
+  node->size =
+      ((node->left) ? node->left->size : 0) +
+      ((node->right) ? node->right->size : 0) + 1;
   
   return newRoot;
 }
@@ -514,6 +589,12 @@ RBNode<T>* RBTree<T>::_rotateRight(RBNode<T>* node) {
   node->left = newRoot->right;
   if (newRoot->right) newRoot->right->parent = node;
   newRoot->right = node;
+  
+  // Update sizing information
+  newRoot->size = node->size;
+  node->size =
+      ((node->left) ? node->left->size : 0) +
+      ((node->right) ? node->right->size : 0) + 1;
   
   return newRoot;
 }
@@ -592,6 +673,13 @@ int RBTree<T>::_verifyHelper(RBNode<T>* current) {
         } else if (current->right && current->right->parent != current) {
           //std::cerr << "Improper parent pointer at " << current->right->val
           //    << std::endl;
+          return 0;
+        }
+        unsigned int lsize = 0;
+        if (current->left) lsize += current->left->size;
+        if (current->right) lsize += current->right->size;
+        if (current->size != lsize+1) {
+          std::cerr << "Sizing error at " << current->val << std::endl;
           return 0;
         }
         
