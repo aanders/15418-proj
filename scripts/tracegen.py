@@ -65,7 +65,7 @@ def instruction():
             data = chr(random.randint(*CHAR_DATA_RANGE))
         else:
             data = random.randint(*INT_DATA_RANGE)
-        bisect.insort_left(data, values)
+        bisect.insort_left(values, data)
         return instr, data
     elif instr == 'delete':
         if len(values) == 0:
