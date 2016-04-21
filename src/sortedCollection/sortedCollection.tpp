@@ -24,7 +24,7 @@ template <class T> SortedCollection<T>::SortedCollection(
 {
   comp = c;
   numUpdates = numTUpdates = numAUpdates = 0;
-  array = new VectorArray<T>(comp);
+  array = new CustomArrayV2<T>(comp);
   tree = new RBTree<T>(comp);
   aUpdatesWait = std::unique_lock<std::mutex>(aUpdatesMutex);
   tUpdatesWait = std::unique_lock<std::mutex>(tUpdatesMutex);
@@ -92,12 +92,15 @@ template <class T> bool SortedCollection<T>::lookupElt(T val)
 
 template <class T> void *SortedCollection<T>::handleUpdatesArray()
 {
+  int numHandled = 0;
   Update<T> u;
   while(true)
   {
     while(!arrayUpdates.remove(&u)) 
     {
       array->flush();
+      numAUpdates += numHandled;
+      numHandled = 0;
       atReady.notify_all();
       aReady.notify_all();
     }
@@ -114,7 +117,7 @@ template <class T> void *SortedCollection<T>::handleUpdatesArray()
       return NULL;
     }
     
-    numAUpdates++;
+    numHandled++;
   }
   return NULL;
 }
@@ -122,6 +125,7 @@ template <class T> void *SortedCollection<T>::handleUpdatesArray()
 template <class T> void *SortedCollection<T>::handleUpdatesTree()
 {
   Update<T> u;
+  
   while(true)
   {
     while(!treeUpdates.remove(&u))

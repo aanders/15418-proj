@@ -9,7 +9,6 @@ template <class T> CustomArrayV2<T>::CustomArrayV2(bool (*c)(T a, T b))
   size = 0;
   allocated = 1;
   data = new T[allocated];
-  
   numInsertions = 0;
 }
 
@@ -18,11 +17,9 @@ template <class T> void CustomArrayV2<T>::emptyInsertions()
 {
   if(numInsertions == 0)
     return;
-  //cout<<numInsertions<<endl;
+  
   sort(insertions, numInsertions, this->comp, insertions+INSERT_BUFFER_SIZE);
   //sortedChecker(insertions, numInsertions);
-  //cout<<"Sorted insertions:\n";
-  //printData(insertions, numInsertions); 
   
   int startIdx = 0;
   int indices[numInsertions];
@@ -85,7 +82,6 @@ template <class T> void CustomArrayV2<T>::emptyInsertions()
     data = newArr;
   }
   
-  //sortedChecker();
 }
 
 template <class T> void CustomArrayV2<T>::ins(T a)
@@ -126,7 +122,6 @@ template <class T> void CustomArrayV2<T>::del(int idx)
 
 template <class T> T CustomArrayV2<T>::lookup(int idx)
 {
-  emptyInsertions();
   return data[idx];
 }
 
@@ -153,8 +148,9 @@ template <class T> void CustomArrayV2<T>::sortedChecker(T *d, int s)
     }
     cout<<d[i]<<", ";
   }
-  if(size > 0)
-    cout<<d[size - 1]<<endl;
+  
+  if(s > 0)
+    cout<<d[s - 1]<<endl;
   else
     cout<<endl;
   
@@ -168,6 +164,7 @@ template <class T> void CustomArrayV2<T>::flush()
 {
   emptyInsertions();
 }
+
 /*
 template <class T> bool CustomArrayV2<T>::lookupElt(T val)
 {

@@ -311,7 +311,6 @@ template <class T> void CustomArrayV3<T>::executeUpdates()
 
 template <class T> T CustomArrayV3<T>::lookup(int idx)
 {
-  executeUpdates();
   return data[idx];
 }
 
