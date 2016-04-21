@@ -22,6 +22,9 @@ std::string Runner::getTrialName(unsigned int trial)
   }
 }
 
+void Runner::init() {}
+void Runner::cleanup() {}
+
 volatile int spinCounter;
 
 void Runner::run(unsigned int trials)
@@ -36,6 +39,7 @@ void Runner::run(unsigned int trials)
     tracefile_.clear();
     tracefile_.seekg(0, ios::beg);
     line_no_ = 0;
+    init();
     double start = CycleTimer::currentSeconds();
     while (std::getline(tracefile_, line))
     {
@@ -69,6 +73,7 @@ void Runner::run(unsigned int trials)
       }
     }
     double end = CycleTimer::currentSeconds();
+    cleanup();
     
     if (std::distance(it, trialNames.cend()) > 0)
     {

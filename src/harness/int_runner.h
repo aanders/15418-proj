@@ -14,15 +14,15 @@ class IntRunner : public Runner
 {
   protected:
     static bool comp(int a, int b) { return a < b; };
-    SortedCollection<int> collection_;
-    RBTree<int> tree_;
+    SortedCollection<int> *collection_;
+    RBTree<int> *tree_;
 
   public:
-    IntRunner(std::ifstream& tracefile)
-      : Runner(tracefile, {"SortedCollection trial", "RedBlackTree trial"}),
-        collection_(&comp), tree_(&comp) {}
-    
+    IntRunner(std::ifstream& tracefile);
+    ~IntRunner();
+   
     void runop(std::string op, std::string data);
+    void cleanup();
     void run();
 };
 

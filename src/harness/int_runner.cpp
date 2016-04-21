@@ -6,6 +6,19 @@
 #include "int_runner.h"
 //#define DEBUG
 
+IntRunner::IntRunner(std::ifstream& tracefile)
+      : Runner(tracefile, {"SortedCollection trial", "RedBlackTree trial"})
+{
+  collection_ = new SortedCollection<int>(&comp);
+  tree_ = new RBTree<int>(&comp);
+}
+
+IntRunner::~IntRunner()
+{
+  if (collection_) delete collection_;
+  if (tree_) delete tree_;
+}
+
 void IntRunner::runop(std::string op, std::string data)
 {
   try {
@@ -14,11 +27,11 @@ void IntRunner::runop(std::string op, std::string data)
       int elt = std::stoi(data);
       if (this->trial_no_ == 0)
       {
-        collection_.ins(elt);
+        collection_->ins(elt);
       }
       else
       {
-        tree_.insert(elt);
+        tree_->insert(elt);
       }
 #ifdef DEBUG
       std::cout << "Inserted " << elt << std::endl;
@@ -33,11 +46,11 @@ void IntRunner::runop(std::string op, std::string data)
         int elt;
         if (this->trial_no_ == 0)
         {
-          elt = collection_.lookup(idx);
+          elt = collection_->lookup(idx);
         }
         else
         {
-          RBNode<int> *node = tree_.lookupByIdx(idx);
+          RBNode<int> *node = tree_->lookupByIdx(idx);
           elt = (node != nullptr) ? node->val : 0;
         }
 #ifdef DEBUG
@@ -59,11 +72,11 @@ void IntRunner::runop(std::string op, std::string data)
       int idx = std::stoi(data);
       if (this->trial_no_ == 0)
       {
-        collection_.del(idx);
+        collection_->del(idx);
       }
       else
       {
-        tree_.removeByIdx(idx);
+        tree_->removeByIdx(idx);
       }
 #ifdef DEBUG
       std::cout << "Deletion at index " << idx << std::endl;
@@ -88,7 +101,18 @@ void IntRunner::runop(std::string op, std::string data)
   }
 }
 
+void IntRunner::cleanup()
+{
+  if (this->trial_no_ == 0)
+  {
+    // Remove the sortedCollection so it doesn't get in the
+    // way of the reference timing
+    delete collection_;
+    collection_ = nullptr;
+  }
+}
+
 void IntRunner::run()
 {
-  Runner::run(2); //CHANGE BACK TO A 1
+  Runner::run(2);
 }

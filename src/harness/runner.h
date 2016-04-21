@@ -29,6 +29,17 @@ class Runner
     virtual void runop(std::string op, std::string data) = 0;
 
     /*
+     * These functions will be called at the beginning and end of
+     * each "trial" execution respectively.  The trial number
+     * can be obtained from the trial_no_ variable.
+     *
+     * The time taken by these functions is not included in the
+     * reported trace running time.
+     */
+    virtual void init();
+    virtual void cleanup();
+
+    /*
      * Run a given number of trials on the associated tracefile.
      * The trial number (from 0 to trials-1) will be passed as
      * an argument to the runop function, which allows different
