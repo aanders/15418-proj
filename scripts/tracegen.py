@@ -4,6 +4,7 @@
 
 import argparse
 import random
+import sys
 
 TRACE_LENGTH = 100
 INT_DATA_RANGE = [-1000,1000]
@@ -133,11 +134,19 @@ def load_args():
 #
 if __name__ == '__main__':
     load_args()
+    sys.stderr.write("Beginning trace generation with the following parameters:\n")
+    sys.stderr.write("  trace-length = " + str(TRACE_LENGTH) + "\n")
+    sys.stderr.write("  data type    = " + str(DATATYPE) + "\n")
+    sys.stderr.write("  bias         = " + str(BIAS)     + "\n")
+    sys.stderr.write("  avg-delay    = " + str(MEAN_DELAY) + "\n")
+    sys.stderr.write("  stddev-delay = " + str(STDDEV_DELAY) + "\n")
     for i in xrange(0,TRACE_LENGTH):
+        sys.stderr.write("\rProgress: {}%".format(int(float(i)/float(TRACE_LENGTH)*100)))
         line = (None, None)
         while line[0] == None:
             line = instruction()
         printline(*line)
         line = pause()
         printline(*line)
+    sys.stderr.write("\nTrace generation complete.\n")
 
