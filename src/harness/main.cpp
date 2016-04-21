@@ -1,4 +1,6 @@
+#include <iostream>
 #include <fstream>
+#include <string>
 #include <stdlib.h>
 
 #include "int_runner.h"
@@ -13,9 +15,43 @@ int main(int argc, char* argv[])
   
   if (argc > 1)
   {
-    std::ifstream f(argv[1]);
-    IntRunner runner(f);
-    runner.run();
+    std::string tracefile(argv[1]);
+
+    std::ifstream f(tracefile);
+    if (!f.is_open())
+    {
+      std::cerr << "Error: could not open file " << tracefile
+          << ".  Aborting." << std::endl;
+      return 1;
+    }
+
+    std::string header;
+    if (!std::getline(f, header))
+    {
+      std::cerr << "Error: " << tracefile <<
+          " has no content.  Aborting." << std::endl;
+      return 1;
+    }
+    
+    if (header.find("DATATYPE:") != 0)
+    {
+      std::cerr << "Error: " << tracefile <<
+          " is not a valid trace file.  Aborting." << std::endl;
+      return 1;
+    }
+
+    if (header.compare("DATATYPE:INT") == 0)
+    {
+      IntRunner runner(f);
+      runner.run(); // automatically closes f
+    }
+    else
+    {
+      std::cerr << "Error: unrecognized datatype declaration "
+          << header << ".  Aborting." << std::endl;
+      f.close();
+      return 2;
+    }
   }
   else
   {
