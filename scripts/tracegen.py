@@ -3,6 +3,7 @@
 # Generate test traces for evaluating the data structure
 
 import argparse
+import bisect
 import random
 import sys
 
@@ -64,8 +65,7 @@ def instruction():
             data = chr(random.randint(*CHAR_DATA_RANGE))
         else:
             data = random.randint(*INT_DATA_RANGE)
-        values.append(data)
-        values.sort()
+        bisect.insort_left(data, values)
         return instr, data
     elif instr == 'delete':
         if len(values) == 0:
