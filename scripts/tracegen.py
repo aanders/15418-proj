@@ -144,6 +144,7 @@ if __name__ == '__main__':
         sys.stderr.write("  avg-delay    = " + str(MEAN_DELAY) + "\n")
         sys.stderr.write("  stddev-delay = " + str(STDDEV_DELAY) + "\n")
 
+    print "DATATYPE:"+str(DATATYPE).upper()
     for i in xrange(0,TRACE_LENGTH):
         if not sys.stdout.isatty():
             sys.stderr.write("\rProgress: {}%".format(int(float(i)/float(TRACE_LENGTH)*100)))
