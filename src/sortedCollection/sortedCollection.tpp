@@ -24,7 +24,9 @@ template <class T> SortedCollection<T>::SortedCollection(
 {
   comp = c;
   numUpdates = numTUpdates = numAUpdates = 0;
-  array = new CustomArrayV2<T>(comp);
+  servicedFromTree = servicedFromArray = 0;
+  
+  array = new VectorArray<T>(comp);
   tree = new RBTree<T>(comp);
   aUpdatesWait = std::unique_lock<std::mutex>(aUpdatesMutex);
   tUpdatesWait = std::unique_lock<std::mutex>(tUpdatesMutex);
@@ -40,6 +42,10 @@ template <class T> SortedCollection<T>::~SortedCollection()
   stop.type = TYPE_STOP;
   treeUpdates.insert(stop);
   arrayUpdates.insert(stop);
+  
+  cout<<"Serviced from tree: \t"<<servicedFromTree<<endl;
+  cout<<"Serviced from array: \t"<<servicedFromArray<<endl;
+  
   
   if(pthread_join(aThread, NULL) != 0)
     cout<<"Join failed."<<endl;
@@ -76,8 +82,10 @@ template <class T> T SortedCollection<T>::lookup(int idx)
   
   if(numAUpdates == numUpdates)
   {
+    servicedFromArray++;
     return array->lookup(idx);
   }
+  servicedFromTree++;
   return tree->lookupByIdx(idx)->val;
 }
 
