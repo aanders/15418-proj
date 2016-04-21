@@ -33,6 +33,7 @@ bool testRbtIndexing()
       cout<<"  at insertion of "<<inserts[i]<<endl;
       return false;
     }
+    rbt.traverse();
   }
 
   for(int i = 0; i < size; i++)

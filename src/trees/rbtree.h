@@ -35,6 +35,7 @@ protected:
   RBNode<T>* _rotateLeft(RBNode<T>* node);
   RBNode<T>* _rotateRight(RBNode<T>* node);
   int _verifyHelper(RBNode<T>* current);
+  void _traverseHelper(RBNode<T>* current);
 
 public:
 
@@ -85,6 +86,13 @@ public:
    * a binary search tree.
    */
   bool verify();
+
+  /*
+   * Perform an in-order traversal of the tree and print
+   * each node's value, color, and size as <val><color><size>
+   * where <val> and <size> are integers and <color> is R or B
+   */
+  void traverse();
   
 };
 

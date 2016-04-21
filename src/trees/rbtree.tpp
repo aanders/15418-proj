@@ -683,3 +683,27 @@ int RBTree<T>::_verifyHelper(RBNode<T>* current) {
   }
 }
 
+/*
+ * traverse
+ */
+template <class T>
+void RBTree<T>::traverse() {
+  std::cout<<"[ ";
+  _traverseHelper(_root);
+  std::cout<<"]"<<std::endl;
+}
+
+template <class T>
+void RBTree<T>::_traverseHelper(RBNode<T>* current) {
+  if (!current) {
+    return;
+  } else {
+    _traverseHelper(current->left);
+    std::cout<<current->val;
+    if (current->color == NodeColor::BLACK) std::cout<<"B";
+    else std::cout<<"R";
+    std::cout<<current->size<<", ";
+    _traverseHelper(current->right);
+  }
+}
+
