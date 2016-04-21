@@ -78,6 +78,8 @@ template <class T> T CustomArray<T>::lookup(int idx)
 {
   return data[idx];
 }
+
+template <class T> void CustomArray<T>::flush() {}
 /*
 template <class T> void CustomArray<T>::sortedChecker()
 {

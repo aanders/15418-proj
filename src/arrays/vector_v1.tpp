@@ -66,6 +66,9 @@ template <class T> T VectorArray<T>::lookup(int idx)
 {
   return data[idx];
 }
+
+template <class T> void VectorArray<T>::flush() {}
+
 /*
 template <class T> void VectorArray<T>::sortedChecker()
 {

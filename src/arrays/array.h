@@ -11,6 +11,8 @@ template <class T> class Array
   virtual void ins(T a) =0;
   virtual void del(int idx) =0;
   virtual T lookup(int idx) =0;
+  
+  virtual void flush() =0;
   //virtual bool lookupElt(T val) =0;
 };
 

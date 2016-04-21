@@ -326,6 +326,10 @@ template <class T> void CustomArrayV3<T>::printData(T *d, int s)
   cout<<endl;
 }
 
+template <class T> void CustomArrayV3<T>::flush() 
+{
+  executeUpdates();
+}
 /*
 template <class T> bool CustomArrayV3<T>::lookupElt(T val)
 {
