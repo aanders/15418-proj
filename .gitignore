@@ -9,6 +9,8 @@ sortedCollection
 
 # Ignore trace files
 *.trace
+# except those in the traces directory
+!traces/**/*.trace
 
 # tags file
 tags
