@@ -34,21 +34,22 @@ PARAMS=(
 )
 
 NAMES=(
-    #"sample.trace0"
-    #"sample.trace1"
-    #"sample.trace2"
-    #"sample.trace3"
-    #"sample.trace4"
-    #"sample.trace5"
-    #"sample.trace6"
-    #"sample.trace7"
-    #"sample.trace8"
-    #"sample.trace9"
-    #"sample.trace10"
-    #"sample.trace11"
-    #"sample.trace12"
-    #"sample.trace13"
+    "trace0"
+    "trace1"
+    "trace2"
+    "trace3"
+    "trace4"
+    "trace5"
+    "trace6"
+    "trace7"
+    "trace8"
+    "trace9"
+    "trace10"
+    "trace11"
+    "trace12"
+    "trace13"
 )
+
 
 #
 # Main generator script
@@ -79,7 +80,7 @@ else
 fi
 
 for paramset in "${PARAMS[@]}"; do
-    if [[ $COUNTER < ${#NAMES[@]} ]]; then
+    if [[ $COUNTER -lt ${#NAMES[@]} ]]; then
         name=${NAMES[$COUNTER]}
     else
         name="test.$COUNTER.trace"

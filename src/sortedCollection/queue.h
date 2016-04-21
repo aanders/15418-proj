@@ -17,6 +17,7 @@ template <class T> class Queue
   
   public:
   Queue();
+  ~Queue();
   void insert(T t);
   bool remove(T* ret);
 };

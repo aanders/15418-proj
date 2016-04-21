@@ -3,7 +3,7 @@
 #ifndef __custom_v2_h__
 #define __custom_v2_h__
 
-#define INSERT_BUFFER_SIZE 10
+#define INSERT_BUFFER_SIZE 100
 //#define DELETE_BUFFER_SIZE 10
 
 template <class T> class CustomArrayV2 : public Array<T>
