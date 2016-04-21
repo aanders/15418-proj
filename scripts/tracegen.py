@@ -90,6 +90,7 @@ def instruction():
 # Generate a random pause interval
 def pause():
     delay_us = random.gauss(MEAN_DELAY, STDDEV_DELAY)
+    print "PAUSING WITH", delay_us, MEAN_DELAY, STDDEV_DELAY
     return 'pause', abs(int(delay_us))
 
 # Print a variable number of arguments
@@ -119,21 +120,23 @@ def load_args():
             help="Std-dev of delay between instructions (default: 300us)")
     args = parser.parse_args()
 
-    if args.trace_length:
+    if args.trace_length >= 1:
         TRACE_LENGTH = args.trace_length
     if args.datatype:
         DATATYPE = args.datatype
     if args.bias:
         BIAS = args.bias
-    if args.avg_delay:
+    if args.avg_delay >= 0:
         MEAN_DELAY = args.avg_delay
-    if args.stddev_delay:
+    if args.stddev_delay >= 0:
         STDDEV_DELAY = args.stddev_delay
 #
 # MAIN
 #
 if __name__ == '__main__':
     load_args()
+    print MEAN_DELAY
+    print STDDEV_DELAY
 
     # Only print program info if we have stdout redirected
     if not sys.stdout.isatty():
