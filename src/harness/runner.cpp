@@ -22,6 +22,8 @@ std::string Runner::getTrialName(unsigned int trial)
   }
 }
 
+volatile int spinCounter;
+
 void Runner::run(unsigned int trials)
 {
   std::string line;
@@ -47,7 +49,9 @@ void Runner::run(unsigned int trials)
         {
           try
           {
-            usleep(std::stoi(data));
+            int cycles = std::stoi(data);
+            for(spinCounter = 0; spinCounter < cycles; spinCounter++) {}
+            //usleep(std::stoi(data));
           }
           catch (const std::invalid_argument& e)
           {
