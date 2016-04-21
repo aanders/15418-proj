@@ -90,7 +90,6 @@ def instruction():
 # Generate a random pause interval
 def pause():
     delay_us = random.gauss(MEAN_DELAY, STDDEV_DELAY)
-    print "PAUSING WITH", delay_us, MEAN_DELAY, STDDEV_DELAY
     return 'pause', abs(int(delay_us))
 
 # Print a variable number of arguments
@@ -135,8 +134,6 @@ def load_args():
 #
 if __name__ == '__main__':
     load_args()
-    print MEAN_DELAY
-    print STDDEV_DELAY
 
     # Only print program info if we have stdout redirected
     if not sys.stdout.isatty():
