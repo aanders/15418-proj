@@ -156,5 +156,6 @@ if __name__ == '__main__':
         printline(*line)
 
     if not sys.stdout.isatty():
+        sys.stderr.write("\rProgress: 100%")
         sys.stderr.write("\nTrace generation complete.\n")
 
