@@ -15,11 +15,12 @@ template <class T> CustomArrayV2<T>::CustomArrayV2(bool (*c)(T a, T b))
 
 template <class T> void CustomArrayV2<T>::emptyInsertions()
 {
+  //cout<<numInsertions<<endl;
+  
   if(numInsertions == 0)
     return;
   
   sort(insertions, numInsertions, this->comp, insertions+INSERT_BUFFER_SIZE);
-  //sortedChecker(insertions, numInsertions);
   
   int startIdx = 0;
   int indices[numInsertions];
@@ -81,7 +82,6 @@ template <class T> void CustomArrayV2<T>::emptyInsertions()
     delete[] data;
     data = newArr;
   }
-  
 }
 
 template <class T> void CustomArrayV2<T>::ins(T a)
@@ -91,12 +91,14 @@ template <class T> void CustomArrayV2<T>::ins(T a)
   
   if(numInsertions == INSERT_BUFFER_SIZE)
   {
+    //cout<<"buffer full:"<<endl;
     emptyInsertions();
   }
 }
 
 template <class T> void CustomArrayV2<T>::del(int idx)
 {
+  //cout<<"deleting:"<<endl;
   emptyInsertions();
   
   for(int i = idx; i < size - 1; i++)
@@ -162,6 +164,7 @@ template <class T> void CustomArrayV2<T>::sortedChecker(T *d, int s)
 
 template <class T> void CustomArrayV2<T>::flush() 
 {
+  //cout<<"flushed:"<<endl;
   emptyInsertions();
 }
 

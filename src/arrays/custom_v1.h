@@ -3,6 +3,8 @@
 #ifndef __custom_v1_h__
 #define __custom_v1_h__
 
+#define V1_EXPAND_CONST 2
+
 template <class T> class CustomArray : public Array<T>
 {
   protected:

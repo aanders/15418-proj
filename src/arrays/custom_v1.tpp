@@ -18,8 +18,8 @@ template <class T> void CustomArray<T>::ins(T a)
   
   if(size == allocated)
   {
-    T* newArr = new T[allocated * 2];
-    allocated = allocated * 2;
+    T* newArr = new T[allocated * V1_EXPAND_CONST];
+    allocated = allocated * V1_EXPAND_CONST;
     for(int i = 0; i < insertionIndex; i++)
     {
       newArr[i] = data[i];
@@ -58,10 +58,10 @@ template <class T> void CustomArray<T>::del(int idx)
   
   size--;
   
-  if(size < allocated / 4)
+  if(size < allocated / (V1_EXPAND_CONST * V1_EXPAND_CONST))
   {
-    T *newArr = new T[allocated / 2];
-    allocated = allocated / 2;
+    T *newArr = new T[allocated / V1_EXPAND_CONST];
+    allocated = allocated / V1_EXPAND_CONST;
     for(int i = 0; i < size; i++)
     {
       newArr[i] = data[i];
