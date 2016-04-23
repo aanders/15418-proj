@@ -25,7 +25,7 @@ OBJS = $(SRCS:.cpp=.o)
 LIBS =
 
 CXX=g++
-CXXFLAGS=-Wall -Wextra -O2 --std=c++11 -g
+CXXFLAGS=-Wall -Wextra -O3 --std=c++11 -g
 INCLUDES=-I$(SRCDIR)/
 LDFLAGS=-lpthread
 
