@@ -18,7 +18,7 @@ template <class T> void CustomArray<T>::ins(T a)
   
   if(size == allocated)
   {
-    T* newArr = new T[allocated * V1_EXPAND_CONST];
+    T* newArr = (T*) new char[allocated * V1_EXPAND_CONST * sizeof(T)];
     allocated = allocated * V1_EXPAND_CONST;
     for(int i = 0; i < insertionIndex; i++)
     {
@@ -45,8 +45,6 @@ template <class T> void CustomArray<T>::ins(T a)
     data[insertionIndex] = a;
     size++;
   }
-  
-  //sortedChecker();
 }
 
 template <class T> void CustomArray<T>::del(int idx)

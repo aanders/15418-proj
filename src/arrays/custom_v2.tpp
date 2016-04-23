@@ -52,7 +52,7 @@ template <class T> void CustomArrayV2<T>::emptyInsertions()
     {
       allocated = allocated * 2;
     }
-    newArr = new T[allocated];
+    newArr = (T*) new char[allocated * sizeof(T)];
     
     for(int i = 0; i < indices[0]; i++)
     {
