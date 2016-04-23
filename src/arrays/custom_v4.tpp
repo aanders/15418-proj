@@ -17,7 +17,19 @@ template <class T> void CustomArrayV4<T>::ins(T a)
   if(size > 0)
     insertionIndex = binarySearch(start, size, this->comp, a);
   
-  if(size == allocated)
+  bool newlyAllocate = (size == allocated);
+  if(insertionIndex < size / 2)
+  {
+    if(start == data)
+      newlyAllocate = true;
+  }
+  else
+  {
+    if(start + size == data + allocated)
+      newlyAllocate = true;
+  }
+  
+  if(newlyAllocate)
   {
     allocated = allocated * V4_EXPAND_CONST;
     T* newArr = (T*) new char[allocated * sizeof(T)];
@@ -42,7 +54,7 @@ template <class T> void CustomArrayV4<T>::ins(T a)
   else
   {
     //safe only because size < allocated
-    if((insertionIndex < (size / 2) && start > data) || 
+    if((insertionIndex < size / 2 && start > data) || 
        (start + size == data + allocated))
     {
       start--;
