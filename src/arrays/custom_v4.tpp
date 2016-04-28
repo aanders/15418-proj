@@ -149,3 +149,13 @@ template <class T> bool CustomArray<T>::lookupElt(T val)
   return this->comp(val, val);
 }
 */
+
+template <class T> void CustomArrayV4<T>::clearAll()
+{
+  size = 0;
+  start = data + (allocated / 3);
+  /*allocated = 1;
+  delete[] data;
+  data = (T*) new T[allocated];//  * sizeof(T)];
+  start = data;*/
+}
