@@ -9,6 +9,8 @@
 
 #define V5_EXPAND_CONST 2
 
+//#define V5_DEBUG
+
 template <class T> class CustomArrayV5 : public Array<T>
 {
   protected:
@@ -20,12 +22,23 @@ template <class T> class CustomArrayV5 : public Array<T>
   CustomArrayV4<T> *inserts;
   int numInserts;
   
+  #ifdef V5_DEBUG
+  long totalInserts;
+  long timesFlushed[2];
+  long maxFlushed;
+  #endif
+  
   public:
   CustomArrayV5(bool (*c)(T a, T b));
+  
+  #ifdef V5_DEBUG
+  ~CustomArrayV5();
+  #endif
+  
   void ins(T a);
   void del(int idx);
   T lookup(int idx);
-  
+  void flush(int cause);
   void flush();
   //bool lookupElt(T val);
 };

@@ -50,10 +50,14 @@ template <class T> SortedCollection<T>::~SortedCollection()
   cout<<"Serviced from array: \t"<<servicedFromArray<<endl;
   cout<<"Times it wasn't ready: \t"<<numTimesWaitedOnLookup<<endl;
   
+  
   if(pthread_join(aThread, NULL) != 0)
     cout<<"Join failed."<<endl;
   if(pthread_join(tThread, NULL) != 0)
     cout<<"Join failed."<<endl;
+  
+  delete (CustomArrayV5<T>*) array;
+  delete tree;
 }
 
 template <class T> void SortedCollection<T>::ins(T t)

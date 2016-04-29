@@ -11,22 +11,50 @@ template <class T> CustomArrayV5<T>::CustomArrayV5(bool (*c)(T a, T b))
   start = data;
   inserts = new CustomArrayV4<T>(c);
   numInserts = 0;
+  
+  #ifdef V5_DEBUG
+  totalInserts = maxFlushed = 0;
+  timesFlushed[0] = timesFlushed[1] = 0;
+  #endif
 }
+
+#ifdef V5_DEBUG
+template <class T> CustomArrayV5<T>::~CustomArrayV5()
+{
+  cout<<"Inserts per flush: "<<totalInserts / 
+    (timesFlushed[0] + timesFlushed[1])<<endl;
+  cout<<"Flushes due to readiness: "<<timesFlushed[0]<<endl;
+  cout<<"Flushes due to deletions: "<<timesFlushed[1]<<endl;
+  cout<<"Max flushed at once: "<<maxFlushed<<endl;
+}
+#endif
 
 template <class T> void CustomArrayV5<T>::ins(T a)
 {
   inserts->ins(a);
   numInserts++;
-  //if(numInserts > 50)
-  //{
-  //  flush();
-  //}
+  
+  #ifdef V5_DEBUG
+  totalInserts++;
+  #endif
 }
 
+//here's hoping this gets optimized out
 template <class T> void CustomArrayV5<T>::flush()
+{
+  flush(0);
+}
+
+template <class T> void 
+  CustomArrayV5<T>::flush(int cause)
 {
   if(numInserts == 0)
     return;
+  
+  #ifdef V5_DEBUG
+  maxFlushed = (maxFlushed < numInserts ? numInserts : maxFlushed);
+  timesFlushed[cause]++;
+  #endif
   
   int insertionIndices[numInserts];
   
@@ -119,7 +147,7 @@ template <class T> void CustomArrayV5<T>::flush()
 
 template <class T> void CustomArrayV5<T>::del(int idx)
 {
-  flush();
+  flush(1);
   
   if(idx < size / 2)
   {
