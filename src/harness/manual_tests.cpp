@@ -89,6 +89,8 @@ void runManualTests()
   sc.del(1);
   sc.del(13);
   
+  cout<<"sorted collection:"<<endl;
+  
   for(int j = 0; j < size - 2; j++)
   {
     int res = sc.lookup(j);

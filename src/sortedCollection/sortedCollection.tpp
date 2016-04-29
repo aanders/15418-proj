@@ -7,6 +7,7 @@
 #include "arrays/custom_v3.h"
 #include "arrays/custom_v4.h"
 #include "arrays/custom_v5.h"
+#include "arrays/custom_v6.h"
 #include "trees/simpleTree.h"
 #include <pthread.h>
 #include <mutex>
@@ -55,8 +56,9 @@ template <class T> SortedCollection<T>::~SortedCollection()
     cout<<"Join failed."<<endl;
   if(pthread_join(tThread, NULL) != 0)
     cout<<"Join failed."<<endl;
-  
-  delete (CustomArrayV5<T>*) array;
+  #ifdef V6_DEBUF
+  delete (CustomArrayV6<T>*) array;
+  #endif
   delete tree;
 }
 
