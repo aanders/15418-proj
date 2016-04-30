@@ -15,6 +15,9 @@ sortedCollection
 # tags file
 tags
 
+# VIM swap files
+*.swp
+
 #######################################
 # Default GitHub C++ .gitignore rules #
 #######################################
