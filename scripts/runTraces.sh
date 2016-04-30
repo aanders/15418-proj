@@ -6,13 +6,13 @@
 TRACEDIR=traces
 
 function usage() {
-    echo "usage: $0 <tracedir> <outfile>"
+    echo "usage: $0 <tracedir> [<outfile>]"
     echo "  <tracedir> : The subdirectory under traces/ contaning the traces to run"
     echo "  <outfile>  : The file to which the trace timings will be appended"
     echo ""
 }
 
-if [[ $# < 2 ]] ; then
+if [[ $# < 1 ]] ; then
     usage
     exit 1
 fi
@@ -22,5 +22,10 @@ if [ ! -d $TRACEDIR/$1 ] ; then
 fi
 
 for tracefile in $( ls $TRACEDIR/$1/*.trace ) ; do
+  if [[ $# < 2 ]] ; then
+    echo "Running trace: $tracefile"
+    ./sortedCollection $tracefile
+  else
     ./sortedCollection $tracefile | cut -d \  -f 4 >> $2
+  fi
 done
