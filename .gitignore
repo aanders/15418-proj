@@ -11,6 +11,9 @@ sortedCollection
 *.trace
 traces/
 
+# Provide a place for bookkeeping files that shouldn't be tracked
+scratch/
+
 # tags file
 tags
 
