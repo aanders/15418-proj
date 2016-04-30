@@ -30,7 +30,6 @@ volatile int spinCounter;
 void Runner::run(unsigned int trials)
 {
   std::string line;
-  std::string op;
 
   std::vector<std::string>::const_iterator it = trialNames.cbegin();
   for (unsigned int t = 0; t < trials; t++)
@@ -41,6 +40,7 @@ void Runner::run(unsigned int trials)
     line_no_ = 0;
     init();
     double start = CycleTimer::currentSeconds();
+    double instr_time = 0.0;
     while (std::getline(tracefile_, line))
     {
       line_no_++;
@@ -68,7 +68,10 @@ void Runner::run(unsigned int trials)
         }
         else
         {
+          double instr_start = CycleTimer::currentSeconds();
           runop(op, data);
+          double instr_end = CycleTimer::currentSeconds();
+          instr_time += (instr_end - instr_start);
         }
       }
     }
@@ -85,6 +88,8 @@ void Runner::run(unsigned int trials)
       std::cout << "Trial " << t << " took " << end-start
           << " seconds to complete" << std::endl;
     }
+    std::cout << "  --> " << instr_time
+        << " seconds spent in data structure operations" << std::endl;
     it++;
   }
 }
