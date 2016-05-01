@@ -106,11 +106,9 @@ template <class T> void
   int incUnderHalf = 2*insertsUnderHalf - updatesUnderHalf;
   int incAfterHalf = 2*insertsAfterHalf - updatesAfterHalf;
   
-  int startOffset = -incUnderHalf;
-  
   bool newlyAllocate = 
-          (incUnderHalf > 0 && start + startOffset - incUnderHalf <= data) ||
-          (start + startOffset + size + incAfterHalf >= data + allocated);
+          (incUnderHalf > 0 && start - incUnderHalf <= data) ||
+          (start + size + incAfterHalf >= data + allocated);
   
   T *newArr;
   T *newStart;
@@ -120,13 +118,13 @@ template <class T> void
     {
       allocated = allocated * V6_EXPAND_CONST;
       newlyAllocate = 
-         (incUnderHalf > 0 && (allocated / 3) + startOffset < incUnderHalf) ||
-         ((allocated / 3) + size + startOffset + incAfterHalf >= allocated);
+         (incUnderHalf > 0 && (allocated / 3) < incUnderHalf) ||
+         ((allocated / 3) + size + incAfterHalf >= allocated);
     }
   }
     
     newArr = (T*) new char[allocated * sizeof(T)];
-    newStart = newArr + (allocated / 3) + startOffset;
+    newStart = newArr + (allocated / 3) - incUnderHalf;
     
     int writeIdx = 0;
     int readIdx = 0;
