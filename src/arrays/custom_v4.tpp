@@ -100,7 +100,7 @@ template <class T> void CustomArrayV4<T>::del(int idx)
   {
     allocated = allocated / V4_EXPAND_CONST;
     T *newArr = (T*) new char[allocated * sizeof(T)];
-    T *newStart = newArr + (allocated / 3);
+    T *newStart = newArr + ((allocated - size) / 2);
     
     for(int i = 0; i < size; i++)
     {
@@ -149,13 +149,3 @@ template <class T> bool CustomArray<T>::lookupElt(T val)
   return this->comp(val, val);
 }
 */
-
-template <class T> void CustomArrayV4<T>::clearAll()
-{
-  size = 0;
-  start = data + (allocated / 3);
-  /*allocated = 1;
-  delete[] data;
-  data = (T*) new T[allocated];//  * sizeof(T)];
-  start = data;*/
-}
