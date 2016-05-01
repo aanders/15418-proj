@@ -10,7 +10,6 @@ template <class T> CustomArrayV6<T>::CustomArrayV6(bool (*c)(T a, T b))
   data = (T*) new char[allocated * sizeof(T)];
   start = data;
   
-  numUpdates = 0;
   updates = new Updates<T>(c, V6_MAX_UPDATES);
   
   #ifdef V6_DEBUG

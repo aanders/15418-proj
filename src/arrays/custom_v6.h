@@ -22,8 +22,6 @@ template <class T> class CustomArrayV6 : public Array<T>
   T *start;
   
   Updates<T> *updates;
-  int numUpdates;
-  int numInserts;
   
   #ifdef V6_DEBUG
   long totalUpdates;
