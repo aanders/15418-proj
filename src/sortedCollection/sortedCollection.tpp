@@ -10,7 +10,6 @@
 #include "arrays/custom_v6.h"
 #include "trees/simpleTree.h"
 #include <pthread.h>
-#include <sched.h>
 #include <mutex>
 
 template <class T> void *arrayThread(void *sc)
@@ -127,7 +126,6 @@ template <class T> void *SortedCollection<T>::handleUpdatesArray()
       numHandled = 0;
       atReady.notify_all();
       aReady.notify_all();
-      sched_yield();
     }
     if(u.type == TYPE_DELETE)
     {
@@ -157,7 +155,6 @@ template <class T> void *SortedCollection<T>::handleUpdatesTree()
     {
       atReady.notify_all();
       tReady.notify_all();
-      sched_yield();
     }
     
     if(u.type == TYPE_DELETE)
