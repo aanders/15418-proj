@@ -11,7 +11,7 @@
 
 //#define V6_DEBUG
 
-#define V6_MAX_UPDATES 17
+#define V6_MAX_UPDATES 500
 
 template <class T> class CustomArrayV6 : public Array<T>
 {

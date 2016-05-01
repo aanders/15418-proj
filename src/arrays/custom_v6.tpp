@@ -33,9 +33,8 @@ template <class T> CustomArrayV6<T>::~CustomArrayV6()
 template <class T> void CustomArrayV6<T>::ins(T a)
 {
   updates->ins(a, start, size);
-  numUpdates++;
   
-  if(numUpdates == V6_MAX_UPDATES)
+  if(updates->size == V6_MAX_UPDATES)
     flush(1);
   
   #ifdef V6_DEBUG
@@ -46,9 +45,8 @@ template <class T> void CustomArrayV6<T>::ins(T a)
 template <class T> void CustomArrayV6<T>::del(int idx)
 {
   updates->del(idx);
-  numUpdates++;
   
-  if(numUpdates == V6_MAX_UPDATES)
+  if(updates->size == V6_MAX_UPDATES)
     flush(1);
   
   #ifdef V6_DEBUG
@@ -69,7 +67,7 @@ template <class T> void
     return;
   
   #ifdef V6_DEBUG
-  maxFlushed = (maxFlushed < numUpdates ? numUpdates : maxFlushed);
+  maxFlushed = (maxFlushed < updates->size ? updates->size : maxFlushed);
   timesFlushed[cause]++;
   #endif
   
@@ -118,13 +116,13 @@ template <class T> void
     {
       allocated = allocated * V6_EXPAND_CONST;
       newlyAllocate = 
-         (incUnderHalf > 0 && (allocated / 3) < incUnderHalf) ||
-         ((allocated / 3) + size + incAfterHalf >= allocated);
+         (incUnderHalf > 0 && ((allocated - size) / 2) < incUnderHalf) ||
+         (((allocated - size) / 2) + size + incAfterHalf >= allocated);
     }
   }
     
     newArr = (T*) new char[allocated * sizeof(T)];
-    newStart = newArr + (allocated / 3) - incUnderHalf;
+    newStart = newArr + ((allocated - size) / 2) - incUnderHalf;
     
     int writeIdx = 0;
     int readIdx = 0;
@@ -207,7 +205,6 @@ template <class T> void
   }
   */
   
-  numUpdates = 0;
   updates->empty();
 }
 /*

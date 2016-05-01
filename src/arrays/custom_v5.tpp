@@ -85,11 +85,11 @@ template <class T> void
     while(newlyAllocate)
     {
       allocated = allocated * V5_EXPAND_CONST;
-      newlyAllocate = (numUnderHalf > 0 && (allocated / 3) < numUnderHalf) ||
-          ((allocated / 3) + size + numInserts - numUnderHalf >= allocated);
+      newlyAllocate = (numUnderHalf > 0 && ((allocated - size) / 2) < numUnderHalf) ||
+          (((allocated - size) / 2) + size + numInserts - numUnderHalf >= allocated);
     }
     T* newArr = (T*) new char[allocated * sizeof(T)];
-    T* newStart = newArr + (allocated / 3) - numUnderHalf; // ok?
+    T* newStart = newArr + ((allocated - size) / 2) - numUnderHalf; // ok?
     
     int j = 0;
     for(int i = 0; i < numInserts; i++)
