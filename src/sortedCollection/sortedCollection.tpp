@@ -33,6 +33,9 @@ template <class T> SortedCollection<T>::SortedCollection(
    
   array = new CustomArrayV6<T>(comp);
   tree = new RBTree<T>(comp);
+  aUpdatesWait = std::unique_lock<std::mutex>(aUpdatesMutex);
+  tUpdatesWait = std::unique_lock<std::mutex>(tUpdatesMutex);
+  atUpdatesWait = std::unique_lock<std::mutex>(atUpdatesMutex);
   
   pthread_create(&aThread, NULL, arrayThread<T>, this);
   pthread_create(&tThread, NULL, treeThread<T>, this);
@@ -90,7 +93,7 @@ template <class T> T SortedCollection<T>::lookup(int idx)
       ready = false;
       numTimesWaitedOnLookup++;
     }
-    sched_yield();
+    atReady.wait(atUpdatesWait);
   }
   
   if(numAUpdates == numUpdates)
@@ -106,7 +109,7 @@ template <class T> bool SortedCollection<T>::lookupElt(T val)
 {
   while(numTUpdates != numUpdates)
   {
-    sched_yield();
+    tReady.wait(tUpdatesWait);
   }
   return (tree->lookup(val) != nullptr);
 }
@@ -122,6 +125,8 @@ template <class T> void *SortedCollection<T>::handleUpdatesArray()
       array->flush();
       numAUpdates += numHandled;
       numHandled = 0;
+      atReady.notify_all();
+      aReady.notify_all();
       sched_yield();
     }
     if(u.type == TYPE_DELETE)
@@ -150,6 +155,8 @@ template <class T> void *SortedCollection<T>::handleUpdatesTree()
   {
     while(!treeUpdates.remove(&u))
     {
+      atReady.notify_all();
+      tReady.notify_all();
       sched_yield();
     }
     
