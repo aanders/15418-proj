@@ -80,10 +80,26 @@ template <class T> void Updates<T>::del(int idx)
   }
   
   int i = 0;
-  while(i < size && indices[i] <= idx) // was <=
+  //cout<<"Indices: ";
+  while(i < size && (indices[i] < idx || 
+        (indices[i] == idx && types[i] == UPDATE_DELETE)))
   {
+    //cout<<indices[i]<<", ";
     i++; //no need to adjust idx because it's pre-adjusted
-  } //FIX THIS
+  }
+  //cout<<endl;
+  
+  if(i < size && indices[i] == idx && types[i] == UPDATE_INSERT)
+  {
+    for(int j = i; j < size - 1; j++)
+    {
+      indices[j] = indices[j+1] - 1;
+      types[j] = types[j+1];
+      values[j] = values[j+1];
+    }
+    size--;
+    return;
+  }
   
   for(int j = size; j > i; j--)
   {

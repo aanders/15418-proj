@@ -65,7 +65,7 @@ template <class T> void CustomArrayV6<T>::flush()
 template <class T> void 
   CustomArrayV6<T>::flush(int cause)
 {
-  if(numUpdates == 0)
+  if(updates->size == 0)
     return;
   
   #ifdef V6_DEBUG
@@ -83,7 +83,7 @@ template <class T> void
   int allTimeLowUnder = 0;
   int allTimeLowAfter = 0;
   
-  for(int i = 0; i < numUpdates; i++)
+  for(int i = 0; i < updates->size; i++)
   {
     if(updates->indices[i] < size / 2)
     {
@@ -130,7 +130,7 @@ template <class T> void
     
     int writeIdx = 0;
     int readIdx = 0;
-    for(int i = 0; i < numUpdates; i++)
+    for(int i = 0; i < updates->size; i++)
     {
       while(writeIdx < updates->indices[i])
       {
