@@ -25,6 +25,7 @@ template <class T> class CustomArrayV4 : public Array<T>
   
   void flush();
   
+  void clearAll();
   //bool lookupElt(T val);
 };
 
