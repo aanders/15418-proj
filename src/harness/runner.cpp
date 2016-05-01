@@ -34,13 +34,21 @@ void Runner::run(unsigned int trials)
   std::vector<std::string>::const_iterator it = trialNames.cbegin();
   for (unsigned int t = 0; t < trials; t++)
   {
+    double instr_time  = 0.0;
+    double insert_time = 0.0;
+    double lookup_time = 0.0;
+    double delete_time = 0.0;
+    long   inserts     = 0;
+    long   lookups     = 0;
+    long   deletes     = 0;
+
     trial_no_ = t;
+    line_no_ = 0;
     tracefile_.clear();
     tracefile_.seekg(0, ios::beg);
-    line_no_ = 0;
     init();
+
     double start = CycleTimer::currentSeconds();
-    double instr_time = 0.0;
     while (std::getline(tracefile_, line))
     {
       line_no_++;
@@ -72,6 +80,21 @@ void Runner::run(unsigned int trials)
           runop(op, data);
           double instr_end = CycleTimer::currentSeconds();
           instr_time += (instr_end - instr_start);
+          if (op.compare("insert") == 0)
+          {
+            insert_time = (insert_time * inserts) + (instr_end - instr_start);
+            insert_time /= ++inserts;
+          }
+          else if (op.compare("lookup") == 0)
+          {
+            lookup_time = (lookup_time * lookups) + (instr_end - instr_start);
+            lookup_time /= ++lookups;
+          }
+          else if (op.compare("delete") == 0)
+          {
+            delete_time = (delete_time * deletes) + (instr_end - instr_start);
+            delete_time /= ++deletes;
+          }
         }
       }
     }
@@ -88,8 +111,14 @@ void Runner::run(unsigned int trials)
       std::cout << "Trial " << t << " took " << end-start
           << " seconds to complete" << std::endl;
     }
-    std::cout << "  --> " << instr_time
-        << " seconds spent in data structure operations" << std::endl;
+    std::cout << "  === Time spent in data structure operations: "
+        << instr_time << "s" << std::endl;
+    std::cout << "  === Average insert time: "
+        << insert_time*1000 << "ms" << std::endl;
+    std::cout << "  === Average lookup time: "
+        << lookup_time*1000 << "ms" << std::endl;
+    std::cout << "  === Average delete time: "
+        << delete_time*1000 << "ms" << std::endl;
     it++;
   }
 }
