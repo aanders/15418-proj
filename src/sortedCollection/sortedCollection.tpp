@@ -31,7 +31,7 @@ template <class T> SortedCollection<T>::SortedCollection(
   servicedFromTree = servicedFromArray = 0;
   numTimesWaitedOnLookup = 0;
    
-  array = new CustomArrayV5<T>(comp);
+  array = new CustomArrayV6<T>(comp);
   tree = new RBTree<T>(comp);
   
   pthread_create(&aThread, NULL, arrayThread<T>, this);
@@ -55,7 +55,7 @@ template <class T> SortedCollection<T>::~SortedCollection()
   if(pthread_join(tThread, NULL) != 0)
     cout<<"Join failed."<<endl;
   #ifdef V6_DEBUF
-  delete (CustomArrayV5<T>*) array;
+  delete (CustomArrayV6<T>*) array;
   #endif
   delete tree;
 }
