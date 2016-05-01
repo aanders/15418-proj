@@ -21,9 +21,10 @@ INSTRUCTIONS = [
 ]
 
 UNIFORM_PDF = [1.0/len(INSTRUCTIONS) for i in xrange(0,len(INSTRUCTIONS))]
+INSERT_LOOKUP_BIAS_PDF = [0.45, 0.45, 0.1]
 INSERT_BIAS_PDF = [0.7, 0.2, 0.1]
 LOOKUP_BIAS_PDF = [0.2, 0.6, 0.2]
-BIASTYPES = ['uniform', 'insert', 'lookup']
+BIASTYPES = ['uniform', 'iuniform', 'insert', 'lookup']
 BIAS = BIASTYPES[0] # uniform by default
 
 MEAN_DELAY = 500 # microseconds
@@ -54,6 +55,8 @@ def instruction():
     # Pick instruction according to pdf
     if BIAS == 'uniform':
         instr = rand_elt(INSTRUCTIONS, UNIFORM_PDF)
+    elif BIAS == 'iuniform':
+        instr = rand_elt(INSTRUCTIONS, INSERT_LOOKUP_BIAS_PDF)
     elif BIAS == 'insert':
         instr = rand_elt(INSTRUCTIONS, INSERT_BIAS_PDF)
     elif BIAS == 'lookup':
