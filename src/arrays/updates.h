@@ -16,8 +16,8 @@ template <class T> class Updates
   bool (*comp)(T a, T b);
   
   Updates(bool (*c)(T a, T b), int ms);
-  void ins(T val, T* array, int asize);
-  void del(int idx);
+  int ins(T val, T* array, int asize);
+  int del(int idx);
   void empty();
 };
 

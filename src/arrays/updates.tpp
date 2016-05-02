@@ -12,12 +12,14 @@ template <class T> Updates<T>::Updates(bool (*c)(T a, T b), int ms)
   indices = new int[ms];
 }
 
-template <class T> void Updates<T>::ins(T val, T* array, int asize)
+//returns the index the element would be inserted at IF a flush
+//is immediate
+template <class T> int Updates<T>::ins(T val, T* array, int asize)
 {
   if(size == maxSize)
   {
     std::cout<<"You tried to add too many updates!!!"<<std::endl;
-    return;
+    return 0;
   }
   
   int insertionIndex = 0;
@@ -69,25 +71,25 @@ template <class T> void Updates<T>::ins(T val, T* array, int asize)
   indices[i] = insertionIndex;
   
   size++;
+  
+  return i;
 }
 
-template <class T> void Updates<T>::del(int idx)
+//returns 1 if it simply deleted an insert, 0 otherwise
+template <class T> int Updates<T>::del(int idx)
 {
   if(size == maxSize)
   {
     std::cout<<"You tried to add too many updates!!!"<<std::endl;
-    return;
+    return 0;
   }
   
   int i = 0;
-  //cout<<"Indices: ";
   while(i < size && (indices[i] < idx || 
         (indices[i] == idx && types[i] == UPDATE_DELETE)))
   {
-    //cout<<indices[i]<<", ";
     i++; //no need to adjust idx because it's pre-adjusted
   }
-  //cout<<endl;
   
   if(i < size && indices[i] == idx && types[i] == UPDATE_INSERT)
   {
@@ -98,7 +100,8 @@ template <class T> void Updates<T>::del(int idx)
       values[j] = values[j+1];
     }
     size--;
-    return;
+    
+    return i - 1;
   }
   
   for(int j = size; j > i; j--)
@@ -117,6 +120,8 @@ template <class T> void Updates<T>::del(int idx)
   }
   indices[i] = idx;
   size++;
+  
+  return i;
 }
 
 template <class T> void Updates<T>::empty()

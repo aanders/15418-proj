@@ -8,12 +8,16 @@ template <class T> CustomArrayV7<T>::CustomArrayV7(bool (*c)(T a, T b))
   size = 0;
   allocated = 1;
   data = (T*) new char[allocated * sizeof(T)];
-  start = data;
+  iuhAndStart = 0;
   
   updates = new Updates<T>(c, V7_MAX_UPDATES);
   buffer = (T*) new char[(V7_MAX_UPDATES + 1) * sizeof(T)];
   
   currUpdates = updatesHandled = 0;
+  
+  updatesAcknowledged = 0;
+  inc = 0;
+  w1 = w2 = w3 = 0;
   
   #ifdef V7_DEBUG
   totalUpdates = maxFlushed = 0;
@@ -36,9 +40,61 @@ template <class T> CustomArrayV7<T>::~CustomArrayV7()
 
 template <class T> void CustomArrayV7<T>::ins(T a)
 {
-  updates->ins(a, start, size);
-  currUpdates++;
+  long start = iuhAndStart & 0xFFFFFFFF;
+  int i = updates->ins(a, data + start, size);
+  int idx = updates->indices[i];
   
+  long iuh = (iuhAndStart >> 32) & 0xFFFFFFFF;
+  iuh++;
+  iuhAndStart = (iuh << 32) | start;
+  
+  inc++;
+  
+  if(idx < size / 2)
+  {
+    //W1
+    if(w1 > idx)
+    {
+      w1 = idx;
+    }
+    
+    //W's 2 and 3
+    if(w2 <= idx)
+    {
+      w2 = idx + 1;
+    }
+    else
+    {
+      w2++;
+    }
+    
+    w3++;
+    
+    while(w2 >= size / 2 && w2 > 0)
+    {
+      w3 = w2;
+      if(i == 0)
+      {
+        w2 = 0;
+      }
+      else
+      {
+        i--;
+        w2 = updates->indices[i];
+      }
+    }
+  }
+  else
+  {
+    if(w3 > idx)
+    {
+      w3 = idx;
+    }
+  }
+  updatesAcknowledged++;
+  
+  
+  currUpdates++;
   if(updates->size == V7_MAX_UPDATES)
     flush(1);
   
@@ -49,9 +105,57 @@ template <class T> void CustomArrayV7<T>::ins(T a)
 
 template <class T> void CustomArrayV7<T>::del(int idx)
 {
-  updates->del(idx);
-  currUpdates++;
+  int i = updates->del(idx);
+  long iuh = (iuhAndStart >> 32) & 0xFFFFFFFF;
+  iuh--;
+  iuhAndStart = (iuh << 32) | (iuhAndStart & 0xFFFFFFFF);
+  inc--;
   
+  if(idx < size / 2)
+  {
+    //W1
+    if(w1 > idx)
+    {
+      w1 = idx;
+    }
+    
+    //W's 2 and 3
+    if(w2 <= idx)
+    {
+      w2 = idx + 1;
+    }
+    else
+    {
+      w2--;
+    }
+    
+    w3--;
+    
+    while(w3 < size / 2)
+    {
+      w2 = w3;
+      if(i >= updates->size - 1)
+      {
+        w3 = size + inc;
+      }
+      else
+      {
+        i++;
+        w3 = updates->indices[i];
+      }
+    }
+  }
+  else
+  {
+    if(w3 > idx)
+    {
+      w3 = idx;
+    }
+  }
+  
+  updatesAcknowledged++;
+  
+  currUpdates++;
   if(updates->size == V7_MAX_UPDATES)
     flush(1);
   
@@ -114,6 +218,8 @@ template <class T> void
   int incUnderHalf = 2*insertsUnderHalf - updatesUnderHalf;
   int incAfterHalf = 2*insertsAfterHalf - updatesAfterHalf;
   
+  T *start = data + (iuhAndStart & 0xFFFFFFFF);
+  
   bool newlyAllocate = 
           (incUnderHalf > 0 && start - incUnderHalf <= data) ||
           (start + size + incAfterHalf >= data + allocated);
@@ -131,7 +237,8 @@ template <class T> void
     }
     
     newArr = (T*) new char[allocated * sizeof(T)];
-    newStart = newArr + ((allocated - size) / 2) - incUnderHalf;
+    long s = ((allocated - size) / 2) - incUnderHalf;
+    newStart = newArr + s;
     
     int writeIdx = 0;
     int readIdx = 0;
@@ -164,7 +271,10 @@ template <class T> void
     
     delete[] data;
     data = newArr;
-    start = newStart;
+    iuhAndStart = s;
+    w1 = size / 2;
+    w2 = size / 2;
+    w3 = size;
   }
   else
   {
@@ -185,18 +295,18 @@ template <class T> void
       bufferSize = numUpdates + 1;
       inBuffer = 0;
       bufferStart = 0;
-
+      
       readIdx = 0;
       writeIdx = 0;
       newStart = start - incUnderHalf;
-
+      
       while(readIdx < bufferSize && readIdx < size)
       {
         buffer[readIdx] = start[readIdx];
         readIdx++;
       }
       inBuffer = readIdx;
-
+      
       for(int i = 0; i < numUpdates; i++)
       {
         while(writeIdx < updates->indices[i])
@@ -237,8 +347,8 @@ template <class T> void
           }
         }
       }
-
     }
+    
     //######## AFTER HALF: #########
     if(updatesAfterHalf > 0)
     {
@@ -322,7 +432,10 @@ template <class T> void
     }
     
     size += incUnderHalf + incAfterHalf;
-    start = start - incUnderHalf;
+    iuhAndStart = (iuhAndStart & 0xFFFFFFFF) - ((long) incUnderHalf);
+    w1 = size / 2;
+    w2 = size / 2;
+    w3 = size;
   }
   
   updates->empty();
@@ -333,12 +446,16 @@ template <class T> void
 
 template <class T> T CustomArrayV7<T>::lookup(int idx)
 {
-  return start[idx];
+  long iuh = (iuhAndStart >> 32) & 0xFFFFFFFF;
+  long start = iuhAndStart & 0xFFFFFFFF;
+  return data[start + idx - iuh];
 }
 
 template <class T> inline bool CustomArrayV7<T>::ready(int numUpdates,
                                                        int idx)
 {
-  return numUpdates == updatesHandled; //updatesAcknowledged && 
-          //(idx == 423423); //range stuff
+  int iuh = (iuhAndStart >> 32) & 0xFFFFFFFF;
+  idx -= iuh;
+  return numUpdates == updatesAcknowledged && 
+          (idx < w1 || (idx >= w2 && idx < w3));
 }
