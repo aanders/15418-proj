@@ -23,6 +23,8 @@ bool testRbtIndexing()
 //  int sorted[size] = {-113, -3, 0, 1, 2, 3, 4, 5, 7, 8, 11, 25};
   
   RBTree<int> rbt(&intComp);
+
+  cout<<"Sizeof RBNode == "<<sizeof(RBNode<int>)<<endl<<endl;
   
   for (int i = 0; i < size; i++)
   {
