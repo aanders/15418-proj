@@ -24,7 +24,7 @@ UNIFORM_PDF = [1.0/len(INSTRUCTIONS) for i in xrange(0,len(INSTRUCTIONS))]
 INSERT_LOOKUP_BIAS_PDF = [0.45, 0.45, 0.1]
 INSERT_BIAS_PDF = [0.7, 0.2, 0.1]
 LOOKUP_BIAS_PDF = [0.2, 0.6, 0.2]
-BIASTYPES = ['uniform', 'iuniform', 'insert', 'lookup']
+BIASTYPES = ['uniform', 'iuniform', 'insert', 'lookup', 'alternate']
 BIAS = BIASTYPES[0] # uniform by default
 
 MEAN_DELAY = 500 # microseconds
@@ -51,7 +51,7 @@ def rand_elt(l, pdf):
     return l[i]
 
 # Generate a random trace instruction
-def instruction():
+def instruction(instr_no=0):
     # Pick instruction according to pdf
     if BIAS == 'uniform':
         instr = rand_elt(INSTRUCTIONS, UNIFORM_PDF)
@@ -61,6 +61,11 @@ def instruction():
         instr = rand_elt(INSTRUCTIONS, INSERT_BIAS_PDF)
     elif BIAS == 'lookup':
         instr = rand_elt(INSTRUCTIONS, LOOKUP_BIAS_PDF)
+    elif BIAS == 'alternate':
+        if instr_no < TRACE_LENGTH / 2:
+            instr = rand_elt(INSTRUCTIONS, INSERT_BIAS_PDF)
+        else:
+            instr = rand_elt(INSTRUCTIONS, LOOKUP_BIAS_PDF)
 
     # Generate appropriate data for the selected instruction
     if instr == 'insert':
@@ -153,7 +158,7 @@ if __name__ == '__main__':
             sys.stderr.write("\rProgress: {}%".format(int(float(i)/float(TRACE_LENGTH)*100)))
         line = (None, None)
         while line[0] == None:
-            line = instruction()
+            line = instruction(i)
         printline(*line)
         line = pause()
         printline(*line)
