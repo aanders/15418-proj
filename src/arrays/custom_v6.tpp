@@ -162,28 +162,161 @@ template <class T> void
   {
     int writeIdx;
     int readIdx;
-    int numUpdates = updates->size;
-    int numInserts = insertsUnderHalf + insertsAfterHalf;
-
-    int bufferSize = numUpdates + 1;
-
-    int inBuffer = 0;
-    int bufferStart = 0;
-
-    readIdx = 0;
-    writeIdx = 0;
-    newStart = start - incUnderHalf;
-
-    while(readIdx < bufferSize && readIdx < size)
+    int numUpdates;
+    int numInserts;
+    
+    int bufferSize;
+    int inBuffer;
+    int bufferStart;
+    
+    //######## UNDER HALF: ########
+    if(updatesUnderHalf > 0)
     {
-      buffer[readIdx] = start[readIdx];
-      readIdx++;
+      numUpdates = updatesUnderHalf;
+      numInserts = insertsUnderHalf;
+      bufferSize = numUpdates + 1;
+      inBuffer = 0;
+      bufferStart = 0;
+
+      readIdx = 0;
+      writeIdx = 0;
+      newStart = start - incUnderHalf;
+
+      while(readIdx < bufferSize && readIdx < size)
+      {
+        buffer[readIdx] = start[readIdx];
+        readIdx++;
+      }
+      inBuffer = readIdx;
+
+      for(int i = 0; i < numUpdates; i++)
+      {
+        while(writeIdx < updates->indices[i])
+        {
+          newStart[writeIdx] = buffer[bufferStart];
+          writeIdx++;
+          inBuffer--;
+          bufferStart++;
+          if(bufferStart == bufferSize)
+          {
+            bufferStart = 0;
+          }
+          if(readIdx < size)
+          {
+            buffer[(bufferStart + inBuffer) % bufferSize] = start[readIdx];
+            inBuffer++;
+            readIdx++;
+          }
+        }
+        if(updates->types[i] == UPDATE_INSERT)
+        {
+          newStart[writeIdx] = updates->values[i];
+          writeIdx++;
+        }
+        else
+        {
+          inBuffer--;
+          bufferStart++;
+          if(bufferStart == bufferSize)
+          {
+            bufferStart = 0;
+          }
+          if(readIdx < size)
+          {
+            buffer[(bufferStart + inBuffer) % bufferSize] = start[readIdx];
+            inBuffer++;
+            readIdx++;
+          }
+        }
+      }
+
+      /*
+         if(incAfterHalf != 0)
+         {
+         while(inBuffer > 0)
+         {
+         newStart[writeIdx] = buffer[bufferStart];
+         writeIdx++;
+         inBuffer--;
+         bufferStart++;
+         if(bufferStart == bufferSize)
+         {
+         bufferStart = 0;
+         }
+         if(readIdx < size)
+         {
+         buffer[(bufferStart + inBuffer) % bufferSize] = start[readIdx];
+         inBuffer++;
+         readIdx++;
+         }
+         }
+         }
+       */
     }
-    inBuffer = readIdx;
-
-    for(int i = 0; i < numUpdates; i++)
+    //######## AFTER HALF: #########
+    if(updatesAfterHalf > 0)
     {
-      while(writeIdx < updates->indices[i])
+      numUpdates = updatesAfterHalf;
+      numInserts = insertsAfterHalf;
+      bufferSize = numUpdates + 1;
+      inBuffer = 0;
+      bufferStart = 0;
+
+      writeIdx = updates->indices[updatesUnderHalf];
+      readIdx = writeIdx - incUnderHalf;
+      newStart = start - incUnderHalf;
+      
+      int idx = 0;
+      while(idx < bufferSize && readIdx < size)
+      {
+        buffer[idx] = start[readIdx];
+        readIdx++;
+        idx++;
+      }
+      inBuffer = idx;
+
+      for(int i = updatesUnderHalf; i < updates->size; i++)
+      {
+        while(writeIdx < updates->indices[i])
+        {
+          newStart[writeIdx] = buffer[bufferStart];
+          writeIdx++;
+          inBuffer--;
+          bufferStart++;
+          if(bufferStart == bufferSize)
+          {
+            bufferStart = 0;
+          }
+          if(readIdx >= 0)
+          {
+            buffer[(bufferStart + inBuffer) % bufferSize] = start[readIdx];
+            inBuffer++;
+            readIdx++;
+          }
+        }
+        if(updates->types[i] == UPDATE_INSERT)
+        {
+          newStart[writeIdx] = updates->values[i];
+          writeIdx++;
+        }
+        else
+        {
+          inBuffer--;
+          bufferStart++;
+          if(bufferStart == bufferSize)
+          {
+            bufferStart = 0;
+          }
+          if(readIdx >= 0)
+          {
+            buffer[(bufferStart + inBuffer) % bufferSize] = start[readIdx];
+            inBuffer++;
+            readIdx++;
+          }
+        }
+      }
+      
+      while(inBuffer > 0)
       {
         newStart[writeIdx] = buffer[bufferStart];
         writeIdx++;
@@ -200,45 +333,27 @@ template <class T> void
           readIdx++;
         }
       }
-      if(updates->types[i] == UPDATE_INSERT)
-      {
-        newStart[writeIdx] = updates->values[i];
-        writeIdx++;
-      }
-      else
-      {
-        inBuffer--;
-        bufferStart++;
-        if(bufferStart == bufferSize)
-        {
-          bufferStart = 0;
-        }
-        if(readIdx < size)
-        {
-          buffer[(bufferStart + inBuffer) % bufferSize] = start[readIdx];
-          inBuffer++;
-          readIdx++;
-        }
-      }
     }
-
+    
+    /*
     while(inBuffer > 0)
     {
       newStart[writeIdx] = buffer[bufferStart];
-      writeIdx++;
+      writeIdx--;
       inBuffer--;
       bufferStart++;
       if(bufferStart == bufferSize)
       {
         bufferStart = 0;
       }
-      if(readIdx < size)
+      if(readIdx >= 0)
       {
         buffer[(bufferStart + inBuffer) % bufferSize] = start[readIdx];
         inBuffer++;
-        readIdx++;
+        readIdx--;
       }
     }
+    */
     
     size += incUnderHalf + incAfterHalf;
     start = start - incUnderHalf;
@@ -246,46 +361,6 @@ template <class T> void
   
   updates->empty();
 }
-/*
-template <class T> void CustomArrayV6<T>::del(int idx)
-{
-  flush(1);
-  
-  if(idx < size / 2)
-  {
-    for(int i = idx; i > 0; i--)
-    {
-      start[i] = start[i-1];
-    }
-    start++;
-  }
-  else
-  {
-    for(int i = idx; i < size - 1; i++)
-    {
-      start[i] = start[i+1];
-    }
-  }
-  
-  size--;
-  
-  if(size < allocated / (V6_EXPAND_CONST * V6_EXPAND_CONST))
-  {
-    allocated = allocated / V6_EXPAND_CONST;
-    T *newArr = (T*) new char[allocated * sizeof(T)];
-    T *newStart = newArr + (allocated / 3);
-    
-    for(int i = 0; i < size; i++)
-    {
-      newStart[i] = start[i];
-    }
-    
-    delete[] data;
-    data = newArr;
-    start = newStart;
-  }
-}
-*/
 
 template <class T> T CustomArrayV6<T>::lookup(int idx)
 {
