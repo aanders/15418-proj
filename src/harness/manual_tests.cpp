@@ -98,25 +98,5 @@ void runManualTests()
   }
   cout<<endl;
   
-  /*
-  int tests[size] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
-  int refsol[size] = {1,1,0,1,1,0,0,0,1,0,1,1,0,0,0};
-  
-  for(int i = 0; i < size; i++)
-  {
-    if (sc.lookupElt(tests[i]) && (refsol[i] == 1))
-    {
-      cout<<"RBT test "<<i<<" passed! (found element)"<<endl;
-    }
-    else if (!sc.lookupElt(tests[i]) && (refsol[i] == 0))
-    {
-      cout<<"RBT test "<<i<<" passed! (element doesn't exist)"<<endl;
-    }
-    else
-    {
-      cout<<"RBT test "<<i<<" failed :("<<endl;
-    }
-  }
-  */
 }
 

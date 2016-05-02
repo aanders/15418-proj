@@ -22,6 +22,7 @@ template <class T> class CustomArrayV6 : public Array<T>
   T *start;
   
   Updates<T> *updates;
+  T *buffer;
   
   #ifdef V6_DEBUG
   long totalUpdates;
@@ -32,9 +33,7 @@ template <class T> class CustomArrayV6 : public Array<T>
   public:
   CustomArrayV6(bool (*c)(T a, T b));
   
-  #ifdef V6_DEBUG
   ~CustomArrayV6();
-  #endif
   
   void ins(T a);
   void del(int idx);

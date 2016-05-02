@@ -11,23 +11,26 @@ template <class T> CustomArrayV6<T>::CustomArrayV6(bool (*c)(T a, T b))
   start = data;
   
   updates = new Updates<T>(c, V6_MAX_UPDATES);
+  buffer = (T*) new char[(V6_MAX_UPDATES + 1) * sizeof(T)];
   
   #ifdef V6_DEBUG
-  totalInserts = maxFlushed = 0;
+  totalUpdates = maxFlushed = 0;
   timesFlushed[0] = timesFlushed[1] = 0;
   #endif
 }
 
-#ifdef V6_DEBUG
 template <class T> CustomArrayV6<T>::~CustomArrayV6()
 {
-  cout<<"Inserts per flush: "<<totalInserts / 
+  delete[] buffer;
+  
+  #ifdef V6_DEBUG
+  cout<<"Updates per flush: "<<totalUpdates / 
     (timesFlushed[0] + timesFlushed[1])<<endl;
   cout<<"Flushes due to readiness: "<<timesFlushed[0]<<endl;
   cout<<"Flushes due to fullness: "<<timesFlushed[1]<<endl;
   cout<<"Max flushed at once: "<<maxFlushed<<endl;
+  #endif
 }
-#endif
 
 template <class T> void CustomArrayV6<T>::ins(T a)
 {
@@ -37,7 +40,7 @@ template <class T> void CustomArrayV6<T>::ins(T a)
     flush(1);
   
   #ifdef V6_DEBUG
-  totalInserts++;
+  totalUpdates++;
   #endif
 }
 
@@ -49,7 +52,7 @@ template <class T> void CustomArrayV6<T>::del(int idx)
     flush(1);
   
   #ifdef V6_DEBUG
-  totalInserts++;
+  totalUpdates++;
   #endif
 }
 
@@ -118,7 +121,6 @@ template <class T> void
          (incUnderHalf > 0 && ((allocated - size) / 2) < incUnderHalf) ||
          (((allocated - size) / 2) + size + incAfterHalf >= allocated);
     }
-  }
     
     newArr = (T*) new char[allocated * sizeof(T)];
     newStart = newArr + ((allocated - size) / 2) - incUnderHalf;
@@ -155,54 +157,92 @@ template <class T> void
     delete[] data;
     data = newArr;
     start = newStart;
-  
-  /*
+  }
   else
   {
-    int bufferSize = (deletesUnderHalf > deletesAfterHalf ? 
-                      deletesUnderHalf : deletesAfterHalf);
-    
-    start += startOffset;
-    
-    T buffer[bufferSize];
+    int writeIdx;
+    int readIdx;
+    int numUpdates = updates->size;
+    int numInserts = insertsUnderHalf + insertsAfterHalf;
+
+    int bufferSize = numUpdates + 1;
+
     int inBuffer = 0;
     int bufferStart = 0;
-    
-    int writeIdx = 0;
-    int readIdx = -startOffset;
-    
-    for(int i = 0; i < deletesUnderHalf; i++)
+
+    readIdx = 0;
+    writeIdx = 0;
+    newStart = start - incUnderHalf;
+
+    while(readIdx < bufferSize && readIdx < size)
     {
-      buffer[i] = start[readIdx];
+      buffer[readIdx] = start[readIdx];
       readIdx++;
     }
-    
-    for(int i = 0; i < updatesUnderHalf; i++)
+    inBuffer = readIdx;
+
+    for(int i = 0; i < numUpdates; i++)
     {
       while(writeIdx < updates->indices[i])
       {
-        
-        start[] = start[j + numUnderHalf - i];
-        j++;
+        newStart[writeIdx] = buffer[bufferStart];
+        writeIdx++;
+        inBuffer--;
+        bufferStart++;
+        if(bufferStart == bufferSize)
+        {
+          bufferStart = 0;
+        }
+        if(readIdx < size)
+        {
+          buffer[(bufferStart + inBuffer) % bufferSize] = start[readIdx];
+          inBuffer++;
+          readIdx++;
+        }
       }
-      start[j] = inserts->lookup(i);
-      j++;
+      if(updates->types[i] == UPDATE_INSERT)
+      {
+        newStart[writeIdx] = updates->values[i];
+        writeIdx++;
+      }
+      else
+      {
+        inBuffer--;
+        bufferStart++;
+        if(bufferStart == bufferSize)
+        {
+          bufferStart = 0;
+        }
+        if(readIdx < size)
+        {
+          buffer[(bufferStart + inBuffer) % bufferSize] = start[readIdx];
+          inBuffer++;
+          readIdx++;
+        }
+      }
+    }
+
+    while(inBuffer > 0)
+    {
+      newStart[writeIdx] = buffer[bufferStart];
+      writeIdx++;
+      inBuffer--;
+      bufferStart++;
+      if(bufferStart == bufferSize)
+      {
+        bufferStart = 0;
+      }
+      if(readIdx < size)
+      {
+        buffer[(bufferStart + inBuffer) % bufferSize] = start[readIdx];
+        inBuffer++;
+        readIdx++;
+      }
     }
     
     size += incUnderHalf + incAfterHalf;
-    j = size - 1;
-    for(int i = numInserts - 1; i >= numUnderHalf; i--)
-    {
-      while(j > insertionIndices[i])
-      {
-        start[j] = start[j - i + numUnderHalf - 1];
-        j--;
-      }
-      start[j] = inserts->lookup(i);
-      j--;
-    }
+    start = start - incUnderHalf;
   }
-  */
   
   updates->empty();
 }
