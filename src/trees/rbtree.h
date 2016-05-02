@@ -16,7 +16,6 @@ public:
   RBNode* right;
   RBNode* parent;
   unsigned int size;
-  char PADDING[24];
   
   // Constructor
   RBNode(T val, NodeColor color) : val(val), color(color),
