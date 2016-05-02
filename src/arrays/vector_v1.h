@@ -7,19 +7,16 @@
 template <class T> class VectorArray: public Array<T>
 {
   protected:
-  //bool (*comp)(T a, T b);
   std::vector<T> data;
-  
-  //void sortedChecker();
+  int updatesHandled;
   
   public:
   VectorArray(bool (*c)(T a, T b));
   void ins(T a);
   void del(int idx);
   T lookup(int idx);
-  
+  inline bool ready(int numUpdates, int idx);
   void flush();
-  //bool lookupElt(T val);
 };
 
 #include "vector_v1.tpp"

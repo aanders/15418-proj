@@ -14,10 +14,7 @@ template <class T> class CustomArrayV2 : public Array<T>
   T *data;
   
   T insertions[INSERT_BUFFER_SIZE * 2];
-  int numInsertions;
-  
-  //int deletions[DELETE_BUFFER_SIZE];
-  //int numDeletions;
+  int numInsertions, updatesHandled;
   
   void sortedChecker(T *d, int s);
   
@@ -30,7 +27,8 @@ template <class T> class CustomArrayV2 : public Array<T>
   void del(int idx);
   T lookup(int idx);
   void flush();
-  //bool lookupElt(T val);
+  
+  inline bool ready(int numUpdates, int idx);
 };
 
 #include "custom_v2.tpp"

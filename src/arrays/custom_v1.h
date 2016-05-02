@@ -11,7 +11,7 @@ template <class T> class CustomArray : public Array<T>
   int allocated;
   int size;
   T *data;
- 
+  int updatesHandled;
   //void sortedChecker();
    
   public:
@@ -21,6 +21,7 @@ template <class T> class CustomArray : public Array<T>
   T lookup(int idx);
   
   void flush();
+  virtual bool ready(int numUpdates, int idx);
   //bool lookupElt(T val);
 };
 

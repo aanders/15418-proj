@@ -13,7 +13,7 @@ template <class T> class Array
   virtual T lookup(int idx) =0;
   
   virtual void flush() =0;
-  //virtual bool lookupElt(T val) =0;
+  virtual inline bool ready(int numUpdates, int idx) =0;
 };
 
 #include "array.tpp"

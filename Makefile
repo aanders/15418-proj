@@ -20,7 +20,9 @@ TEMPLATES = arrays/vector_v1.tpp arrays/array.tpp trees/simpleTree.tpp \
       sortedCollection/sortedCollection.tpp arrays/custom_v1.tpp \
       arrays/custom_v2.tpp arrays/custom_v3.tpp \
       arrays/custom_v4.tpp arrays/custom_v5.tpp \
-      arrays/custom_v6.tpp arrays/updates.tpp
+      arrays/custom_v6.tpp arrays/updates.tpp \
+      arrays/custom_v7.tpp
+
 
 
 OBJS = $(SRCS:.cpp=.o)

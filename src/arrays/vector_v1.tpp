@@ -37,7 +37,7 @@ template <class T> int binarySearch(std::vector<T> *vec, bool (*comp)(T a, T b),
 }
 
 template <class T> VectorArray<T>::VectorArray(bool (*c)(T a, T b)) 
-  : Array<T>(c) {}
+  : Array<T>(c) {updatesHandled = 0;}
 
 template <class T> void VectorArray<T>::ins(T a)
 {
@@ -47,19 +47,16 @@ template <class T> void VectorArray<T>::ins(T a)
   }
   else
   {
-    //std::cout<<"A"<<std::endl;
     int insertionIndex = binarySearch(&data, this->comp, a);
-    //std::cout<<"B"<<std::endl;
     data.insert(data.begin() + insertionIndex, a);
-    //std::cout<<"C"<<std::endl;
   }
-  //sortedChecker();
+  updatesHandled++;
 }
 
 template <class T> void VectorArray<T>::del(int idx)
 {
   data.erase(data.begin() + idx);
-  //sortedChecker();
+  updatesHandled++;
 }
 
 template <class T> T VectorArray<T>::lookup(int idx)
@@ -69,34 +66,8 @@ template <class T> T VectorArray<T>::lookup(int idx)
 
 template <class T> void VectorArray<T>::flush() {}
 
-/*
-template <class T> void VectorArray<T>::sortedChecker()
+template <class T> inline bool VectorArray<T>::ready(int numUpdates, 
+                                                      int idx)
 {
-  bool ok = true;
-  int size = data.size();
-  
-  for(int i = 0; i < size - 1; i++)
-  {
-    if(this->comp(data[i+1], data[i]))
-    {
-      ok = false;
-    }
-    cout<<data[i]<<", ";
-  }
-  if(size > 0)
-    cout<<data[size - 1]<<endl;
-  else
-    cout<<endl;
-  
-  if(!ok)
-  {
-    cout<<"Not ok bro.\n";
-  }
+  return numUpdates == updatesHandled;
 }
-*/
-/*
-template <class T> bool VectorArray<T>::lookupElt(T val)
-{
-  return this->comp(val, val);
-}
-*/

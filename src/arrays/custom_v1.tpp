@@ -8,6 +8,7 @@ template <class T> CustomArray<T>::CustomArray(bool (*c)(T a, T b))
   size = 0;
   allocated = 1;
   data = new T[allocated];
+  updatesHandled = 0;
 }
 
 template <class T> void CustomArray<T>::ins(T a)
@@ -45,6 +46,8 @@ template <class T> void CustomArray<T>::ins(T a)
     data[insertionIndex] = a;
     size++;
   }
+  
+  updatesHandled++;
 }
 
 template <class T> void CustomArray<T>::del(int idx)
@@ -69,7 +72,7 @@ template <class T> void CustomArray<T>::del(int idx)
     data = newArr;
   }
   
-  //sortedChecker();
+  updatesHandled++;
 }
 
 template <class T> T CustomArray<T>::lookup(int idx)
@@ -78,33 +81,9 @@ template <class T> T CustomArray<T>::lookup(int idx)
 }
 
 template <class T> void CustomArray<T>::flush() {}
-/*
-template <class T> void CustomArray<T>::sortedChecker()
+
+template <class T> inline bool CustomArray<T>::ready(int numUpdates, 
+                                                    int idx)
 {
-  bool ok = true;
-  
-  for(int i = 0; i < size - 1; i++)
-  {
-    if(this->comp(data[i+1], data[i]))
-    {
-      ok = false;
-    }
-    cout<<data[i]<<", ";
-  }
-  if(size > 0)
-    cout<<data[size - 1]<<endl;
-  else
-    cout<<endl;
-  
-  if(!ok)
-  {
-    cout<<"Not ok bro.\n";
-  }
+  return numUpdates == updatesHandled;
 }
-*/
-/*
-template <class T> bool CustomArray<T>::lookupElt(T val)
-{
-  return this->comp(val, val);
-}
-*/

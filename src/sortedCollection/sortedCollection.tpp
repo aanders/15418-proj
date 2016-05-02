@@ -8,6 +8,7 @@
 #include "arrays/custom_v4.h"
 #include "arrays/custom_v5.h"
 #include "arrays/custom_v6.h"
+#include "arrays/custom_v7.h"
 #include "trees/simpleTree.h"
 #include <pthread.h>
 #include <mutex>
@@ -30,7 +31,7 @@ template <class T> SortedCollection<T>::SortedCollection(
   servicedFromTree = servicedFromArray = 0;
   numTimesWaitedOnLookup = 0;
    
-  array = new CustomArrayV6<T>(comp);
+  array = new CustomArrayV7<T>(comp);
   tree = new RBTree<T>(comp);
   aUpdatesWait = std::unique_lock<std::mutex>(aUpdatesMutex);
   tUpdatesWait = std::unique_lock<std::mutex>(tUpdatesMutex);
@@ -85,7 +86,7 @@ template <class T> void SortedCollection<T>::del(int idx)
 template <class T> T SortedCollection<T>::lookup(int idx)
 {
   bool ready = true;
-  while(numTUpdates != numUpdates && numAUpdates != numUpdates) 
+  while(numTUpdates != numUpdates && !array->ready(numUpdates, idx)) 
   {
     if(ready)
     {
@@ -95,7 +96,7 @@ template <class T> T SortedCollection<T>::lookup(int idx)
     atReady.wait(atUpdatesWait);
   }
   
-  if(numAUpdates == numUpdates)
+  if(array->ready(numUpdates, idx))
   {
     servicedFromArray++;
     return array->lookup(idx);
@@ -115,15 +116,15 @@ template <class T> bool SortedCollection<T>::lookupElt(T val)
 
 template <class T> void *SortedCollection<T>::handleUpdatesArray()
 {
-  int numHandled = 0;
+  //int numHandled = 0;
   Update<T> u;
   while(true)
   {
     while(!arrayUpdates.remove(&u)) 
     {
       array->flush();
-      numAUpdates += numHandled;
-      numHandled = 0;
+      //numAUpdates += numHandled;
+      //numHandled = 0;
       atReady.notify_all();
       aReady.notify_all();
     }
@@ -140,7 +141,7 @@ template <class T> void *SortedCollection<T>::handleUpdatesArray()
       return NULL;
     }
     
-    numHandled++;
+    //numHandled++;
   }
   return NULL;
 }
