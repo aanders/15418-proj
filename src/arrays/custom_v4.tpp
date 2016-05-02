@@ -9,6 +9,7 @@ template <class T> CustomArrayV4<T>::CustomArrayV4(bool (*c)(T a, T b))
   allocated = 1;
   data = (T*) new char[allocated * sizeof(T)];
   start = data;
+  updatesHandled++;
 }
 
 template <class T> void CustomArrayV4<T>::ins(T a)
@@ -74,6 +75,8 @@ template <class T> void CustomArrayV4<T>::ins(T a)
     }
     size++;
   }
+  
+  updatesHandled++;
 }
 
 template <class T> void CustomArrayV4<T>::del(int idx)
@@ -111,6 +114,8 @@ template <class T> void CustomArrayV4<T>::del(int idx)
     data = newArr;
     start = newStart;
   }
+  
+  updatesHandled++;
 }
 
 template <class T> T CustomArrayV4<T>::lookup(int idx)
@@ -119,6 +124,13 @@ template <class T> T CustomArrayV4<T>::lookup(int idx)
 }
 
 template <class T> void CustomArrayV4<T>::flush() {}
+
+template <class T> inline bool CustomArrayV4<T>::ready(int numUpdates, 
+                                                      int idx)
+{
+  return numUpdates == updatesHandled;
+}
+
 /*
 template <class T> void CustomArray<T>::sortedChecker()
 {
@@ -153,9 +165,5 @@ template <class T> bool CustomArray<T>::lookupElt(T val)
 template <class T> void CustomArrayV4<T>::clearAll()
 {
   size = 0;
-  start = data + (allocated / 3);
-  /*allocated = 1;
-  delete[] data;
-  data = (T*) new T[allocated];//  * sizeof(T)];
-  start = data;*/
+  start = data + ((allocated - size) / 2);
 }

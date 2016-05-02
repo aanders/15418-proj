@@ -10,13 +10,12 @@ template <class T> CustomArrayV2<T>::CustomArrayV2(bool (*c)(T a, T b))
   allocated = 1;
   data = new T[allocated];
   numInsertions = 0;
+  updatesHandled = 0;
 }
 
 
 template <class T> void CustomArrayV2<T>::emptyInsertions()
 {
-  //cout<<numInsertions<<endl;
-  
   if(numInsertions == 0)
     return;
   
@@ -74,14 +73,15 @@ template <class T> void CustomArrayV2<T>::emptyInsertions()
     }
   }
   
-  size += numInsertions;
-  numInsertions = 0;
-  
   if(aNewArr)
   {
     delete[] data;
     data = newArr;
   }
+  
+  size += numInsertions;
+  updatesHandled += numInsertions;
+  numInsertions = 0;
 }
 
 template <class T> void CustomArrayV2<T>::ins(T a)
@@ -91,14 +91,12 @@ template <class T> void CustomArrayV2<T>::ins(T a)
   
   if(numInsertions == INSERT_BUFFER_SIZE)
   {
-    //cout<<"buffer full:"<<endl;
     emptyInsertions();
   }
 }
 
 template <class T> void CustomArrayV2<T>::del(int idx)
 {
-  //cout<<"deleting:"<<endl;
   emptyInsertions();
   
   for(int i = idx; i < size - 1; i++)
@@ -120,6 +118,8 @@ template <class T> void CustomArrayV2<T>::del(int idx)
     delete[] data;
     data = newArr;
   }
+  
+  updatesHandled++;
 }
 
 template <class T> T CustomArrayV2<T>::lookup(int idx)
@@ -127,6 +127,7 @@ template <class T> T CustomArrayV2<T>::lookup(int idx)
   return data[idx];
 }
 
+/*
 template <class T> void CustomArrayV2<T>::printData(T *d, int s)
 {
   for(int i = 0; i < s; i++)
@@ -161,16 +162,15 @@ template <class T> void CustomArrayV2<T>::sortedChecker(T *d, int s)
     cout<<"Not ok bro.\n";
   }
 }
+*/
 
 template <class T> void CustomArrayV2<T>::flush() 
 {
-  //cout<<"flushed:"<<endl;
   emptyInsertions();
 }
 
-/*
-template <class T> bool CustomArrayV2<T>::lookupElt(T val)
+template <class T> inline bool CustomArrayV2<T>::ready(int numUpdates, 
+                                                      int idx)
 {
-  return this->comp(val, val);
+  return numUpdates == updatesHandled;
 }
-*/

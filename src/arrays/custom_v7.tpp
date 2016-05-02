@@ -2,7 +2,7 @@
 #include "custom_v6.h"
 #include "binSearch.h"
 
-template <class T> CustomArrayV6<T>::CustomArrayV6(bool (*c)(T a, T b))
+template <class T> CustomArrayV7<T>::CustomArrayV7(bool (*c)(T a, T b))
   : Array<T>(c)
 {
   size = 0;
@@ -10,22 +10,22 @@ template <class T> CustomArrayV6<T>::CustomArrayV6(bool (*c)(T a, T b))
   data = (T*) new char[allocated * sizeof(T)];
   start = data;
   
-  updates = new Updates<T>(c, V6_MAX_UPDATES);
-  buffer = (T*) new char[(V6_MAX_UPDATES + 1) * sizeof(T)];
+  updates = new Updates<T>(c, V7_MAX_UPDATES);
+  buffer = (T*) new char[(V7_MAX_UPDATES + 1) * sizeof(T)];
   
   currUpdates = updatesHandled = 0;
   
-  #ifdef V6_DEBUG
+  #ifdef V7_DEBUG
   totalUpdates = maxFlushed = 0;
   timesFlushed[0] = timesFlushed[1] = 0;
   #endif
 }
 
-template <class T> CustomArrayV6<T>::~CustomArrayV6()
+template <class T> CustomArrayV7<T>::~CustomArrayV7()
 {
   delete[] buffer;
   
-  #ifdef V6_DEBUG
+  #ifdef V7_DEBUG
   cout<<"Updates per flush: "<<totalUpdates / 
     (timesFlushed[0] + timesFlushed[1])<<endl;
   cout<<"Flushes due to readiness: "<<timesFlushed[0]<<endl;
@@ -34,40 +34,40 @@ template <class T> CustomArrayV6<T>::~CustomArrayV6()
   #endif
 }
 
-template <class T> void CustomArrayV6<T>::ins(T a)
+template <class T> void CustomArrayV7<T>::ins(T a)
 {
   updates->ins(a, start, size);
   currUpdates++;
   
-  if(updates->size == V6_MAX_UPDATES)
+  if(updates->size == V7_MAX_UPDATES)
     flush(1);
   
-  #ifdef V6_DEBUG
+  #ifdef V7_DEBUG
   totalUpdates++;
   #endif
 }
 
-template <class T> void CustomArrayV6<T>::del(int idx)
+template <class T> void CustomArrayV7<T>::del(int idx)
 {
   updates->del(idx);
   currUpdates++;
   
-  if(updates->size == V6_MAX_UPDATES)
+  if(updates->size == V7_MAX_UPDATES)
     flush(1);
   
-  #ifdef V6_DEBUG
+  #ifdef V7_DEBUG
   totalUpdates++;
   #endif
 }
 
 //here's hoping this gets optimized out
-template <class T> void CustomArrayV6<T>::flush()
+template <class T> void CustomArrayV7<T>::flush()
 {
   flush(0);
 }
 
 template <class T> void 
-  CustomArrayV6<T>::flush(int cause)
+  CustomArrayV7<T>::flush(int cause)
 {
   if(updates->size == 0)
   {
@@ -76,7 +76,7 @@ template <class T> void
     return;
   }
   
-  #ifdef V6_DEBUG
+  #ifdef V7_DEBUG
   maxFlushed = (maxFlushed < updates->size ? updates->size : maxFlushed);
   timesFlushed[cause]++;
   #endif
@@ -124,7 +124,7 @@ template <class T> void
   {
     while(newlyAllocate)
     {
-      allocated = allocated * V6_EXPAND_CONST;
+      allocated = allocated * V7_EXPAND_CONST;
       newlyAllocate = 
          (incUnderHalf > 0 && ((allocated - size) / 2) < incUnderHalf) ||
          (((allocated - size) / 2) + size + incAfterHalf >= allocated);
@@ -331,13 +331,14 @@ template <class T> void
   currUpdates = 0;
 }
 
-template <class T> T CustomArrayV6<T>::lookup(int idx)
+template <class T> T CustomArrayV7<T>::lookup(int idx)
 {
   return start[idx];
 }
 
-template <class T> inline bool CustomArrayV6<T>::ready(int numUpdates,
+template <class T> inline bool CustomArrayV7<T>::ready(int numUpdates,
                                                        int idx)
 {
-  return numUpdates == updatesHandled;
+  return numUpdates == updatesHandled; //updatesAcknowledged && 
+          //(idx == 423423); //range stuff
 }

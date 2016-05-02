@@ -21,6 +21,7 @@ template <class T> class CustomArrayV5 : public Array<T>
   
   CustomArrayV4<T> *inserts;
   int numInserts;
+  int updatesHandled;
   
   #ifdef V5_DEBUG
   long totalInserts;
@@ -40,7 +41,7 @@ template <class T> class CustomArrayV5 : public Array<T>
   T lookup(int idx);
   void flush(int cause);
   void flush();
-  //bool lookupElt(T val);
+  inline bool ready(int numUpdates, int idx);
 };
 
 #include "custom_v5.tpp"

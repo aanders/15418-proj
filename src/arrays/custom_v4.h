@@ -16,6 +16,7 @@ template <class T> class CustomArrayV4 : public Array<T>
   int size;
   T *data;
   T *start;
+  int updatesHandled;
   
   public:
   CustomArrayV4(bool (*c)(T a, T b));
@@ -24,9 +25,8 @@ template <class T> class CustomArrayV4 : public Array<T>
   T lookup(int idx);
   
   void flush();
-  
+  virtual bool ready(int numUpdates, int idx);
   void clearAll();
-  //bool lookupElt(T val);
 };
 
 #include "custom_v4.tpp"

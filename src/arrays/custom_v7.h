@@ -4,16 +4,16 @@
 /* This is version V5 with an update rather than insert buffer
  */
 
-#ifndef __custom_v6_h__
-#define __custom_v6_h__
+#ifndef __custom_v7_h__
+#define __custom_v7_h__
 
-#define V6_EXPAND_CONST 2
+#define V7_EXPAND_CONST 2
 
-//#define V6_DEBUG
+//#define V7_DEBUG
 
-#define V6_MAX_UPDATES 500
+#define V7_MAX_UPDATES 500
 
-template <class T> class CustomArrayV6 : public Array<T>
+template <class T> class CustomArrayV7 : public Array<T>
 {
   protected:
   int allocated;
@@ -26,17 +26,18 @@ template <class T> class CustomArrayV6 : public Array<T>
   
   int currUpdates;
   int updatesHandled;
+  int updatesAcknowledged;
   
-  #ifdef V6_DEBUG
+  #ifdef V7_DEBUG
   long totalUpdates;
   long timesFlushed[2];
   long maxFlushed;
   #endif
   
   public:
-  CustomArrayV6(bool (*c)(T a, T b));
+  CustomArrayV7(bool (*c)(T a, T b));
   
-  ~CustomArrayV6();
+  ~CustomArrayV7();
   
   void ins(T a);
   void del(int idx);
@@ -46,6 +47,6 @@ template <class T> class CustomArrayV6 : public Array<T>
   inline bool ready(int numUpdates, int idx);
 };
 
-#include "custom_v6.tpp"
+#include "custom_v7.tpp"
 
 #endif

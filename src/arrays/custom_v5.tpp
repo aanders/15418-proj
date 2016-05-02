@@ -11,6 +11,7 @@ template <class T> CustomArrayV5<T>::CustomArrayV5(bool (*c)(T a, T b))
   start = data;
   inserts = new CustomArrayV4<T>(c);
   numInserts = 0;
+  updatesHandled = 0;
   
   #ifdef V5_DEBUG
   totalInserts = maxFlushed = 0;
@@ -141,6 +142,8 @@ template <class T> void
       j--;
     }
   }
+  
+  updatesHandled += numInserts;
   numInserts = 0;
   inserts->clearAll();
 }
@@ -182,11 +185,18 @@ template <class T> void CustomArrayV5<T>::del(int idx)
     data = newArr;
     start = newStart;
   }
+  updatesHandled++;
 }
 
 template <class T> T CustomArrayV5<T>::lookup(int idx)
 {
   return start[idx];
+}
+
+template <class T> inline bool CustomArrayV5<T>::ready(int numUpdates,
+                                                      int idx)
+{
+  return numUpdates == updatesHandled;
 }
 
 /*
