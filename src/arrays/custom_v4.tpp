@@ -9,7 +9,7 @@ template <class T> CustomArrayV4<T>::CustomArrayV4(bool (*c)(T a, T b))
   allocated = 1;
   data = (T*) new char[allocated * sizeof(T)];
   start = data;
-  updatesHandled++;
+  updatesHandled = 0;
 }
 
 template <class T> void CustomArrayV4<T>::ins(T a)
