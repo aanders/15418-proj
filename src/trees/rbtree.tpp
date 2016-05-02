@@ -130,7 +130,7 @@ T RBTree<T>::insert(T val) {
  * Protected helper to re-balance the tree after insertion
  */
 template <class T>
-void RBTree<T>::_ibalance(RBNode<T>* inserted) {
+inline void RBTree<T>::_ibalance(RBNode<T>* inserted) {
   if (inserted == _root) {
     // Easy peasy.  Color node black and we're done
     inserted->color = NodeColor::BLACK;
@@ -318,7 +318,7 @@ T RBTree<T>::removeNode(RBNode<T> *node) {
  *
  */
 template <class T>
-void RBTree<T>::_prepTree(RBNode<T>* toRemove) {
+inline void RBTree<T>::_prepTree(RBNode<T>* toRemove) {
   /*
    * Precondition:
    * toRemove != NULL
@@ -372,7 +372,7 @@ void RBTree<T>::_prepTree(RBNode<T>* toRemove) {
  */
 
 template <class T>
-void RBTree<T>::_rbalance(RBNode<T>* removed) {
+inline void RBTree<T>::_rbalance(RBNode<T>* removed) {
   if (!removed) {
     // weird
     // std::cerr << "weird" << std::endl;
@@ -511,7 +511,7 @@ void RBTree<T>::_rbalance(RBNode<T>* removed) {
  * returns the new root of the subtree
  */
 template <class T>
-RBNode<T>* RBTree<T>::_rotateLeft(RBNode<T>* node) {
+inline RBNode<T>* RBTree<T>::_rotateLeft(RBNode<T>* node) {
   if (!node || !node->right) {
     // Not possible to rotate
     return node;
@@ -556,7 +556,7 @@ RBNode<T>* RBTree<T>::_rotateLeft(RBNode<T>* node) {
  * returns the new root of the subtree
  */
 template <class T>
-RBNode<T>* RBTree<T>::_rotateRight(RBNode<T>* node) {
+inline RBNode<T>* RBTree<T>::_rotateRight(RBNode<T>* node) {
   if (!node || !node->left) {
     // Not possible to rotate
     return node;

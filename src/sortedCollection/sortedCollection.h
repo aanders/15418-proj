@@ -39,6 +39,18 @@ template <class T> class SortedCollection
   int numAUpdates;
   int numTUpdates;
 
+  std::mutex aUpdatesMutex;
+  std::mutex tUpdatesMutex;
+  std::mutex atUpdatesMutex;
+
+  std::unique_lock<std::mutex> aUpdatesWait;
+  std::unique_lock<std::mutex> tUpdatesWait;
+  std::unique_lock<std::mutex> atUpdatesWait;
+
+  std::condition_variable aReady;
+  std::condition_variable tReady;
+  std::condition_variable atReady;
+  
   pthread_t tThread, aThread;
   
   public:
