@@ -43,7 +43,7 @@ template <class T> CustomArrayV7<T>::~CustomArrayV7()
 template <class T> void CustomArrayV7<T>::ins(T a)
 {
   int64_t start = iuhAndStart & V7_32B;
-  int i = updates->ins(a, data + start, size);
+  updates->ins(a, data + start, size);
   int64_t iuh = updates->iuh;
   iuhAndStart = (iuh << 32) | start;
   
@@ -87,7 +87,7 @@ template <class T> void CustomArrayV7<T>::ins(T a)
 
 template <class T> void CustomArrayV7<T>::del(int idx)
 {
-  int i = updates->del(idx);
+  updates->del(idx, size);
   int64_t iuh = updates->iuh;
   iuhAndStart = (iuh << 32) | (iuhAndStart & V7_32B);
   
@@ -332,20 +332,21 @@ template <class T> void
         idx++;
       }
       inBuffer = idx;
-
+      
       for(int i = updatesUnderHalf; i < updates->size; i++)
       {
         while(writeIdx < updates->indices[i])
         {
           newStart[writeIdx] = buffer[bufferStart];
           writeIdx++;
+          w3++; //MOVE THE BARRIER BACK
           inBuffer--;
           bufferStart++;
           if(bufferStart == bufferSize)
           {
             bufferStart = 0;
           }
-          if(readIdx < start)
+          if(readIdx < size)
           {
             buffer[(bufferStart + inBuffer) % bufferSize] = start[readIdx];
             inBuffer++;
@@ -356,6 +357,7 @@ template <class T> void
         {
           newStart[writeIdx] = updates->values[i];
           writeIdx++;
+          w3++;
         }
         else
         {
@@ -378,6 +380,7 @@ template <class T> void
       {
         newStart[writeIdx] = buffer[bufferStart];
         writeIdx++;
+        w3++;
         inBuffer--;
         bufferStart++;
         if(bufferStart == bufferSize)
@@ -396,10 +399,6 @@ template <class T> void
     size += incUnderHalf + incAfterHalf;
     iuhAndStartLock.lock();
     int64_t iuh = iuhAndStart >> 32;
-    if(iuh != ((int64_t) incUnderHalf))
-    {
-      cout<<"inequality: "<<iuh<<" "<<incUnderHalf<<endl;
-    }
     iuhAndStart = (iuhAndStart & V7_32B) - ((int64_t) incUnderHalf);
     iuhAndStartLock.unlock();
     w1 = size / 2;
@@ -427,7 +426,8 @@ template <class T> T CustomArrayV7<T>::lookup(int idx)
   else
   {
     idx -= iuh;
-    //cout<<"near"<<endl;
+    //if(iuh != 0)
+    //  cout<<"an iuh lookup!"<<endl;
   }
   T ret = data[start + idx];
   iuhAndStartLock.unlock();
@@ -441,6 +441,8 @@ template <class T> inline bool CustomArrayV7<T>::ready(int numUpdates,
   {
     return false;
   }
+  if(numUpdates == updatesHandled)
+    return true;
   
   int64_t iuh = iuhAndStart >> 32;
   return (idx < w1 && false) || ((idx - iuh) >= w2 && (idx - iuh) < w3);
