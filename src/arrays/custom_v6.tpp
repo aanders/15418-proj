@@ -109,17 +109,6 @@ template <class T> void
   int incUnderHalf = 2*insertsUnderHalf - updatesUnderHalf;
   int incAfterHalf = 2*insertsAfterHalf - updatesAfterHalf;
   
-  if(incUnderHalf != updates->iuh)
-  {
-    cout<<incUnderHalf<<" vs. the guess: "<<updates->iuh<<endl;
-    cout<<"last was: "<<updates->last<<endl;
-    cout<<"lastPrev was: "<<updates->lastPrev<<endl;
-  }
-  else
-  {
-    //cout<<updates->last<<endl;
-  }
-  
   bool newlyAllocate = 
           (incUnderHalf > 0 && start - incUnderHalf <= data) ||
           (start + size + incAfterHalf >= data + allocated);

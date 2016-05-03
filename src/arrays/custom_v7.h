@@ -31,8 +31,9 @@ template <class T> class CustomArrayV7 : public Array<T>
   int updatesAcknowledged;
   volatile int64_t iuhAndStart;
   volatile int64_t iuhAndStartCopy;
-  mutex iuhAndStartLock;
-  int w1, w2, w3;
+  mutex handyLock;
+  bool mainHasLock;
+  int w0, w1, w2, w3;
   //^^^ params identifying the "window" of available lookups
   //0 <---> w1e, w2i <---> w3e
   
