@@ -17,7 +17,6 @@ template <class T> class Updates
   
   int firstOverHalf;
   int iuh;
-  int last, lastPrev;
   
   Updates(bool (*c)(T a, T b), int ms);
   void ins(T val, T* array, int asize);

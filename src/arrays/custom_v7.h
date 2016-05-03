@@ -12,7 +12,7 @@
 
 //#define V7_DEBUG
 
-#define V7_MAX_UPDATES 500
+#define V7_MAX_UPDATES 2000
 
 template <class T> class CustomArrayV7 : public Array<T>
 {
