@@ -28,7 +28,7 @@ template <class T> class CustomArrayV7 : public Array<T>
   int updatesHandled;
   
   int updatesAcknowledged;
-  long iuhAndStart;
+  int64_t iuhAndStart;
   int inc; //total increase/decrease of elements
   int w1, w2, w3;
   //^^^ params identifying the "window" of available lookups

@@ -1,6 +1,8 @@
 #include <iostream>
-#include "custom_v6.h"
+#include "custom_v7.h"
 #include "binSearch.h"
+
+#define V7_32B 0x00000000FFFFFFFF
 
 template <class T> CustomArrayV7<T>::CustomArrayV7(bool (*c)(T a, T b))
   : Array<T>(c)
@@ -40,11 +42,11 @@ template <class T> CustomArrayV7<T>::~CustomArrayV7()
 
 template <class T> void CustomArrayV7<T>::ins(T a)
 {
-  long start = iuhAndStart & 0xFFFFFFFF;
+  int64_t start = iuhAndStart & V7_32B;
   int i = updates->ins(a, data + start, size);
   int idx = updates->indices[i];
   
-  long iuh = (iuhAndStart >> 32) & 0xFFFFFFFF;
+  int64_t iuh = iuhAndStart >> 32;
   iuh++;
   iuhAndStart = (iuh << 32) | start;
   
@@ -106,9 +108,9 @@ template <class T> void CustomArrayV7<T>::ins(T a)
 template <class T> void CustomArrayV7<T>::del(int idx)
 {
   int i = updates->del(idx);
-  long iuh = (iuhAndStart >> 32) & 0xFFFFFFFF;
+  int64_t iuh = iuhAndStart >> 32;
   iuh--;
-  iuhAndStart = (iuh << 32) | (iuhAndStart & 0xFFFFFFFF);
+  iuhAndStart = (iuh << 32) | (iuhAndStart & V7_32B);
   inc--;
   
   if(idx < size / 2)
@@ -218,7 +220,7 @@ template <class T> void
   int incUnderHalf = 2*insertsUnderHalf - updatesUnderHalf;
   int incAfterHalf = 2*insertsAfterHalf - updatesAfterHalf;
   
-  T *start = data + (iuhAndStart & 0xFFFFFFFF);
+  T *start = data + (iuhAndStart & V7_32B);
   
   bool newlyAllocate = 
           (incUnderHalf > 0 && start - incUnderHalf <= data) ||
@@ -237,7 +239,7 @@ template <class T> void
     }
     
     newArr = (T*) new char[allocated * sizeof(T)];
-    long s = ((allocated - size) / 2) - incUnderHalf;
+    int64_t s = ((allocated - size) / 2) - incUnderHalf;
     newStart = newArr + s;
     
     int writeIdx = 0;
@@ -432,7 +434,7 @@ template <class T> void
     }
     
     size += incUnderHalf + incAfterHalf;
-    iuhAndStart = (iuhAndStart & 0xFFFFFFFF) - ((long) incUnderHalf);
+    iuhAndStart = (iuhAndStart & V7_32B) - ((int64_t) incUnderHalf);
     w1 = size / 2;
     w2 = size / 2;
     w3 = size;
@@ -446,15 +448,17 @@ template <class T> void
 
 template <class T> T CustomArrayV7<T>::lookup(int idx)
 {
-  long iuh = (iuhAndStart >> 32) & 0xFFFFFFFF;
-  long start = iuhAndStart & 0xFFFFFFFF;
+  int64_t iuh = (iuhAndStart >> 32);
+  int64_t start = iuhAndStart & V7_32B;
+  //cout<<"start: "<<start<<" iuh: "<<iuh<<" idx: "<<idx<<endl;
+  //cout<<"start + idx - iuh: "<<start + idx - iuh<<endl;
   return data[start + idx - iuh];
 }
 
 template <class T> inline bool CustomArrayV7<T>::ready(int numUpdates,
                                                        int idx)
 {
-  int iuh = (iuhAndStart >> 32) & 0xFFFFFFFF;
+  int iuh = iuhAndStart >> 32;
   idx -= iuh;
   return numUpdates == updatesAcknowledged && 
           (idx < w1 || (idx >= w2 && idx < w3));
