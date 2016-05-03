@@ -16,7 +16,6 @@ template <class T> Updates<T>::Updates(bool (*c)(T a, T b), int ms)
 
 template <class T> void Updates<T>::ins(T val, T* array, int asize)
 {
-  last = UPDATE_INSERT;
   if(size == maxSize)
   {
     std::cout<<"You tried to add too many updates!!!"<<std::endl;
@@ -28,6 +27,8 @@ template <class T> void Updates<T>::ins(T val, T* array, int asize)
   if(asize > 0)
     insertionIndex = binarySearch(array, asize, comp, val);
   
+  lastPrev = last;
+  last = 0;
   int i = -1;
   bool done = false;
   while(!done)
@@ -35,14 +36,15 @@ template <class T> void Updates<T>::ins(T val, T* array, int asize)
     i++;
     if(i == size)
     {
+      last = 1;
       done = true;
     }
     else if(types[i] == UPDATE_INSERT)
     {
-      
       //if val < values[i]
       if(comp(val, values[i]))
       {
+        last = 2;
         done = true;
       }
       else
@@ -59,6 +61,7 @@ template <class T> void Updates<T>::ins(T val, T* array, int asize)
       //if this is pre-delete
       if(insertionIndex < indices[i])
       {
+        last = 3;
         done = true;
       }
       else if(insertionIndex > indices[i])
@@ -111,12 +114,35 @@ template <class T> void Updates<T>::ins(T val, T* array, int asize)
     firstOverHalf++;
   }
   
+  iuhCount = 0;
+  for(int i = 0; i < size; i++)
+  {
+    if(indices[i] < asize / 2)
+    {
+      if(types[i] == UPDATE_INSERT)
+      {
+        iuhCount++;
+      }
+      else
+      {
+        iuhCount--;
+      }
+    }
+  }
+  if(iuhCount != iuh)
+  {
+    cout<<"We've got an issue!!! "<<iuhCount - iuh<<endl;
+    cout<<"Relevant? "<<(asize / 2) - insertionIndex<<endl;
+    cout<<"Relevant? "<<(asize / 2) - indices[i+1]<<endl;
+  }
+  
   return;
 }
 
 template <class T> void Updates<T>::del(int idx, int asize)
 {
-  last = UPDATE_DELETE;
+  lastPrev = last;
+  last = -1;
   
   if(size == maxSize)
   {
@@ -176,6 +202,25 @@ template <class T> void Updates<T>::del(int idx, int asize)
     {
       firstOverHalf++;
     }
+    iuhCount = 0;
+    for(int i = 0; i < size; i++)
+    {
+      if(indices[i] < asize / 2)
+      {
+        if(types[i] == UPDATE_INSERT)
+        {
+          iuhCount++;
+        }
+        else
+        {
+          iuhCount--;
+        }
+      }
+    }
+    if(iuhCount != iuh)
+    {
+      cout<<"We've got another issue!!!"<<endl;
+    }
     return;
   }
   
@@ -221,6 +266,26 @@ template <class T> void Updates<T>::del(int idx, int asize)
   while(firstOverHalf < size && indices[firstOverHalf] < asize / 2)
   {
     firstOverHalf++;
+  }
+  
+  iuhCount = 0;
+  for(int i = 0; i < size; i++)
+  {
+    if(indices[i] < asize / 2)
+    {
+      if(types[i] == UPDATE_INSERT)
+      {
+        iuhCount++;
+      }
+      else
+      {
+        iuhCount--;
+      }
+    }
+  }
+  if(iuhCount != iuh)
+  {
+    cout<<"We've got yet another issue!!!"<<endl;
   }
   
   return;

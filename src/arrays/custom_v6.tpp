@@ -112,14 +112,12 @@ template <class T> void
   if(incUnderHalf != updates->iuh)
   {
     cout<<incUnderHalf<<" vs. the guess: "<<updates->iuh<<endl;
-    if(updates->last == UPDATE_INSERT)
-    {
-      cout<<"was an insert"<<endl;
-    }
-    else
-    {
-      cout<<"was a delete"<<endl;
-    }
+    cout<<"last was: "<<updates->last<<endl;
+    cout<<"lastPrev was: "<<updates->lastPrev<<endl;
+  }
+  else
+  {
+    //cout<<updates->last<<endl;
   }
   
   bool newlyAllocate = 
