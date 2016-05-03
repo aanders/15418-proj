@@ -15,9 +15,13 @@ template <class T> class Updates
   int size;
   bool (*comp)(T a, T b);
   
+  int firstOverHalf;
+  int iuh;
+  int last;
+  
   Updates(bool (*c)(T a, T b), int ms);
-  int ins(T val, T* array, int asize);
-  int del(int idx);
+  void ins(T val, T* array, int asize);
+  void del(int idx, int asize);
   void empty();
 };
 

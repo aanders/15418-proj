@@ -1,5 +1,6 @@
 #include "updates.h"
 #include "arrays/array.h"
+#include <mutex>
 
 /* This is version V6 with pointers to available lookup content
  */
@@ -28,8 +29,9 @@ template <class T> class CustomArrayV7 : public Array<T>
   int updatesHandled;
   
   int updatesAcknowledged;
-  int64_t iuhAndStart;
-  int inc; //total increase/decrease of elements
+  volatile int64_t iuhAndStart;
+  volatile int64_t iuhAndStartCopy;
+  mutex iuhAndStartLock;
   int w1, w2, w3;
   //^^^ params identifying the "window" of available lookups
   //0 <---> w1e, w2i <---> w3e

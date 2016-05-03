@@ -49,7 +49,7 @@ template <class T> void CustomArrayV6<T>::ins(T a)
 
 template <class T> void CustomArrayV6<T>::del(int idx)
 {
-  updates->del(idx);
+  updates->del(idx, size);
   currUpdates++;
   
   if(updates->size == V6_MAX_UPDATES)
@@ -86,11 +86,6 @@ template <class T> void
   int insertsAfterHalf = 0;
   int updatesAfterHalf = 0;
   
-  int heightUnder = 0;
-  int heightAfter = 0;
-  int allTimeLowUnder = 0;
-  int allTimeLowAfter = 0;
-  
   for(int i = 0; i < updates->size; i++)
   {
     if(updates->indices[i] < size / 2)
@@ -113,6 +108,19 @@ template <class T> void
   
   int incUnderHalf = 2*insertsUnderHalf - updatesUnderHalf;
   int incAfterHalf = 2*insertsAfterHalf - updatesAfterHalf;
+  
+  if(incUnderHalf != updates->iuh)
+  {
+    cout<<incUnderHalf<<" vs. the guess: "<<updates->iuh<<endl;
+    if(updates->last == UPDATE_INSERT)
+    {
+      cout<<"was an insert"<<endl;
+    }
+    else
+    {
+      cout<<"was a delete"<<endl;
+    }
+  }
   
   bool newlyAllocate = 
           (incUnderHalf > 0 && start - incUnderHalf <= data) ||
@@ -273,7 +281,7 @@ template <class T> void
           {
             bufferStart = 0;
           }
-          if(readIdx >= 0)
+          if(readIdx < size)
           {
             buffer[(bufferStart + inBuffer) % bufferSize] = start[readIdx];
             inBuffer++;

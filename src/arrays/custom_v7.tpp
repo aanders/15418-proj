@@ -1,4 +1,5 @@
 #include <iostream>
+#include <mutex>
 #include "custom_v7.h"
 #include "binSearch.h"
 
@@ -18,7 +19,6 @@ template <class T> CustomArrayV7<T>::CustomArrayV7(bool (*c)(T a, T b))
   currUpdates = updatesHandled = 0;
   
   updatesAcknowledged = 0;
-  inc = 0;
   w1 = w2 = w3 = 0;
   
   #ifdef V7_DEBUG
@@ -44,57 +44,37 @@ template <class T> void CustomArrayV7<T>::ins(T a)
 {
   int64_t start = iuhAndStart & V7_32B;
   int i = updates->ins(a, data + start, size);
-  int idx = updates->indices[i];
-  
-  int64_t iuh = iuhAndStart >> 32;
-  iuh++;
+  int64_t iuh = updates->iuh;
   iuhAndStart = (iuh << 32) | start;
   
-  inc++;
-  
-  if(idx < size / 2)
+  if(updates->firstOverHalf == updates->size)
   {
-    //W1
-    if(w1 > idx)
-    {
-      w1 = idx;
-    }
-    
-    //W's 2 and 3
-    if(w2 <= idx)
-    {
-      w2 = idx + 1;
-    }
-    else
-    {
-      w2++;
-    }
-    
-    w3++;
-    
-    while(w2 >= size / 2 && w2 > 0)
-    {
-      w3 = w2;
-      if(i == 0)
-      {
-        w2 = 0;
-      }
-      else
-      {
-        i--;
-        w2 = updates->indices[i];
-      }
-    }
+    w3 = size;
   }
   else
   {
-    if(w3 > idx)
-    {
-      w3 = idx;
-    }
+    w3 = updates->indices[updates->firstOverHalf];
   }
-  updatesAcknowledged++;
   
+  if(updates->firstOverHalf == 0)
+  {
+    w2 = 0;
+  }
+  else
+  {
+    w2 = updates->indices[updates->firstOverHalf - 1] + 1;
+  }
+  
+  if(updates->firstOverHalf == 0)
+  {
+    w1 = 0;
+  }
+  else
+  {
+    w1 = updates->indices[0];
+  }
+  
+  updatesAcknowledged++;
   
   currUpdates++;
   if(updates->size == V7_MAX_UPDATES)
@@ -108,51 +88,34 @@ template <class T> void CustomArrayV7<T>::ins(T a)
 template <class T> void CustomArrayV7<T>::del(int idx)
 {
   int i = updates->del(idx);
-  int64_t iuh = iuhAndStart >> 32;
-  iuh--;
+  int64_t iuh = updates->iuh;
   iuhAndStart = (iuh << 32) | (iuhAndStart & V7_32B);
-  inc--;
   
-  if(idx < size / 2)
+  if(updates->firstOverHalf == updates->size)
   {
-    //W1
-    if(w1 > idx)
-    {
-      w1 = idx;
-    }
-    
-    //W's 2 and 3
-    if(w2 <= idx)
-    {
-      w2 = idx + 1;
-    }
-    else
-    {
-      w2--;
-    }
-    
-    w3--;
-    
-    while(w3 < size / 2)
-    {
-      w2 = w3;
-      if(i >= updates->size - 1)
-      {
-        w3 = size + inc;
-      }
-      else
-      {
-        i++;
-        w3 = updates->indices[i];
-      }
-    }
+    w3 = size;
   }
   else
   {
-    if(w3 > idx)
-    {
-      w3 = idx;
-    }
+    w3 = updates->indices[updates->firstOverHalf];
+  }
+  
+  if(updates->firstOverHalf == 0)
+  {
+    w2 = 0;
+  }
+  else
+  {
+    w2 = updates->indices[updates->firstOverHalf - 1] + 1;
+  }
+  
+  if(updates->firstOverHalf == 0)
+  {
+    w1 = 0;
+  }
+  else
+  {
+    w1 = updates->indices[0];
   }
   
   updatesAcknowledged++;
@@ -191,11 +154,6 @@ template <class T> void
   int updatesUnderHalf = 0;
   int insertsAfterHalf = 0;
   int updatesAfterHalf = 0;
-  
-  int heightUnder = 0;
-  int heightAfter = 0;
-  int allTimeLowUnder = 0;
-  int allTimeLowAfter = 0;
   
   for(int i = 0; i < updates->size; i++)
   {
@@ -271,9 +229,11 @@ template <class T> void
       readIdx++;
     }
     
+    iuhAndStartLock.lock();
     delete[] data;
     data = newArr;
     iuhAndStart = s;
+    iuhAndStartLock.unlock();
     w1 = size / 2;
     w2 = size / 2;
     w3 = size;
@@ -385,7 +345,7 @@ template <class T> void
           {
             bufferStart = 0;
           }
-          if(readIdx >= 0)
+          if(readIdx < start)
           {
             buffer[(bufferStart + inBuffer) % bufferSize] = start[readIdx];
             inBuffer++;
@@ -434,7 +394,14 @@ template <class T> void
     }
     
     size += incUnderHalf + incAfterHalf;
+    iuhAndStartLock.lock();
+    int64_t iuh = iuhAndStart >> 32;
+    if(iuh != ((int64_t) incUnderHalf))
+    {
+      cout<<"inequality: "<<iuh<<" "<<incUnderHalf<<endl;
+    }
     iuhAndStart = (iuhAndStart & V7_32B) - ((int64_t) incUnderHalf);
+    iuhAndStartLock.unlock();
     w1 = size / 2;
     w2 = size / 2;
     w3 = size;
@@ -446,20 +413,35 @@ template <class T> void
   currUpdates = 0;
 }
 
+//this needs to execute without iuhAndStart being modified
+//after being copied.
 template <class T> T CustomArrayV7<T>::lookup(int idx)
 {
-  int64_t iuh = (iuhAndStart >> 32);
+  iuhAndStartLock.lock();
+  int64_t iuh = iuhAndStart >> 32;
   int64_t start = iuhAndStart & V7_32B;
-  //cout<<"start: "<<start<<" iuh: "<<iuh<<" idx: "<<idx<<endl;
-  //cout<<"start + idx - iuh: "<<start + idx - iuh<<endl;
-  return data[start + idx - iuh];
+  if(idx < w1)
+  {
+    //cout<<"far"<<endl;
+  }
+  else
+  {
+    idx -= iuh;
+    //cout<<"near"<<endl;
+  }
+  T ret = data[start + idx];
+  iuhAndStartLock.unlock();
+  return ret;
 }
 
 template <class T> inline bool CustomArrayV7<T>::ready(int numUpdates,
                                                        int idx)
 {
-  int iuh = iuhAndStart >> 32;
-  idx -= iuh;
-  return numUpdates == updatesAcknowledged && 
-          (idx < w1 || (idx >= w2 && idx < w3));
+  if(numUpdates != updatesAcknowledged)
+  {
+    return false;
+  }
+  
+  int64_t iuh = iuhAndStart >> 32;
+  return (idx < w1 && false) || ((idx - iuh) >= w2 && (idx - iuh) < w3);
 }
