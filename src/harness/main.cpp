@@ -5,10 +5,23 @@
 
 #include "int_runner.h"
 #include "char_runner.h"
+#include "memrunner.h"
 
 using namespace std;
 
 extern void runManualTests();
+
+int parseInt(std::string s)
+{
+  try
+  {
+    return std::stoi(s);
+  }
+  catch (const std::invalid_argument& e)
+  {
+    throw MemRunner<int>::invalid_data();
+  }
+}
 
 int main(int argc, char* argv[])
 {
@@ -42,8 +55,19 @@ int main(int argc, char* argv[])
 
     if (header.compare("DATATYPE:INT") == 0)
     {
-      IntRunner runner(f);
-      runner.run(); // automatically closes f
+      //IntRunner runner(f);
+      //runner.run(); // automatically closes f
+
+      MemRunner<int> runner(f, [](int a, int b) { return a < b; });
+      if (runner.loadTrace(&parseInt))
+      {
+        runner.run(2);
+      }
+      else
+      {
+        std::cerr << "Error: trace file did not load successfully.  Aborting" << std::endl;
+        return 1;
+      }
     }
     else
     {
