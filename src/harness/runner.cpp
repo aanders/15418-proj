@@ -25,7 +25,7 @@ std::string Runner::getTrialName(unsigned int trial)
 void Runner::init() {}
 void Runner::cleanup() {}
 
-volatile int spinCounter;
+static volatile int spinCounter;
 
 void Runner::run(unsigned int trials)
 {
