@@ -55,9 +55,9 @@ int main(int argc, char* argv[])
 
     if (header.compare("DATATYPE:INT") == 0)
     {
-      //IntRunner runner(f);
-      //runner.run(); // automatically closes f
-
+      IntRunner runner(f);
+      runner.run(); // automatically closes f
+      /*
       MemRunner<int> runner(f, [](int a, int b) { return a < b; });
       if (runner.loadTrace(&parseInt))
       {
@@ -68,6 +68,7 @@ int main(int argc, char* argv[])
         std::cerr << "Error: trace file did not load successfully.  Aborting" << std::endl;
         return 1;
       }
+      */
     }
     else
     {

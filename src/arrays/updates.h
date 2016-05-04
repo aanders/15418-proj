@@ -4,6 +4,8 @@
 #define UPDATE_INSERT 0
 #define UPDATE_DELETE 1
 
+#define UPDATE_EC //EC = extra computation
+
 template <class T> class Updates
 {
   public:
