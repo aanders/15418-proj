@@ -8,6 +8,7 @@ import random
 import sys
 
 TRACE_LENGTH = 100
+BURSTS_IN_TRACE = 400
 INT_DATA_RANGE = [-1000,1000]
 CHAR_DATA_RANGE = [33, 126] # printable, non-space ASCII range
 STRING_LENGTH = 50  # average string length
@@ -16,17 +17,15 @@ STRING_DEV = 10     # standard deviation of string length
 DATATYPES = ['int', 'char', 'string']
 DATATYPE = DATATYPES[0] # int by default
 
-INSTRUCTIONS = [
-    "insert",
-    "lookup",
-    "delete",
-]
+INSTRUCTIONS = [ "i", "l", "d", ]
 
 UNIFORM_PDF = [1.0/len(INSTRUCTIONS) for i in xrange(0,len(INSTRUCTIONS))]
 INSERT_LOOKUP_BIAS_PDF = [0.45, 0.45, 0.1]
 INSERT_BIAS_PDF = [0.7, 0.2, 0.1]
 LOOKUP_BIAS_PDF = [0.2, 0.6, 0.2]
-BIASTYPES = ['uniform', 'iuniform', 'insert', 'lookup', 'alternate']
+INSERT_BURST_PDF = [1, 0, 0]
+LOOKUP_BURST_PDF = [0, 1, 0]
+BIASTYPES = ['uniform', 'iuniform', 'insert', 'lookup', 'alternate', 'burst']
 BIAS = BIASTYPES[0] # uniform by default
 
 MEAN_DELAY = 500 # microseconds
@@ -68,9 +67,15 @@ def instruction(instr_no=0):
             instr = rand_elt(INSTRUCTIONS, INSERT_BIAS_PDF)
         else:
             instr = rand_elt(INSTRUCTIONS, LOOKUP_BIAS_PDF)
+    elif BIAS == 'burst':
+        burst_no = (instr_no * BURSTS_IN_TRACE) / TRACE_LENGTH
+        if burst_no % 2 == 0:
+            instr = 'i'
+        else:
+            instr = 'l'
 
     # Generate appropriate data for the selected instruction
-    if instr == 'insert':
+    if instr == 'i':
         if DATATYPE == 'char':
             data = chr(random.randint(*CHAR_DATA_RANGE))
         elif DATATYPE == 'string':
@@ -80,7 +85,7 @@ def instruction(instr_no=0):
             data = random.randint(*INT_DATA_RANGE)
         bisect.insort_left(values, data)
         return instr, data
-    elif instr == 'delete':
+    elif instr == 'd':
         if len(values) == 0:
             # can't do delete with no data
             return None, None
@@ -88,7 +93,7 @@ def instruction(instr_no=0):
             data = random.randint(0,len(values)-1)
             del values[data]
             return instr, data
-    elif instr == 'lookup':
+    elif instr == 'l':
         # TODO: possibly simulate out-of-bounds lookups?
         if len(values) == 0:
             # can't do lookup with no data
@@ -103,7 +108,7 @@ def instruction(instr_no=0):
 # Generate a random pause interval
 def pause():
     delay_us = random.gauss(MEAN_DELAY, STDDEV_DELAY)
-    return 'pause', abs(int(delay_us))
+    return 'p', abs(int(delay_us))
 
 # Print a variable number of arguments
 def printline(*args):

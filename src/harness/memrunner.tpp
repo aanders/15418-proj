@@ -183,7 +183,7 @@ bool MemRunner<T>::loadTrace(T (*parser)(std::string s))
       std::string op = line.substr(0,n);
       std::string datastr = line.substr(n+1);
 
-      if (op.compare("pause")  == 0 || op.compare("delete") == 0)
+      if (op.compare("p")  == 0 || op.compare("d") == 0)
       {
         try
         {
@@ -198,7 +198,7 @@ bool MemRunner<T>::loadTrace(T (*parser)(std::string s))
           errors = true;
         }
       }
-      else if (op.compare("lookup") == 0)
+      else if (op.compare("l") == 0)
       {
         std::size_t i = datastr.find(" ");
         if (i != string::npos)
@@ -225,7 +225,7 @@ bool MemRunner<T>::loadTrace(T (*parser)(std::string s))
           }
         }
       }
-      else if (op.compare("insert") == 0)
+      else if (op.compare("i") == 0)
       {
         try
         {

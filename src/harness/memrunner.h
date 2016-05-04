@@ -19,7 +19,7 @@
 enum oper_t { INSERT, LOOKUP, DELETE, PAUSE };
 
 // Initialization list for an unordered map of strings to oper_t values
-#define OPERATION_MAPPING {{"pause",PAUSE},{"lookup",LOOKUP},{"insert",INSERT},{"delete",DELETE}}
+#define OPERATION_MAPPING {{"p",PAUSE},{"l",LOOKUP},{"i",INSERT},{"d",DELETE}}
 
 // The data associated with an operation can be an integer index or a T
 // (or both, in the case of a lookup)

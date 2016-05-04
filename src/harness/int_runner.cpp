@@ -22,7 +22,7 @@ IntRunner::~IntRunner()
 void IntRunner::runop(std::string op, std::string data)
 {
   try {
-    if (op.compare("insert") == 0)
+    if (op.compare("i") == 0)
     {
       int elt = std::stoi(data);
       if (this->trial_no_ == 0)
@@ -37,7 +37,7 @@ void IntRunner::runop(std::string op, std::string data)
       std::cout << "Inserted " << elt << std::endl;
 #endif
     }
-    else if (op.compare("lookup") == 0)
+    else if (op.compare("l") == 0)
     {
       std::size_t n = data.find(" ");
       if (n != string::npos) {
@@ -67,7 +67,7 @@ void IntRunner::runop(std::string op, std::string data)
         }
       }
     }
-    else if (op.compare("delete") == 0)
+    else if (op.compare("d") == 0)
     {
       int idx = std::stoi(data);
       if (this->trial_no_ == 0)
