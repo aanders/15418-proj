@@ -8,7 +8,7 @@
 void CharRunner::runop(std::string op, std::string data,
     unsigned int trial)
 {
-  if (op.compare("insert") == 0)
+  if (op.compare("i") == 0)
   {
     char elt = data[0];
     collection_.ins(elt);
@@ -16,7 +16,7 @@ void CharRunner::runop(std::string op, std::string data,
     std::cout << "Inserted " << elt << std::endl;
 #endif
   }
-  else if (op.compare("lookup") == 0)
+  else if (op.compare("l") == 0)
   {
     std::size_t n = data.find(" ");
     if (n != string::npos) {
@@ -34,7 +34,7 @@ void CharRunner::runop(std::string op, std::string data,
       }
     }
   }
-  else if (op.compare("delete") == 0)
+  else if (op.compare("d") == 0)
   {
     int idx = std::stoi(data);
     collection_.del(idx);

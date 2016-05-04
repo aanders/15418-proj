@@ -57,7 +57,7 @@ void Runner::run(unsigned int trials)
       {
         std::string op = line.substr(0,n);
         std::string data = line.substr(n+1);
-        if (op.compare("pause") == 0)
+        if (op.compare("p") == 0)
         {
           try
           {
@@ -80,17 +80,17 @@ void Runner::run(unsigned int trials)
           runop(op, data);
           double instr_end = CycleTimer::currentSeconds();
           instr_time += (instr_end - instr_start);
-          if (op.compare("insert") == 0)
+          if (op.compare("i") == 0)
           {
             insert_time = (insert_time * inserts) + (instr_end - instr_start);
             insert_time /= ++inserts;
           }
-          else if (op.compare("lookup") == 0)
+          else if (op.compare("l") == 0)
           {
             lookup_time = (lookup_time * lookups) + (instr_end - instr_start);
             lookup_time /= ++lookups;
           }
-          else if (op.compare("delete") == 0)
+          else if (op.compare("d") == 0)
           {
             delete_time = (delete_time * deletes) + (instr_end - instr_start);
             delete_time /= ++deletes;
