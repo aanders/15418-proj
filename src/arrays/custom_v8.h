@@ -12,6 +12,7 @@
 //#define V8_DEBUG
 
 #define V8_MAX_UPDATES 2000
+#define V8_SWITCH_POINT 40
 
 #define V8_V4MODE 0
 #define V8_V6MODE 1

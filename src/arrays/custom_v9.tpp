@@ -75,7 +75,9 @@ template <class T> void CustomArrayV9<T>::ins(T a)
     
     currUpdates++;
     if(updates->size == V9_MAX_UPDATES)
+    {
       flush(1);
+    }
     
     #ifdef V9_DEBUG
     totalUpdates++;
@@ -149,7 +151,7 @@ template <class T> void CustomArrayV9<T>::ins(T a)
   updatesAcknowledged++;
   if(*targetUpdates - updatesHandled >= V9_SWITCH_POINT)
   {
-    cout<<"V7"<<endl;
+    //cout<<"V7"<<endl;
     mode = V9_V7MODE;
   }
 }
@@ -192,7 +194,9 @@ template <class T> void CustomArrayV9<T>::del(int idx)
     
     currUpdates++;
     if(updates->size == V9_MAX_UPDATES)
+    {
       flush(1);
+    }
     
     #ifdef V9_DEBUG
     totalUpdates++;
@@ -238,7 +242,7 @@ template <class T> void CustomArrayV9<T>::del(int idx)
   updatesAcknowledged++;
   if(*targetUpdates - updatesHandled >= V9_SWITCH_POINT)
   {
-    cout<<"V7"<<endl;
+    //cout<<"V7"<<endl;
     mode = V9_V7MODE;
   }
 }
@@ -540,7 +544,7 @@ template <class T> void
   
   if(*targetUpdates - updatesHandled < V9_SWITCH_POINT)
   {
-    cout<<"V4"<<endl;
+    //cout<<"V4"<<endl;
     mode = V9_V4MODE;
   }
 }

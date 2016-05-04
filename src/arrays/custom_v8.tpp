@@ -116,7 +116,7 @@ template <class T> void CustomArrayV8<T>::ins(T a)
   }
   
   updatesHandled++;
-  if(*targetUpdates - updatesHandled >= 30)
+  if(*targetUpdates - updatesHandled >= V8_SWITCH_POINT)
   {
     mode = V8_V6MODE;
   }
@@ -173,7 +173,7 @@ template <class T> void CustomArrayV8<T>::del(int idx)
   }
   
   updatesHandled++;
-  if(*targetUpdates - updatesHandled >= 30)
+  if(*targetUpdates - updatesHandled >= V8_SWITCH_POINT)
   {
     mode = V8_V6MODE;
   }
@@ -449,7 +449,7 @@ template <class T> void
   updatesHandled += currUpdates;
   currUpdates = 0;
   
-  if(*targetUpdates - updatesHandled < 30) //ARBITRARY CONSTANT ALERT!!!!!
+  if(*targetUpdates - updatesHandled < V8_SWITCH_POINT)
   {
     mode = V8_V4MODE;
   }
