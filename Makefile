@@ -25,7 +25,6 @@ TEMPLATES = arrays/vector_v1.tpp arrays/array.tpp trees/simpleTree.tpp \
       arrays/custom_v8.tpp
 
 
-
 OBJS = $(SRCS:.cpp=.o)
 LIBS =
 
