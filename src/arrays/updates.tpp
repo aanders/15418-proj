@@ -21,7 +21,9 @@ template <class T> void Updates<T>::ins(T val, T* array, int asize)
     std::cout<<"You tried to add too many updates!!!"<<std::endl;
     return;
   }
+  #ifdef UPDATE_EC
   int iuhCount = 0;
+  #endif
   
   int insertionIndex = 0;
   if(asize > 0)
@@ -47,10 +49,12 @@ template <class T> void Updates<T>::ins(T val, T* array, int asize)
       {
         insertionIndex++;
         /*
+        #ifdef UPDATE_EC
         if(indices[i] < asize / 2)
         {
           iuhCount++;
         }
+        #endif
         */
       }
     }
@@ -65,10 +69,12 @@ template <class T> void Updates<T>::ins(T val, T* array, int asize)
       {
         insertionIndex--;
         /*
+        #ifdef UPDATE_EC
         if(indices[i] < asize / 2)
         {
           iuhCount--;
         }
+        #endif
         */
       }
     }
@@ -81,6 +87,7 @@ template <class T> void Updates<T>::ins(T val, T* array, int asize)
     //that's ok ONLY because of the way we actually execute these updates
     types[j] = types[j-1];
     /*
+    #ifdef UPDATE_EC
     if(indices[j] < asize / 2)
     {
       if(types[j] == UPDATE_INSERT)
@@ -92,22 +99,26 @@ template <class T> void Updates<T>::ins(T val, T* array, int asize)
         iuhCount--;
       }
     }
+    #endif
     */
   }
   values[i] = val;
   indices[i] = insertionIndex;
   types[i] = UPDATE_INSERT;
   /*
+  #ifdef UPDATE_EC
   if(indices[i] < asize / 2)
   {
     iuhCount++;
   }
   
   iuh = iuhCount;
+  #endif
   */
   
   size++;
   
+  #ifdef UPDATE_EC
   while(firstOverHalf > 0 && indices[firstOverHalf - 1] >= asize / 2)
   {
     firstOverHalf--;
@@ -137,15 +148,7 @@ template <class T> void Updates<T>::ins(T val, T* array, int asize)
     }
   }
   iuh = iuhCount;
-  
-  /*
-  if(iuhCount != iuh)
-  {
-    cout<<"We've got an issue!!! "<<iuhCount - iuh<<endl;
-    cout<<"Relevant? "<<(asize / 2) - insertionIndex<<endl;
-    cout<<"Relevant? "<<(asize / 2) - indices[i+1]<<endl;
-  }
-  */
+  #endif
   
   return;
 }
@@ -158,12 +161,15 @@ template <class T> void Updates<T>::del(int idx, int asize)
     return;
   }
   
+  #ifdef UPDATE_EC
   int iuhCount = 0;
+  #endif
   
   int i = 0;
   while(i < size && (indices[i] < idx || 
         (indices[i] == idx && types[i] == UPDATE_DELETE)))
   {
+    #ifdef UPDATE_EC
     if(indices[i] < asize / 2)
     {
       if(types[i] == UPDATE_INSERT)
@@ -175,6 +181,7 @@ template <class T> void Updates<T>::del(int idx, int asize)
         iuhCount--;
       }
     }
+    #endif
     i++; //no need to adjust idx because it's pre-adjusted
   }
   
@@ -185,6 +192,7 @@ template <class T> void Updates<T>::del(int idx, int asize)
       indices[j] = indices[j+1] - 1;
       types[j] = types[j+1];
       values[j] = values[j+1];
+      #ifdef UPDATE_EC
       if(indices[j] < asize / 2)
       {
         if(types[j] == UPDATE_INSERT)
@@ -196,9 +204,11 @@ template <class T> void Updates<T>::del(int idx, int asize)
           iuhCount--;
         }
       }
+      #endif
     }
     size--;
     
+    #ifdef UPDATE_EC
     iuh = iuhCount;
     
     while(firstOverHalf > size || 
@@ -210,6 +220,7 @@ template <class T> void Updates<T>::del(int idx, int asize)
     {
       firstOverHalf++;
     }
+    #endif
     
     return;
   }
@@ -220,6 +231,7 @@ template <class T> void Updates<T>::del(int idx, int asize)
     types[j] = types[j-1];
     indices[j] = indices[j-1] - 1; //note that this messes with delete indices
     //that's ok ONLY because of the way we actually execute these updates
+    #ifdef UPDATE_EC
     if(indices[j] < asize / 2)
     {
       if(types[j] == UPDATE_INSERT)
@@ -231,9 +243,12 @@ template <class T> void Updates<T>::del(int idx, int asize)
         iuhCount--;
       }
     }
+    #endif
   }
   types[i] = UPDATE_DELETE;
   indices[i] = idx;
+  
+  #ifdef UPDATE_EC
   if(indices[i] < asize / 2)
   {
     if(types[i] == UPDATE_INSERT)
@@ -245,8 +260,10 @@ template <class T> void Updates<T>::del(int idx, int asize)
       iuhCount--;
     }
   }
+  #endif
   size++;
   
+  #ifdef UPDATE_EC
   iuh = iuhCount;
   
   while(firstOverHalf > 0 && indices[firstOverHalf - 1] >= asize / 2)
@@ -257,6 +274,7 @@ template <class T> void Updates<T>::del(int idx, int asize)
   {
     firstOverHalf++;
   }
+  #endif
   
   return;
 }

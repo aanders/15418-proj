@@ -34,7 +34,7 @@ template <class T> void CustomArrayV4<T>::ins(T a)
   {
     allocated = allocated * V4_EXPAND_CONST;
     T* newArr = (T*) new char[allocated * sizeof(T)];
-    T* newStart = newArr + (allocated / 3);
+    T* newStart = newArr + ((allocated - size) / 2);
     
     for(int i = 0; i < insertionIndex; i++)
     {
@@ -130,37 +130,6 @@ template <class T> inline bool CustomArrayV4<T>::ready(int numUpdates,
 {
   return numUpdates == updatesHandled;
 }
-
-/*
-template <class T> void CustomArray<T>::sortedChecker()
-{
-  bool ok = true;
-  
-  for(int i = 0; i < size - 1; i++)
-  {
-    if(this->comp(data[i+1], data[i]))
-    {
-      ok = false;
-    }
-    cout<<data[i]<<", ";
-  }
-  if(size > 0)
-    cout<<data[size - 1]<<endl;
-  else
-    cout<<endl;
-  
-  if(!ok)
-  {
-    cout<<"Not ok bro.\n";
-  }
-}
-*/
-/*
-template <class T> bool CustomArray<T>::lookupElt(T val)
-{
-  return this->comp(val, val);
-}
-*/
 
 template <class T> void CustomArrayV4<T>::clearAll()
 {
