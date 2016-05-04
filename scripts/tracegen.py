@@ -10,8 +10,10 @@ import sys
 TRACE_LENGTH = 100
 INT_DATA_RANGE = [-1000,1000]
 CHAR_DATA_RANGE = [33, 126] # printable, non-space ASCII range
+STRING_LENGTH = 50  # average string length
+STRING_DEV = 10     # standard deviation of string length
 
-DATATYPES = ['int', 'char']
+DATATYPES = ['int', 'char', 'string']
 DATATYPE = DATATYPES[0] # int by default
 
 INSTRUCTIONS = [
@@ -71,6 +73,9 @@ def instruction(instr_no=0):
     if instr == 'insert':
         if DATATYPE == 'char':
             data = chr(random.randint(*CHAR_DATA_RANGE))
+        elif DATATYPE == 'string':
+            size = abs(int(random.gauss(STRING_LENGTH, STRING_DEV)))
+            data = ''.join(chr(random.randint(*CHAR_DATA_RANGE)) for s in xrange(size))
         else:
             data = random.randint(*INT_DATA_RANGE)
         bisect.insort_left(values, data)
