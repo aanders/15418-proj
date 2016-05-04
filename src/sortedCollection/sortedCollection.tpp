@@ -10,6 +10,7 @@
 #include "arrays/custom_v6.h"
 #include "arrays/custom_v7.h"
 #include "arrays/custom_v8.h"
+#include "arrays/custom_v9.h"
 #include "trees/simpleTree.h"
 #include <pthread.h>
 #include <mutex>
@@ -32,7 +33,7 @@ template <class T> SortedCollection<T>::SortedCollection(
   servicedFromTree = servicedFromArray = 0;
   numTimesWaitedOnLookup = 0;
    
-  array = new CustomArrayV7<T>(comp /*, &numUpdates*/);
+  array = new CustomArrayV9<T>(comp , &numUpdates);
   tree = new RBTree<T>(comp);
   aUpdatesWait = std::unique_lock<std::mutex>(aUpdatesMutex);
   tUpdatesWait = std::unique_lock<std::mutex>(tUpdatesMutex);

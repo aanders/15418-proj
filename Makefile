@@ -22,7 +22,7 @@ TEMPLATES = arrays/vector_v1.tpp arrays/array.tpp trees/simpleTree.tpp \
       arrays/custom_v4.tpp arrays/custom_v5.tpp \
       arrays/custom_v6.tpp arrays/updates.tpp \
       arrays/custom_v7.tpp harness/memrunner.h \
-      arrays/custom_v8.tpp
+      arrays/custom_v8.tpp arrays/custom_v9.tpp
 
 
 OBJS = $(SRCS:.cpp=.o)

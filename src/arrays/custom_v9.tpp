@@ -1,40 +1,34 @@
 #include <iostream>
-#include <mutex>
-#include "custom_v7.h"
+#include "custom_v9.h"
 #include "binSearch.h"
 
-#define V7_32B 0x00000000FFFFFFFF
-
-template <class T> CustomArrayV7<T>::CustomArrayV7(bool (*c)(T a, T b))
-  : Array<T>(c)
+template <class T> CustomArrayV9<T>::CustomArrayV9(bool (*c)(T a, T b), 
+  int *tU) : Array<T>(c)
 {
   size = 0;
   allocated = 1;
   data = (T*) new char[allocated * sizeof(T)];
-  //iuhAndStart = 0;
-  iuh = 0;
   start = data;
   
-  updates = new Updates<T>(c, V7_MAX_UPDATES);
-  buffer = (T*) new char[(V7_MAX_UPDATES + 1) * sizeof(T)];
+  mode = V9_V4MODE;
+  targetUpdates = tU;
+  
+  updates = new Updates<T>(c, V9_MAX_UPDATES);
+  buffer = (T*) new char[(V9_MAX_UPDATES + 1) * sizeof(T)];
   
   currUpdates = updatesHandled = 0;
-  mainHasLock = false;
   
-  updatesAcknowledged = 0;
-  w0 = w1 = w2 = w3 = 0;
-  
-  #ifdef V7_DEBUG
+  #ifdef V9_DEBUG
   totalUpdates = maxFlushed = 0;
   timesFlushed[0] = timesFlushed[1] = 0;
   #endif
 }
 
-template <class T> CustomArrayV7<T>::~CustomArrayV7()
+template <class T> CustomArrayV9<T>::~CustomArrayV9()
 {
   delete[] buffer;
   
-  #ifdef V7_DEBUG
+  #ifdef V9_DEBUG
   cout<<"Updates per flush: "<<totalUpdates / 
     (timesFlushed[0] + timesFlushed[1])<<endl;
   cout<<"Flushes due to readiness: "<<timesFlushed[0]<<endl;
@@ -43,106 +37,226 @@ template <class T> CustomArrayV7<T>::~CustomArrayV7()
   #endif
 }
 
-template <class T> void CustomArrayV7<T>::ins(T a)
+template <class T> void CustomArrayV9<T>::ins(T a)
 {
-  //int64_t start = iuhAndStart & V7_32B;
-  updates->ins(a, start, size);
-  //int64_t iuh = updates->iuh;
-  iuh = updates->iuh;
-  //iuhAndStart = (iuh << 32) | start;
-  
-  if(updates->firstOverHalf == updates->size)
+  if(mode == V9_V7MODE)
   {
-    w3 = size;
+    updates->ins(a, start, size);
+    iuh = updates->iuh;
+    
+    if(updates->firstOverHalf == updates->size)
+    {
+      w3 = size;
+    }
+    else
+    {
+      w3 = updates->indices[updates->firstOverHalf];
+    }
+    
+    if(updates->firstOverHalf == 0)
+    {
+      w2 = 0;
+    }
+    else
+    {
+      w2 = updates->indices[updates->firstOverHalf - 1] + 1;
+    }
+    
+    if(updates->firstOverHalf == 0)
+    {
+      w1 = 0;
+    }
+    else
+    {
+      w1 = updates->indices[0];
+    }
+    
+    updatesAcknowledged++;
+    
+    currUpdates++;
+    if(updates->size == V9_MAX_UPDATES)
+      flush(1);
+    
+    #ifdef V9_DEBUG
+    totalUpdates++;
+    #endif
+    return;
+  }
+  
+  int insertionIndex = 0;
+  if(size > 0)
+    insertionIndex = binarySearch(start, size, this->comp, a);
+  
+  bool newlyAllocate = (size == allocated);
+  if(insertionIndex < size / 2)
+  {
+    if(start == data)
+      newlyAllocate = true;
   }
   else
   {
-    w3 = updates->indices[updates->firstOverHalf];
+    if(start + size == data + allocated)
+      newlyAllocate = true;
   }
   
-  if(updates->firstOverHalf == 0)
+  if(newlyAllocate)
   {
-    w2 = 0;
+    allocated = allocated * V9_EXPAND_CONST;
+    T* newArr = (T*) new char[allocated * sizeof(T)];
+    T* newStart = newArr + ((allocated - size) / 2);
+    
+    for(int i = 0; i < insertionIndex; i++)
+    {
+      newStart[i] = start[i];
+    }
+    newStart[insertionIndex] = a;
+    for(int i = insertionIndex; i < size; i++)
+    {
+      newStart[i + 1] = start[i];
+    }
+    
+    size++;
+    
+    delete[] data;
+    data = newArr;
+    start = newStart;
   }
   else
   {
-    w2 = updates->indices[updates->firstOverHalf - 1] + 1;
+    //safe only because size < allocated
+    if((insertionIndex < size / 2 && start > data) || 
+       (start + size == data + allocated))
+    {
+      start--;
+      for(int i = 0; i < insertionIndex; i++)
+      {
+        start[i] = start[i+1];
+      }
+      start[insertionIndex] = a;
+    }
+    else
+    {
+      for(int i = size; i > insertionIndex; i--)
+      {
+        start[i] = start[i-1];
+      }
+      start[insertionIndex] = a;
+    }
+    size++;
   }
   
-  if(updates->firstOverHalf == 0)
-  {
-    w1 = 0;
-  }
-  else
-  {
-    w1 = updates->indices[0];
-  }
-  
+  updatesHandled++;
   updatesAcknowledged++;
-  
-  currUpdates++;
-  if(updates->size == V7_MAX_UPDATES)
-    flush(1);
-  
-  #ifdef V7_DEBUG
-  totalUpdates++;
-  #endif
+  if(*targetUpdates - updatesHandled >= V9_SWITCH_POINT)
+  {
+    cout<<"V7"<<endl;
+    mode = V9_V7MODE;
+  }
 }
 
-template <class T> void CustomArrayV7<T>::del(int idx)
+template <class T> void CustomArrayV9<T>::del(int idx)
 {
-  updates->del(idx, size);
-  //int64_t iuh = updates->iuh;
-  iuh = updates->iuh;
-  //iuhAndStart = (iuh << 32) | (iuhAndStart & V7_32B);
-  
-  if(updates->firstOverHalf == updates->size)
+  if(mode == V9_V7MODE)
   {
-    w3 = size;
+    updates->del(idx, size);
+    iuh = updates->iuh;
+    
+    if(updates->firstOverHalf == updates->size)
+    {
+      w3 = size;
+    }
+    else
+    {
+      w3 = updates->indices[updates->firstOverHalf];
+    }
+    
+    if(updates->firstOverHalf == 0)
+    {
+      w2 = 0;
+    }
+    else
+    {
+      w2 = updates->indices[updates->firstOverHalf - 1] + 1;
+    }
+    
+    if(updates->firstOverHalf == 0)
+    {
+      w1 = 0;
+    }
+    else
+    {
+      w1 = updates->indices[0];
+    }
+    
+    updatesAcknowledged++;
+    
+    currUpdates++;
+    if(updates->size == V9_MAX_UPDATES)
+      flush(1);
+    
+    #ifdef V9_DEBUG
+    totalUpdates++;
+    #endif
+    return;
+  }
+  
+  if(idx < size / 2)
+  {
+    for(int i = idx; i > 0; i--)
+    {
+      start[i] = start[i-1];
+    }
+    start++;
   }
   else
   {
-    w3 = updates->indices[updates->firstOverHalf];
+    for(int i = idx; i < size - 1; i++)
+    {
+      start[i] = start[i+1];
+    }
   }
   
-  if(updates->firstOverHalf == 0)
+  size--;
+  
+  if(size < allocated / (V9_EXPAND_CONST * V9_EXPAND_CONST))
   {
-    w2 = 0;
-  }
-  else
-  {
-    w2 = updates->indices[updates->firstOverHalf - 1] + 1;
+    allocated = allocated / V9_EXPAND_CONST;
+    T *newArr = (T*) new char[allocated * sizeof(T)];
+    T *newStart = newArr + ((allocated - size) / 2);
+    
+    for(int i = 0; i < size; i++)
+    {
+      newStart[i] = start[i];
+    }
+    
+    delete[] data;
+    data = newArr;
+    start = newStart;
   }
   
-  if(updates->firstOverHalf == 0)
-  {
-    w1 = 0;
-  }
-  else
-  {
-    w1 = updates->indices[0];
-  }
-  
+  updatesHandled++;
   updatesAcknowledged++;
-  
-  currUpdates++;
-  if(updates->size == V7_MAX_UPDATES)
-    flush(1);
-  
-  #ifdef V7_DEBUG
-  totalUpdates++;
-  #endif
+  if(*targetUpdates - updatesHandled >= V9_SWITCH_POINT)
+  {
+    cout<<"V7"<<endl;
+    mode = V9_V7MODE;
+  }
 }
 
 //here's hoping this gets optimized out
-template <class T> void CustomArrayV7<T>::flush()
+template <class T> inline void CustomArrayV9<T>::flush()
 {
   flush(0);
 }
 
 template <class T> void 
-  CustomArrayV7<T>::flush(int cause)
+  CustomArrayV9<T>::flush(int cause)
 {
+  if(mode == V9_V4MODE)
+  {
+    return;
+  }
+  
   if(updates->size == 0)
   {
     updatesHandled += currUpdates;
@@ -150,7 +264,7 @@ template <class T> void
     return;
   }
   
-  #ifdef V7_DEBUG
+  #ifdef V9_DEBUG
   maxFlushed = (maxFlushed < updates->size ? updates->size : maxFlushed);
   timesFlushed[cause]++;
   #endif
@@ -183,8 +297,6 @@ template <class T> void
   int incUnderHalf = 2*insertsUnderHalf - updatesUnderHalf;
   int incAfterHalf = 2*insertsAfterHalf - updatesAfterHalf;
   
-  //T *start = data + (iuhAndStart & V7_32B);
-  
   bool newlyAllocate = 
           (incUnderHalf > 0 && start - incUnderHalf <= data) ||
           (start + size + incAfterHalf >= data + allocated);
@@ -195,7 +307,7 @@ template <class T> void
   {
     while(newlyAllocate)
     {
-      allocated = allocated * V7_EXPAND_CONST;
+      allocated = allocated * V9_EXPAND_CONST;
       newlyAllocate = 
          (incUnderHalf > 0 && ((allocated - size) / 2) < incUnderHalf) ||
          (((allocated - size) / 2) + size + incAfterHalf >= allocated);
@@ -390,7 +502,6 @@ template <class T> void
           }
         }
       }
-      
       while(inBuffer > 0)
       {
         newStart[writeIdx] = buffer[bufferStart];
@@ -413,8 +524,6 @@ template <class T> void
     
     size += incUnderHalf + incAfterHalf;
     handyLock.lock();
-    //int64_t iuh = iuhAndStart >> 32;
-    //iuhAndStart = (iuhAndStart & V7_32B) - ((int64_t) incUnderHalf);
     start = newStart;
     iuh = 0;
     w0 = 0;
@@ -428,14 +537,18 @@ template <class T> void
   
   updatesHandled += currUpdates;
   currUpdates = 0;
+  
+  if(*targetUpdates - updatesHandled < V9_SWITCH_POINT)
+  {
+    cout<<"V4"<<endl;
+    mode = V9_V4MODE;
+  }
 }
 
-template <class T> T CustomArrayV7<T>::lookup(int idx)
+template <class T> T CustomArrayV9<T>::lookup(int idx)
 {
-  //int64_t start = iuhAndStart & V7_32B;
   if(mainHasLock)
   {
-    //int64_t iuh = iuhAndStart >> 32;
     if(!(idx < w1)) //either idx < w0 or w2 <= idx < w3
     {
       idx -= iuh;
@@ -450,7 +563,7 @@ template <class T> T CustomArrayV7<T>::lookup(int idx)
   return ret;
 }
 
-template <class T> inline bool CustomArrayV7<T>::ready(int numUpdates,
+template <class T> inline bool CustomArrayV9<T>::ready(int numUpdates,
                                                        int idx)
 {
   if(numUpdates != updatesAcknowledged)
@@ -460,6 +573,10 @@ template <class T> inline bool CustomArrayV7<T>::ready(int numUpdates,
   if(numUpdates == updatesHandled)
   {
     return true;
+  }
+  if(mode == V9_V4MODE)
+  {
+    return false;
   }
   
   if(!mainHasLock)

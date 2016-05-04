@@ -1,26 +1,32 @@
 #include "updates.h"
 #include "arrays/array.h"
-#include <mutex>
 
-/* This is version V6 with pointers to available lookup content
+/* This is version is a V4-V7 combo
  */
 
-#ifndef __custom_v7_h__
-#define __custom_v7_h__
+#ifndef __custom_v9_h__
+#define __custom_v9_h__
 
-#define V7_EXPAND_CONST 2
+#define V9_EXPAND_CONST 2
 
-//#define V7_DEBUG
+//#define V9_DEBUG
 
-#define V7_MAX_UPDATES 2000
+#define V9_MAX_UPDATES 2000
+#define V9_SWITCH_POINT 40
 
-template <class T> class CustomArrayV7 : public Array<T>
+#define V9_V4MODE 0
+#define V9_V7MODE 1
+
+template <class T> class CustomArrayV9 : public Array<T>
 {
   protected:
   int allocated;
   int size;
   T *data;
   T *start;
+  
+  int mode;
+  int *targetUpdates;
   
   Updates<T> *updates;
   T *buffer;
@@ -37,16 +43,16 @@ template <class T> class CustomArrayV7 : public Array<T>
   //^^^ params identifying the "window" of available lookups
   //0 <---> w1e, w2i <---> w3e
   
-  #ifdef V7_DEBUG
+  #ifdef V9_DEBUG
   long totalUpdates;
   long timesFlushed[2];
   long maxFlushed;
   #endif
   
   public:
-  CustomArrayV7(bool (*c)(T a, T b));
+  CustomArrayV9(bool (*c)(T a, T b), int *tU);
   
-  ~CustomArrayV7();
+  ~CustomArrayV9();
   
   void ins(T a);
   void del(int idx);
@@ -56,6 +62,6 @@ template <class T> class CustomArrayV7 : public Array<T>
   inline bool ready(int numUpdates, int idx);
 };
 
-#include "custom_v7.tpp"
+#include "custom_v9.tpp"
 
 #endif
