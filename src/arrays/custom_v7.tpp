@@ -17,9 +17,10 @@ template <class T> CustomArrayV7<T>::CustomArrayV7(bool (*c)(T a, T b))
   buffer = (T*) new char[(V7_MAX_UPDATES + 1) * sizeof(T)];
   
   currUpdates = updatesHandled = 0;
+  mainHasLock = false;
   
   updatesAcknowledged = 0;
-  w1 = w2 = w3 = 0;
+  w0 = w1 = w2 = w3 = 0;
   
   #ifdef V7_DEBUG
   totalUpdates = maxFlushed = 0;
@@ -229,14 +230,15 @@ template <class T> void
       readIdx++;
     }
     
-    iuhAndStartLock.lock();
+    handyLock.lock();
     delete[] data;
     data = newArr;
     iuhAndStart = s;
-    iuhAndStartLock.unlock();
+    w0 = 0;
     w1 = size / 2;
     w2 = size / 2;
     w3 = size;
+    handyLock.unlock();
   }
   else
   {
@@ -258,16 +260,22 @@ template <class T> void
       inBuffer = 0;
       bufferStart = 0;
       
-      readIdx = 0;
       writeIdx = 0;
+      readIdx = 0;
       newStart = start - incUnderHalf;
       
-      while(readIdx < bufferSize && readIdx < size)
+      int i = 0;
+      while(i < bufferSize && readIdx < size)
       {
-        buffer[readIdx] = start[readIdx];
+        buffer[i] = start[readIdx];
         readIdx++;
+        i++;
       }
-      inBuffer = readIdx;
+      inBuffer = i;
+      
+      handyLock.lock();
+      w1 = 0;
+      handyLock.unlock();
       
       for(int i = 0; i < numUpdates; i++)
       {
@@ -275,6 +283,7 @@ template <class T> void
         {
           newStart[writeIdx] = buffer[bufferStart];
           writeIdx++;
+          w0++;
           inBuffer--;
           bufferStart++;
           if(bufferStart == bufferSize)
@@ -292,6 +301,7 @@ template <class T> void
         {
           newStart[writeIdx] = updates->values[i];
           writeIdx++;
+          w0++;
         }
         else
         {
@@ -397,13 +407,14 @@ template <class T> void
     }
     
     size += incUnderHalf + incAfterHalf;
-    iuhAndStartLock.lock();
+    handyLock.lock();
     int64_t iuh = iuhAndStart >> 32;
     iuhAndStart = (iuhAndStart & V7_32B) - ((int64_t) incUnderHalf);
-    iuhAndStartLock.unlock();
+    w0 = 0;
     w1 = size / 2;
     w2 = size / 2;
     w3 = size;
+    handyLock.unlock();
   }
   
   updates->empty();
@@ -416,21 +427,36 @@ template <class T> void
 //after being copied.
 template <class T> T CustomArrayV7<T>::lookup(int idx)
 {
-  iuhAndStartLock.lock();
   int64_t iuh = iuhAndStart >> 32;
   int64_t start = iuhAndStart & V7_32B;
-  if(idx < w1)
+  if(mainHasLock)
   {
-    //cout<<"far"<<endl;
+    if(idx < w1)
+    {
+      //cout<<"w1"<<endl;
+    }
+    else //either idx < w0 or w2 <= idx < w3
+    {
+      //if(idx < w0)
+      //  cout<<"w0"<<endl;
+      //else
+      //  cout<<"w2"<<endl;
+      idx -= iuh;
+      //if(iuh != 0)
+      //  cout<<"an iuh lookup!"<<endl;
+    }
+  }
+  T ret = data[start + idx];
+  if(mainHasLock)
+  {
+    //cout<<"Yolanda."<<endl;
+    handyLock.unlock();
+    mainHasLock = false;
   }
   else
   {
-    idx -= iuh;
-    //if(iuh != 0)
-    //  cout<<"an iuh lookup!"<<endl;
+    //cout<<"Mahershalalhashbaz"<<endl;
   }
-  T ret = data[start + idx];
-  iuhAndStartLock.unlock();
   return ret;
 }
 
@@ -442,8 +468,24 @@ template <class T> inline bool CustomArrayV7<T>::ready(int numUpdates,
     return false;
   }
   if(numUpdates == updatesHandled)
+  {
     return true;
+  }
+  
+  if(!mainHasLock)
+  {
+    handyLock.lock();
+    mainHasLock = true;
+  }
   
   int64_t iuh = iuhAndStart >> 32;
-  return (idx < w1 && false) || ((idx - iuh) >= w2 && (idx - iuh) < w3);
+  bool ret = (idx < w1) || 
+             (idx - iuh < w0) ||
+             ((idx - iuh) >= w2 && (idx - iuh) < w3);
+  if(!ret)
+  {
+    handyLock.unlock();
+    mainHasLock = false;
+  }
+  return ret;
 }
