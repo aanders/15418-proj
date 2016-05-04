@@ -7,7 +7,7 @@
 //#define DEBUG
 
 IntRunner::IntRunner(std::ifstream& tracefile)
-      : Runner(tracefile, {"SortedCollection trial", "RedBlackTree trial"})
+      : Runner(tracefile, {"RedBlackTree trial", "SortedCollection trial"})
 {
   collection_ = new SortedCollection<int>(&comp);
   tree_ = new RBTree<int>(&comp);
@@ -25,7 +25,7 @@ void IntRunner::runop(std::string op, std::string data)
     if (op.compare("i") == 0)
     {
       int elt = std::stoi(data);
-      if (this->trial_no_ == 0)
+      if (this->trial_no_ == 1)
       {
         collection_->ins(elt);
       }
@@ -44,7 +44,7 @@ void IntRunner::runop(std::string op, std::string data)
         int idx = std::stoi(data.substr(0,n));
         int ref = std::stoi(data.substr(n+1));
         int elt;
-        if (this->trial_no_ == 0)
+        if (this->trial_no_ == 1)
         {
           elt = collection_->lookup(idx);
         }
@@ -70,7 +70,7 @@ void IntRunner::runop(std::string op, std::string data)
     else if (op.compare("d") == 0)
     {
       int idx = std::stoi(data);
-      if (this->trial_no_ == 0)
+      if (this->trial_no_ == 1)
       {
         collection_->del(idx);
       }
@@ -103,7 +103,7 @@ void IntRunner::runop(std::string op, std::string data)
 
 void IntRunner::cleanup()
 {
-  if (this->trial_no_ == 0)
+  if (this->trial_no_ == 1)
   {
     // Remove the sortedCollection so it doesn't get in the
     // way of the reference timing
