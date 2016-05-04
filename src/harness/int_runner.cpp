@@ -7,7 +7,7 @@
 //#define DEBUG
 
 IntRunner::IntRunner(std::ifstream& tracefile)
-      : Runner(tracefile, {"RedBlackTree trial", "SortedCollection trial"})
+      : Runner(tracefile, {"Cache loading", "SortedCollection timing", "RedBlackTree reference"})
 {
   collection_ = new SortedCollection<int>(&comp);
   tree_ = new RBTree<int>(&comp);
@@ -103,6 +103,12 @@ void IntRunner::runop(std::string op, std::string data)
 
 void IntRunner::cleanup()
 {
+  if (this->trial_no_ == 0)
+  {
+    // Remove the tree we used for prepping the cache
+    delete tree_;
+    tree_ = new RBTree<int>(&comp);
+  }
   if (this->trial_no_ == 1)
   {
     // Remove the sortedCollection so it doesn't get in the
@@ -114,5 +120,5 @@ void IntRunner::cleanup()
 
 void IntRunner::run()
 {
-  Runner::run(2);
+  Runner::run(3);
 }
