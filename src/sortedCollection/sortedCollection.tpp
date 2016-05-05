@@ -19,7 +19,7 @@
 /*
  * CHANGE THIS DEFINITION TO ALTER THE INTERNAL ARRAY VERSION
  */
-#define ARRAY_VERSION 8
+#define ARRAY_VERSION 9
 
 template <class T> void *arrayThread(void *sc)
 {
@@ -137,15 +137,12 @@ template <class T> bool SortedCollection<T>::lookupElt(T val)
 
 template <class T> void *SortedCollection<T>::handleUpdatesArray()
 {
-  //int numHandled = 0;
   Update<T> u;
   while(true)
   {
     while(!arrayUpdates.remove(&u)) 
     {
       array->flush();
-      //numAUpdates += numHandled;
-      //numHandled = 0;
       atReady.notify_all();
       aReady.notify_all();
     }
@@ -161,8 +158,6 @@ template <class T> void *SortedCollection<T>::handleUpdatesArray()
     {
       return NULL;
     }
-    
-    //numHandled++;
   }
   return NULL;
 }
