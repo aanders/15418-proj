@@ -1,7 +1,7 @@
 #include "queue.h"
 
-#ifndef __queue_cpp__
-#define __queue_cpp__
+#ifndef __queue_tpp__
+#define __queue_tpp__
 
 //This code almost verbatum from lecture slides.
 
