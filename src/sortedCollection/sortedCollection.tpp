@@ -15,6 +15,12 @@
 #include <pthread.h>
 #include <mutex>
 
+
+/*
+ * CHANGE THIS DEFINITION TO ALTER THE INTERNAL ARRAY VERSION
+ */
+#define ARRAY_VERSION 8
+
 template <class T> void *arrayThread(void *sc)
 {
   return ((SortedCollection<T>*) sc)->handleUpdatesArray();
@@ -33,7 +39,20 @@ template <class T> SortedCollection<T>::SortedCollection(
   servicedFromTree = servicedFromArray = 0;
   numTimesWaitedOnLookup = 0;
    
-  array = new CustomArrayV9<T>(comp , &numUpdates);
+#if ARRAY_VERSION == 9
+  array = new CustomArrayV9<T>(comp, &numUpdates);
+#elif ARRAY_VERSION == 8
+  array = new CustomArrayV8<T>(comp, &numUpdates);
+#elif ARRAY_VERSION == 7
+  array = new CustomArrayV7<T>(comp);
+#elif ARRAY_VERSION == 6
+  array = new CustomArrayV6<T>(comp);
+#elif ARRAY_VERSION == 5
+  array = new CustomArrayV5<T>(comp);
+#elif ARRAY_VERSION == 4
+  array = new CustomArrayV4<T>(comp);
+#endif
+
   tree = new RBTree<T>(comp);
   aUpdatesWait = std::unique_lock<std::mutex>(aUpdatesMutex);
   tUpdatesWait = std::unique_lock<std::mutex>(tUpdatesMutex);

@@ -45,7 +45,7 @@ data_t<T> mkalldata(int i, T dd)
 template <class T>
 MemRunner<T>::MemRunner(std::ifstream& tracefile, bool (*c)(T a, T b))
       : comp(c), tracefile_(tracefile),
-        trialNames({"SortedCollection trial", "RedBlackTree trial"}),
+        trialNames({"Cache loading", "SortedCollection timing", "RedBlackTree reference"}),
         operations(OPERATION_MAPPING)
 {
   collection_ = new SortedCollection<T>(c);
@@ -85,7 +85,15 @@ template <class T> void MemRunner<T>::init() {}
 
 template <class T> void MemRunner<T>::cleanup()
 {
-  if (this->trial_no_ == 0)
+
+  if (trial_no_ == 0)
+  {
+    // Remove the tree we used for prepping the cache
+    // Remove the tree we used for prepping the cache
+    delete tree_;
+    tree_ = new RBTree<T>(comp);
+  }
+  if (trial_no_ == 1)
   {
     // Remove the sortedCollection so it doesn't get in the
     // way of the reference timing
@@ -97,7 +105,7 @@ template <class T> void MemRunner<T>::cleanup()
 template <class T>
 void MemRunner<T>::run_insert(unsigned int trial_no, T elt)
 {
-  if (trial_no == 0)
+  if (trial_no == 1)
   {
     collection_->ins(elt);
   }
@@ -114,7 +122,7 @@ template <class T>
 T MemRunner<T>::run_lookup(unsigned int trial_no, int idx)
 {
   T elt;
-  if (trial_no == 0)
+  if (trial_no == 1)
   {
     elt = collection_->lookup(idx);
   }
@@ -133,7 +141,7 @@ T MemRunner<T>::run_lookup(unsigned int trial_no, int idx)
 template <class T>
 void MemRunner<T>::run_delete(unsigned int trial_no, int idx)
 {
-  if (trial_no == 0)
+  if (trial_no == 1)
   {
     collection_->del(idx);
   }
