@@ -15,24 +15,12 @@ LENGTHS=( "16000" "64000" "128000" "512000" "1024000" "2048000" )
 # Main generator script
 #
 
-TRACEDIR=traces
+TRACEDIR=traces/all-tests
 COUNTER=0
 
-function usage() {
-    echo "usage: $0 <output-dir>"
-    echo "  <output-dir> : subdirectory to be created under the main traces/"
-    echo "                 directory, which will hold the generated traces"
-    echo "                 The program will exit with an error if <output-dir>"
-    echo "                 already exists."
-    echo ""
-}
-
-if [[ $# < 1 ]] ; then
-    usage
-    exit 1
-fi
-
-mkdir -p $TRACEDIR/$1
+for l in "${LENGTHS[@]}"; do
+    mkdir -p ${TRACEDIR}-$(($l/1000))k
+done
 
 TOTAL=$((${#LENGTHS[@]}*${#BIASES[@]}*${#DELAYS[@]}))
 for l in "${LENGTHS[@]}"; do
@@ -40,7 +28,7 @@ for l in "${LENGTHS[@]}"; do
         for d in "${DELAYS[@]}"; do
             paramset="-l $l -b $b -d $d -t int -s $(($d/10))"
             name="$((l/1000))k-int-${d}-tight-$b.trace"
-            outfile=$TRACEDIR/$1/$name
+            outfile=${TRACEDIR}-$((l/1000))k/$name
             COUNTER=$(($COUNTER + 1))
             echo ""
             echo -e "\033[1mGenerating trace $COUNTER/$TOTAL\033[0m"
