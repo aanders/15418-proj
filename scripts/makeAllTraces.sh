@@ -32,12 +32,7 @@ if [[ $# < 1 ]] ; then
     exit 1
 fi
 
-if [ -d $TRACEDIR/$1 ] ; then
-    echo "Output destination $TRACEDIR/$1 already exists!  Aborting."
-    exit 2
-else
-    mkdir -p $TRACEDIR/$1
-fi
+mkdir -p $TRACEDIR/$1
 
 TOTAL=$((${#LENGTHS[@]}*${#BIASES[@]}*${#DELAYS[@]}))
 for l in "${LENGTHS[@]}"; do
@@ -45,10 +40,15 @@ for l in "${LENGTHS[@]}"; do
         for d in "${DELAYS[@]}"; do
             paramset="-l $l -b $b -d $d -t int -s $(($d/10))"
             name="$((l/1000))k-int-${d}-tight-$b.trace"
+            outfile=$TRACEDIR/$1/$name
             COUNTER=$(($COUNTER + 1))
             echo ""
             echo -e "\033[1mGenerating trace $COUNTER/$TOTAL\033[0m"
-            scripts/tracegen.py $paramset \> $TRACEDIR/$1/$name
+            if [ -e $outfile ] ; then
+                echo "  Skipping trace generation: file $outfile exists"
+            else
+                scripts/tracegen.py $paramset > $outfile
+            fi
         done
     done
 done
