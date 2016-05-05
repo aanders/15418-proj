@@ -13,17 +13,17 @@ BEGIN { matching = 0; }
     sub("s","",$8)
     if (matching) { printf $8"," }
 }
-/insert/ {
+/insert time/ {
     sub("ms","",$5)
     if (matching) { printf $5"," }
 }
 
-/lookup/ {
+/lookup time/ {
     sub("ms","",$5)
     if (matching) { printf $5"," }
 }
 
-/delete/ {
+/delete time/ {
     sub("ms","",$5)
     if (matching == 1) { printf $5"," }
     if (matching == 2) { print $5 }
