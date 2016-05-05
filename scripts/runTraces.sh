@@ -21,7 +21,7 @@ if [ ! -d $TRACEDIR/$1 ] ; then
     echo "error: $TRACEDIR/$1 is not a directory"
 fi
 
-for tracefile in $( ls $TRACEDIR/$1/*.trace ) ; do
+for tracefile in $( ls $TRACEDIR/$1/*.trace | sort -t- -k5n -k7r) ; do
   if [[ $# < 2 ]] ; then
     echo "Running trace: $tracefile"
     ./sortedCollection $tracefile
