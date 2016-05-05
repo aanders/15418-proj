@@ -288,7 +288,7 @@ template <class T> void
           {
             bufferStart = 0;
           }
-          if(readIdx >= 0)
+          if(readIdx < size)
           {
             buffer[(bufferStart + inBuffer) % bufferSize] = start[readIdx];
             inBuffer++;
