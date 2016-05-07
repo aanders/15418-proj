@@ -11,6 +11,9 @@ sortedCollection
 *.trace
 traces/
 
+# and result files
+results/
+
 # Provide a place for bookkeeping files that shouldn't be tracked
 scratch/
 
