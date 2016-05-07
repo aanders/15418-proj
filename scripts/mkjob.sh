@@ -82,7 +82,7 @@ mkdir -p $RESULTDIR
 
 tracelen=$(echo $traceset | cut -d- -f3)
 resultFilePrefix=v$ver-$runner-$tracelen
-mostRecentTrial=$(find $RUNNER -name $resultFilePrefix-*.csv -printf "%f\n" | cut -d- -f4 | cut -d. -f1)
+mostRecentTrial=$(find $RUNNER -name $resultFilePrefix-*.csv -printf "%f\n" | cut -d- -f4 | cut -d. -f1 | sort -nr | head -n 1)
 if [ -z "$mostRecentTrial" ]; then
     trial=1
 else
