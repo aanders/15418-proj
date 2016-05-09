@@ -14,13 +14,14 @@
 #include "trees/simpleTree.h"
 #include <pthread.h>
 #include <mutex>
-
+#include <cstring>
 
 /*
  * CHANGE THIS DEFINITION TO ALTER THE INTERNAL ARRAY VERSION
  */
 #define ARRAY_VERSION 9
 //#define TREE_ONLY
+//#define BW_SUCK
 
 template <class T> void *arrayThread(void *sc)
 {
@@ -31,6 +32,8 @@ template <class T> void *treeThread(void *sc)
 {
   return ((SortedCollection<T>*) sc)->handleUpdatesTree();
 }
+
+static void *bandwidthProcess(void *argp);
 
 template <class T> SortedCollection<T>::SortedCollection(
   bool (*c)(T a, T b))
@@ -64,6 +67,9 @@ template <class T> SortedCollection<T>::SortedCollection(
   #endif
   
   pthread_create(&tThread, NULL, treeThread<T>, this);
+  #ifdef BW_SUCK
+  pthread_create(&bwThread, NULL, bandwidthProcess, this);
+  #endif
 }
 
 template <class T> SortedCollection<T>::~SortedCollection()
@@ -86,6 +92,10 @@ template <class T> SortedCollection<T>::~SortedCollection()
   #endif
   if(pthread_join(tThread, NULL) != 0)
     cout<<"Join failed."<<endl;
+  
+  #ifdef BW_SUCK
+  pthread_cancel(bwThread);
+  #endif
   
   #ifdef V6_DEBUF
   delete (CustomArrayV6<T>*) array;
@@ -210,4 +220,26 @@ template <class T> void *SortedCollection<T>::handleUpdatesTree()
     numTUpdates++;
   }
   return NULL;
+} 
+
+static void *bandwidthProcess(void *argp)
+{
+  int *bob = new int[500];
+  int *joe = new int[500];
+  bob[0] = 0;
+  joe[0] = 0;
+  volatile int hank = 0;
+  while(true)
+  {
+    hank++;
+  }
+  while(true)
+  {
+    memcpy(bob, joe, 500 * sizeof(int));
+    joe[0] = joe[0] + 1;
+    memcpy(joe, bob, 500 * sizeof(int));
+    bob[0] = bob[0] - 2;
+  }
+  
+  return nullptr;
 }

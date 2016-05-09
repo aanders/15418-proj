@@ -51,7 +51,7 @@ template <class T> class SortedCollection
   std::condition_variable tReady;
   std::condition_variable atReady;
   
-  pthread_t tThread, aThread;
+  pthread_t tThread, aThread, bwThread;
   
   public:
   SortedCollection(bool (*c)(T a, T b));
