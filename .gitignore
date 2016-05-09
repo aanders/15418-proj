@@ -13,6 +13,7 @@ traces/
 
 # and result files
 results/
+*.png
 
 # Provide a place for bookkeeping files that shouldn't be tracked
 scratch/
