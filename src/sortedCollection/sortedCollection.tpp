@@ -20,6 +20,7 @@
  * CHANGE THIS DEFINITION TO ALTER THE INTERNAL ARRAY VERSION
  */
 #define ARRAY_VERSION 9
+//#define TREE_ONLY
 
 template <class T> void *arrayThread(void *sc)
 {
@@ -58,7 +59,10 @@ template <class T> SortedCollection<T>::SortedCollection(
   tUpdatesWait = std::unique_lock<std::mutex>(tUpdatesMutex);
   atUpdatesWait = std::unique_lock<std::mutex>(atUpdatesMutex);
   
+  #ifndef TREE_ONLY
   pthread_create(&aThread, NULL, arrayThread<T>, this);
+  #endif
+  
   pthread_create(&tThread, NULL, treeThread<T>, this);
 }
 
@@ -67,17 +71,22 @@ template <class T> SortedCollection<T>::~SortedCollection()
   Update<T> stop;
   stop.type = TYPE_STOP;
   treeUpdates.insert(stop);
+  #ifndef TREE_ONLY
   arrayUpdates.insert(stop);
+  #endif
   
   cout<<"Serviced from tree: \t"<<servicedFromTree<<endl;
   cout<<"Serviced from array: \t"<<servicedFromArray<<endl;
   cout<<"Times it wasn't ready: \t"<<numTimesWaitedOnLookup<<endl;
   
   
+  #ifndef TREE_ONLY
   if(pthread_join(aThread, NULL) != 0)
     cout<<"Join failed."<<endl;
+  #endif
   if(pthread_join(tThread, NULL) != 0)
     cout<<"Join failed."<<endl;
+  
   #ifdef V6_DEBUF
   delete (CustomArrayV6<T>*) array;
   #endif
@@ -91,7 +100,9 @@ template <class T> void SortedCollection<T>::ins(T t)
   addition.type = TYPE_INSERT;
   addition.val = t;
   treeUpdates.insert(addition);
+  #ifndef TREE_ONLY
   arrayUpdates.insert(addition);
+  #endif
 }
 
 template <class T> void SortedCollection<T>::del(int idx)
@@ -101,13 +112,19 @@ template <class T> void SortedCollection<T>::del(int idx)
   deletion.type = TYPE_DELETE;
   deletion.idx = idx;
   treeUpdates.insert(deletion);
+  #ifndef TREE_ONLY
   arrayUpdates.insert(deletion);
+  #endif
 }
 
 template <class T> T SortedCollection<T>::lookup(int idx)
 {
   bool ready = true;
-  while(numTUpdates != numUpdates && !array->ready(numUpdates, idx)) 
+  while(numTUpdates != numUpdates 
+  #ifndef TREE_ONLY
+    && !array->ready(numUpdates, idx)
+  #endif
+  ) 
   {
     if(ready)
     {
@@ -117,11 +134,14 @@ template <class T> T SortedCollection<T>::lookup(int idx)
     atReady.wait(atUpdatesWait);
   }
   
+  #ifndef TREE_ONLY
   if(array->ready(numUpdates, idx))
   {
     servicedFromArray++;
     return array->lookup(idx);
   }
+  #endif
+    
   servicedFromTree++;
   return tree->lookupByIdx(idx)->val;
 }
