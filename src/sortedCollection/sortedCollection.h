@@ -30,6 +30,7 @@ template <class T> class SortedCollection
   RBTree<T> *tree;
   Queue< Update<T> > treeUpdates;
   Queue< Update<T> > arrayUpdates;
+  Queue< Update<T> > allUpdates;
   
   long servicedFromTree;
   long servicedFromArray;
@@ -51,7 +52,7 @@ template <class T> class SortedCollection
   std::condition_variable tReady;
   std::condition_variable atReady;
   
-  pthread_t tThread, aThread, bwThread;
+  pthread_t tThread, aThread, bwThread, usThread;
   
   public:
   SortedCollection(bool (*c)(T a, T b));
@@ -64,6 +65,7 @@ template <class T> class SortedCollection
   
   void *handleUpdatesArray();
   void *handleUpdatesTree();
+  void *updateSplitter();
 };
 
 #include "sortedCollection.tpp"

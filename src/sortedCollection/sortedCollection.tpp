@@ -15,6 +15,7 @@
 #include <pthread.h>
 #include <mutex>
 #include <cstring>
+#include <sched.h>
 
 /*
  * CHANGE THIS DEFINITION TO ALTER THE INTERNAL ARRAY VERSION
@@ -22,6 +23,7 @@
 #define ARRAY_VERSION 9
 //#define TREE_ONLY
 //#define BW_SUCK
+//#define UPDATE_SPLIT
 
 template <class T> void *arrayThread(void *sc)
 {
@@ -31,6 +33,11 @@ template <class T> void *arrayThread(void *sc)
 template <class T> void *treeThread(void *sc)
 {
   return ((SortedCollection<T>*) sc)->handleUpdatesTree();
+}
+
+template <class T> void *splitterThread(void *sc)
+{
+  return ((SortedCollection<T>*) sc)->updateSplitter();
 }
 
 static void *bandwidthProcess(void *argp);
@@ -70,21 +77,28 @@ template <class T> SortedCollection<T>::SortedCollection(
   #ifdef BW_SUCK
   pthread_create(&bwThread, NULL, bandwidthProcess, this);
   #endif
+  #ifdef UPDATE_SPLIT
+  pthread_create(&usThread, NULL, splitterThread<T>, this);
+  #endif
 }
 
 template <class T> SortedCollection<T>::~SortedCollection()
 {
   Update<T> stop;
   stop.type = TYPE_STOP;
+  #ifndef UPDATE_SPLIT
   treeUpdates.insert(stop);
   #ifndef TREE_ONLY
   arrayUpdates.insert(stop);
+  #endif
+  #endif
+  #ifdef UPDATE_SPLIT
+  allUpdates.insert(stop);
   #endif
   
   cout<<"Serviced from tree: \t"<<servicedFromTree<<endl;
   cout<<"Serviced from array: \t"<<servicedFromArray<<endl;
   cout<<"Times it wasn't ready: \t"<<numTimesWaitedOnLookup<<endl;
-  
   
   #ifndef TREE_ONLY
   if(pthread_join(aThread, NULL) != 0)
@@ -92,6 +106,10 @@ template <class T> SortedCollection<T>::~SortedCollection()
   #endif
   if(pthread_join(tThread, NULL) != 0)
     cout<<"Join failed."<<endl;
+  #ifdef UPDATE_SPLIT
+  if(pthread_join(usThread, NULL) != 0)
+    cout<<"Join failed."<<endl;
+  #endif
   
   #ifdef BW_SUCK
   pthread_cancel(bwThread);
@@ -109,9 +127,14 @@ template <class T> void SortedCollection<T>::ins(T t)
   Update<T> addition;
   addition.type = TYPE_INSERT;
   addition.val = t;
+  #ifndef UPDATE_SPLIT
   treeUpdates.insert(addition);
   #ifndef TREE_ONLY
   arrayUpdates.insert(addition);
+  #endif
+  #endif
+  #ifdef UPDATE_SPLIT
+  allUpdates.insert(addition);
   #endif
 }
 
@@ -121,9 +144,14 @@ template <class T> void SortedCollection<T>::del(int idx)
   Update<T> deletion;
   deletion.type = TYPE_DELETE;
   deletion.idx = idx;
+  #ifndef UPDATE_SPLIT
   treeUpdates.insert(deletion);
   #ifndef TREE_ONLY
   arrayUpdates.insert(deletion);
+  #endif
+  #endif
+  #ifdef UPDATE_SPLIT
+  allUpdates.insert(deletion);
   #endif
 }
 
@@ -220,7 +248,22 @@ template <class T> void *SortedCollection<T>::handleUpdatesTree()
     numTUpdates++;
   }
   return NULL;
-} 
+}
+
+template <class T> void *SortedCollection<T>::updateSplitter()
+{
+  Update<T> u;
+  while(true)
+  {
+    while(!allUpdates.remove(&u)) {sched_yield();}
+    treeUpdates.insert(u);
+    arrayUpdates.insert(u);
+    if(u.type == TYPE_STOP)
+      break;
+  }
+  
+  return NULL;
+}
 
 static void *bandwidthProcess(void *argp)
 {
