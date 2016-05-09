@@ -115,6 +115,7 @@ ylabel('Total time in data structure ops (ms)');
 xlabel('Trace length (10^3 instructions)');
 grid on;
 
+suptitle('Data Structure Ops (Time)')
 %% [V9 Mem 1ms] INSERT time vs Trace Len for Trace Bias
 figure;
 subplot(2,2,1);
@@ -162,6 +163,7 @@ ylabel('Avg insert time (ms)');
 xlabel('Trace length (10^3 instructions)');
 grid on;
 
+suptitle('Average Insert Time')
 %% [V9 Mem 1ms] LOOKUP time vs Trace Len for Trace Bias
 figure;
 subplot(2,2,1);
@@ -209,6 +211,7 @@ ylabel('Avg lookup time (ms)');
 xlabel('Trace length (10^3 instructions)');
 grid on;
 
+suptitle('Average Lookup Time');
 %% [V9 Mem 1ms] DELETE time vs Trace Len for Trace Bias
 figure;
 subplot(2,2,1);
@@ -256,6 +259,7 @@ ylabel('Avg delete time (ms)');
 xlabel('Trace length (10^3 instructions)');
 grid on;
 
+suptitle('Average Delete Time');
 %% V8 vs V9 (Op time vs Trace Len per Trace Bias)
 figure;
 subplot(2,2,1);
