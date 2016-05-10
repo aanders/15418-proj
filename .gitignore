@@ -1,0 +1,58 @@
+###############################
+# 15418-proj .gitignore rules #
+###############################
+
+# Executable
+sortedCollection
+# but don't ignore the sortedCollection directory
+!sortedCollection/
+
+# Ignore trace files
+*.trace
+traces/
+
+# and result files
+results/
+*.png
+
+# Provide a place for bookkeeping files that shouldn't be tracked
+scratch/
+
+# tags file
+tags
+
+# VIM swap files
+*.swp
+
+#######################################
+# Default GitHub C++ .gitignore rules #
+#######################################
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
